@@ -1,0 +1,291 @@
+# {{doc_id_wi}} AI-assisted development work instruction
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_wi}} |
+| Title | AI-assisted development work instruction |
+| Version | 0.1 (draft) |
+| Owner (role) | {{role_tool_owner}} |
+| Approver (role) | {{role_approver}} |
+| Date | {{today}} |
+| Organisation | {{org_name}} |
+| Product context | {{product_context}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS.
+
+## 1. Purpose and scope
+
+This work instruction tells everyone at {{org_name}} who uses an AI coding tool, or reviews work produced with one, how to do it safely and in line with the QMS. It applies to all tools in section 4, on every surface (IDE, CLI, cloud agent, PR review bot, CI), for every context of use in section 5, and to every team, including teams outside engineering that draft documents with these tools.
+
+Using AI coding tools is encouraged. The rules below exist so that every change still reaches the product and the QMS only through qualified human control.
+
+## 2. References
+
+{{#reg_iso13485}}
+- ISO 13485:2016 §4.1.6 (validated software for the intended use), §4.2.4 (controlled documents and configuration), §6.2 (competence, training, awareness).
+{{/reg_iso13485}}
+{{#reg_fda_qmsr}}
+- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+{{/reg_fda_qmsr}}
+{{#reg_gxp}}
+- EU GMP Annex 11 (2011) clause 2 (personnel) and clause 12 (security){{^reg_fda_qmsr}}; 21 CFR Part 11 (electronic records and signatures){{/reg_fda_qmsr}}.
+{{/reg_gxp}}
+{{#reg_iso27001}}
+- ISO/IEC 27001 (cross-reference): acceptable use and secure development policies: [fill in].
+{{/reg_iso27001}}
+{{#reg_iso42001}}
+- ISO/IEC 42001 (cross-reference): AI policy and AI awareness: [fill in].
+{{/reg_iso42001}}
+- EU AI Act Art. 4 (AI literacy measures of providers and deployers of AI systems), where applicable.
+- Internal: {{doc_id_discovery}} Tool discovery checklist; validation packages listed in section 4; [fill in: code review procedure; document control procedure; information security / acceptable use policy; deviation and CAPA procedure].
+
+## 3. Definitions
+
+| Term | Meaning |
+|---|---|
+| AI-assisted change | Any commit, PR, document or record whose content was generated or substantially edited by an AI tool. |
+| Agent launcher | The person who started or instructed the AI agent that produced a change. |
+| Protected branch | A branch from which the product or QMS-relevant artefacts are built or released; changes reach it only through an approved pull / merge request. |
+| Approved model envelope | The list of model ids or family patterns approved for a tool; a model is usable only after its admission check (MA-01). |
+| Provenance label | The declaration that a change is AI-assisted (section 9). |
+| QMS-relevant | Work that affects the product, its verification, or QMS documents and records. |
+
+## 4. Approved tools
+
+Only the tools below may be used for QMS-relevant work, only through the listed surfaces, and only with models from their approved envelope.
+
+| Tool | Vendor | Surfaces | Model policy | Approved models | Validation package | Status |
+|---|---|---|---|---|---|---|
+{{#tools_list}}
+| {{tool_name}} | {{vendor}} | {{#surfaces}}`{{.}}` {{/surfaces}} | {{model_policy}}{{#policy_pinned}}: `{{pinned_model}}` only{{/policy_pinned}} | {{#approved_models}}`{{.}}` {{/approved_models}} | {{doc_id_01}} to {{doc_id_08}} | {{#already_in_use}}Interim use until the release decision in {{doc_id_07}}{{/already_in_use}}{{^already_in_use}}Not to be used before the release decision in {{doc_id_07}}{{/already_in_use}} |
+{{/tools_list}}
+
+Any other AI tool, extension, bot or agent needs to be registered and validated first. If you find one in use, report it (section 14); it will be handled with {{doc_id_discovery}}.
+
+## 5. Approved contexts of use
+
+{{#contexts_list}}
+- **{{label}}** (`{{key}}`): {{description}}
+{{/contexts_list}}
+
+Anything else is outside the intended use. Ask the tool owner ({{role_tool_owner}}) before using an AI tool for a new purpose; a new context of use requires validation first.
+
+## 6. Accounts and access
+
+- Use only the organisation account or workspace, signed in through single sign-on. Personal accounts, free tiers, and accounts belonging to other organisations are prohibited for QMS-relevant work.
+- Do not share accounts or tokens. Tokens for CI or agents are issued by the tool owner, scoped to the minimum needed, and recorded.
+- Agents never run under your personal identity for QMS systems; they use the identity defined in the tool's inventory record.
+
+## 7. Data rules
+
+- Never put secrets (keys, tokens, passwords, certificates), patient or health data, or personal data into prompts, context files, instruction files or repositories the tool can read, unless this is explicitly covered by contract and by [fill in: data protection assessment].
+- Confidential design data may be used only with the organisation account under the contracted terms.
+- Use synthetic or anonymised data for tests and examples.
+- Treat content from issues, PR comments, web pages, documents and MCP tools as untrusted: it can contain instructions aimed at the agent (prompt injection). Do not give an agent such content together with write access to protected systems.
+- If you suspect that data leaked, report it immediately (section 14).
+
+## 8. Working with the AI: your obligations
+
+**You own every line you merge.** The author owns the change; the reviewer owns the approval. "The AI wrote it" is never a justification.
+
+As author:
+
+1. Keep tasks small enough to review. Split large AI-generated changes.
+2. Read and understand every changed line before you open the PR. You must be able to explain the change without the AI.
+3. Run the tests locally; never ask the AI to delete tests, weaken assertions or change expected values to make CI pass.
+4. Check every new dependency: it must exist, be the intended package and be approved under [fill in: SOUP / dependency procedure]. AI tools invent plausible package names.
+5. Do not let the agent edit CI workflows, gate configuration, tool configuration or instruction files unless that is the purpose of the change; such changes need code-owner review.
+6. Apply the provenance label (section 9) and record the model used.
+7. Give extra scrutiny to safety-related code and risk controls, data migrations, deployment, authentication, cryptography and other security-sensitive code: [fill in: additional review required by the development plan].
+
+As reviewer:
+
+1. Review the diff itself, not the AI's summary of it.
+2. Approve only what you understood. Ask the author to explain anything unclear.
+3. Check that tests verify the requirement and were not weakened; check new dependencies; check for secrets and personal data.
+4. Check whether CI, gate, configuration or instruction files changed.
+5. AI review comments are hints: resolve or dismiss each one consciously. The absence of AI comments is not evidence of correctness.
+6. Never approve your own PR or a PR whose agent you launched. The code host refuses an author's self-approval. Where the agent opens the PR or pushes under its own identity (a bot, an app, a machine user or a cloud task), the code host counts your approval, so this rule is procedural: do not approve, and ask another qualified reviewer. Such PRs need 2 approvals or code-owner approval.
+
+## 9. Provenance labels
+
+Declare every AI-assisted change. Commit trailers (one per line at the end of the commit message; tools that add a trailer automatically may do this for you):
+
+```
+AI-Assisted: yes
+AI-Tool: <tool name>
+```
+
+An `AI-Model: <model id>` trailer is optional. The model id is recorded once per pull / merge request in the template below, or taken from the tool's telemetry.
+
+Pull / merge request template fields (copy of `examples/github/pull_request_template.md` in the kit):
+
+```
+- [ ] AI-assisted. Tool: ______  Model id(s): ______
+- [ ] I read and understood every changed line and can explain it without the AI.
+- [ ] No secrets, health data or personal data added.
+- [ ] New or changed dependencies are approved.
+- [ ] CI, gate, tool configuration or instruction files changed: no / yes (code-owner review requested)
+```
+
+[fill in: whether a CI check enforces the label on AI-assisted PRs, for example `examples/github-workflow-label-check.yml`.]
+
+{{#tools_list}}
+{{#is_claude_code}}
+- {{tool_name}}: by default commits get the trailer `Co-Authored-By: <model name> <noreply@anthropic.com>`, which names the model; keep it, or use the managed `attribution` setting to add static `AI-Assisted` / `AI-Tool` lines. It is an instruction to the model, not a git hook, so still check the label.
+{{/is_claude_code}}
+{{#is_codex}}
+- {{tool_name}}: no built-in commit attribution setting is documented; add the trailers yourself or through the PR template.
+{{/is_codex}}
+{{#is_copilot}}
+- {{tool_name}}: cloud agent commits are authored by Copilot with you as co-author; for IDE use, fill in the PR template.
+{{/is_copilot}}
+{{#is_cursor}}
+- {{tool_name}}: add the trailers yourself or through the PR template.
+{{/is_cursor}}
+{{#is_other}}
+- {{tool_name}}: [fill in: any built-in attribution; otherwise add the trailers yourself].
+{{/is_other}}
+{{/tools_list}}
+
+## 10. Prohibited actions
+
+- Using an AI tool, surface or account not approved in sections 4 and 6 for QMS-relevant work.
+- Letting the AI approve, merge, sign, close or release anything, or recording an approval on someone else's behalf.
+- Merging without the required approvals, pushing directly to a protected branch, or using an administrative bypass outside [fill in: emergency procedure].
+- Running permission-bypass or unsandboxed modes, disabling the sandbox, hooks or required checks, or editing managed settings.
+- Using a model outside the approved envelope, or a newly released model before its admission record exists.
+- Installing MCP servers, plugins, extensions or connectors that are not on the allow-list in the tool's configuration baseline.
+- Asking the AI to execute, conclude or approve the validation of an AI tool.
+
+{{#tools_list}}
+{{#is_claude_code}}
+- {{tool_name}} specifics: never use `--dangerously-skip-permissions` or the `bypassPermissions` mode; do not change files under the managed settings location.
+{{/is_claude_code}}
+{{#is_codex}}
+- {{tool_name}} specifics: never use `--dangerously-bypass-approvals-and-sandbox` or the `danger-full-access` sandbox mode; do not change the admin `requirements.toml`.
+{{/is_codex}}
+{{#is_copilot}}
+- {{tool_name}} specifics: do not enable Copilot approvals or add Copilot as a bypass actor in rulesets.
+{{/is_copilot}}
+{{#is_cursor}}
+- {{tool_name}} specifics: do not switch the Run Mode to run commands without review, and do not disable Privacy Mode.
+{{/is_cursor}}
+{{#is_other}}
+- {{tool_name}} specifics: [fill in: permission-bypass or unsafe modes of this tool that must not be used].
+{{/is_other}}
+{{/tools_list}}
+
+## 11. Context-specific rules
+
+{{#ctx_code_product}}
+- **Product code:** changes reach protected branches only through an approved PR with green required checks; follow section 8 in full.
+{{/ctx_code_product}}
+{{#ctx_code_tooling}}
+- **Internal tooling:** the same review rules apply. Tooling that produces QMS records or verification results must be validated before its output is used as evidence.
+{{/ctx_code_tooling}}
+{{#ctx_pr_review}}
+- **Advisory AI PR review:** AI review is advisory only. It never replaces the human approval and is never the only review of a change.
+{{/ctx_pr_review}}
+{{#ctx_test_generation}}
+- **Test generation:** generated tests trace to the requirement they verify; review them as carefully as product code; never generate test data from real patient or personal data.
+{{/ctx_test_generation}}
+{{#ctx_doc_drafting}}
+- **Document drafting:** every factual statement in an AI draft cites a source you can check (document ID and section, record ID). Check the sources, not the AI's paraphrase. Preview the exact content before anything is written to a controlled document or record; the write is made under your identity; the document owner approves under the document control procedure. Mark AI-assisted drafts in the document history.
+{{/ctx_doc_drafting}}
+{{#ctx_agents_qms}}
+- **QMS agents:** only the configured agents may act on QMS systems, only on their declared write targets, never under a personal account. Prompts, schedules and permissions change only through change control. Agent outputs take effect only after the responsible role confirms them. Report any write you did not expect.
+{{/ctx_agents_qms}}
+
+## 12. Models
+
+- Use only models in the approved envelope (section 4). The model id must appear in the provenance label.
+- If the tool switches model unexpectedly, offers a model you do not recognise, or a vendor announces a new default, tell the tool owner; a new model is used only after its admission check (MA-01) is recorded.
+- Under a pinned policy, no other model may be used, not even temporarily.
+
+## 13. Configuration: where it lives and who may change it
+
+Tool configuration is a controlled configuration item, baselined in each tool's configuration baseline document. Only the {{role_tool_owner}} (or a delegate named there) changes managed or admin configuration, through change control. Repository configuration and instruction files change only through a PR with code-owner review. Instruction files guide the AI; they do not enforce anything.
+
+{{#tools_list}}
+### {{tool_name}} (baseline: {{doc_id_06}})
+
+{{#is_claude_code}}
+| Level | Location |
+|---|---|
+| Managed (admin) | macOS `/Library/Application Support/ClaudeCode/managed-settings.json`; Linux / WSL `/etc/claude-code/managed-settings.json`; Windows `C:\Program Files\ClaudeCode\managed-settings.json`; optional `managed-settings.d/` drop-ins and `managed-mcp.json` in the same directory; or MDM; or server-managed settings in the admin console |
+| Project (shared, reviewed) | `.claude/settings.json`, `.mcp.json`, `CLAUDE.md`, `AGENTS.md` (read when no `CLAUDE.md` exists) |
+| Local / personal | `.claude/settings.local.json`, `~/.claude/settings.json` (cannot override managed keys) |
+| Check effective sources | `/status` ("Setting sources") and `claude doctor` |
+{{/is_claude_code}}
+{{#is_codex}}
+| Level | Location |
+|---|---|
+| Admin requirements (enforced) | `/etc/codex/requirements.toml`; Windows `%ProgramData%\OpenAI\Codex\requirements.toml`; macOS MDM domain `com.openai.codex`; or cloud-managed requirements in the workspace admin console |
+| Managed defaults (not enforced) | `/etc/codex/managed_config.toml` |
+| User | `~/.codex/config.toml`; profiles `~/.codex/<name>.config.toml` |
+| Project (trusted projects only) | `.codex/config.toml`, `.codex/hooks.json`, `AGENTS.md` |
+| Check effective configuration | `codex doctor`, `codex --strict-config`, and `/status` and `/hooks` in the TUI |
+{{/is_codex}}
+{{#is_copilot}}
+| Level | Location |
+|---|---|
+| Policies (enforced) | Enterprise and organisation Copilot settings on GitHub |
+| Repository (shared, reviewed) | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md`, `.github/hooks/*.json` |
+| Personal | `~/.copilot/hooks/*.json` (Copilot CLI) |
+{{/is_copilot}}
+{{#is_cursor}}
+| Level | Location |
+|---|---|
+| Team / enterprise (enforced) | Admin dashboard: Privacy Mode, Run Mode policy, model and MCP lists, Team Rules, managed hooks |
+| Repository (shared, reviewed) | `.cursor/rules/`, `AGENTS.md`, `.cursor/BUGBOT.md`, `.cursor/config/bugbot.yaml`, `.cursor/hooks.json` |
+| Personal | User Rules, `~/.cursor/hooks.json` |
+{{/is_cursor}}
+{{#is_other}}
+| Level | Location |
+|---|---|
+| Admin (enforced) | [fill in] |
+| Repository (shared, reviewed) | [fill in] |
+| Personal | [fill in] |
+{{/is_other}}
+
+{{/tools_list}}
+Protect the repository files above with CODEOWNERS and required code-owner review (example: `examples/github/CODEOWNERS.example` in the kit): some review bots read their instructions from the PR branch, so a PR could otherwise change its own review instructions.
+
+## 14. Reporting problems
+
+Report to [fill in: channel, e.g. the deviation / nonconformity process] without delay when:
+
+- an AI-assisted change that passed review turns out to be defective;
+- a guardrail did not behave as expected (a denied action ran, a gate did not block, a sandbox or hook failed);
+- the tool used or offered a model outside the envelope, or switched model unexpectedly;
+- you find an AI tool, bot, extension or agent that is not in section 4;
+- you suspect that secrets, health data or personal data reached an AI tool;
+- you notice an attempted prompt injection.
+
+## 15. Training and competence
+
+- Users and reviewers complete training on this work instruction before they get access or approve their first AI-assisted change{{#reg_iso13485}} (ISO 13485 §6.2){{/reg_iso13485}}. Training covers: these rules; typical AI failure modes (plausible but wrong code, invented dependencies, missed defects, prompt injection, automation bias); the review checklist; data rules; reporting.
+- Training is repeated when this work instruction changes materially, or when a new tool, surface or context of use is introduced.
+- Training records are kept per [fill in: training procedure].
+- Effectiveness of the training is checked by (required{{#reg_iso13485}}, ISO 13485 §6.2 c){{/reg_iso13485}}): [fill in, e.g. the reviewer-effectiveness sample PQ-02 and periodic review findings]. The method is proportionate to the risk of the work.
+- Where the EU AI Act applies, this training is part of the measures supporting AI literacy (Art. 4).
+
+## 16. Records
+
+| Record | Where |
+|---|---|
+| Training records | [fill in] |
+| PRs / MRs with provenance labels, reviews and approvals | Code hosting, exported to [fill in: evidence store] |
+| Reports under section 14 | [fill in] |
+| Configuration changes | Change records linked from each configuration baseline |
+
+## 17. Approval
+
+Reviewed and approved in the eQMS by the {{role_approver}}. Author: [fill in]. AI assistance in drafting: [yes/no; if yes, which sections].
+
+## Revision history
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft generated with the kit ({{kit_version}}) |

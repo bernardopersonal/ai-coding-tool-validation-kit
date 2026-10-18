@@ -1,0 +1,73 @@
+# OpenAI Codex: example DEFAULTS for a validated state.
+#
+# Use as ~/.codex/config.toml (user), /etc/codex/config.toml (system) or as
+# managed defaults. These are defaults: users can override them during a run.
+# The admin-enforced counterpart is requirements.example.toml.
+# Keys checked against the Codex CLI 0.163.0 configuration schema on
+# 2026-10-18. Explanations: README.md in this folder.
+#
+# Top-level keys must come before the first [table] header in TOML.
+
+# Model: a default only (an explicit --model, --config or --profile wins).
+# Record and monitor the model actually used; never hard-code it in templates.
+# model = "<approved model id>"
+
+approval_policy = "on-request"      # "on-request" or "never"; "untrusted" is retired
+approvals_reviewer = "user"          # a person decides escalations
+sandbox_mode = "workspace-write"     # do not mix with permission profiles
+web_search = "disabled"              # or "cached"; treat web results as untrusted
+
+# Set to false only when updates are rolled out centrally (validated version).
+check_for_update_on_startup = false
+
+# Organisation sign-in only (must agree with allowed_login_methods and
+# allowed_chatgpt_workspaces in requirements). Replace the workspace id.
+forced_login_method = "chatgpt"
+forced_chatgpt_workspace_id = "00000000-0000-0000-0000-000000000000"
+
+[sandbox_workspace_write]
+writable_roots = []
+network_access = false
+exclude_tmpdir_env_var = false
+exclude_slash_tmp = false
+
+[shell_environment_policy]
+# "all" keeps the variables builds and tests need (JAVA_HOME, VIRTUAL_ENV,
+# NODE_OPTIONS, proxy and CA settings). "core" strips them and breaks
+# common toolchains; use it only on runners whose environment you control.
+inherit = "all"
+# Default is true, which passes variables named *KEY*, *SECRET*, *TOKEN*
+# to spawned commands. false strips them.
+ignore_default_excludes = false
+
+# Further exclusions on top of the default ones. Filters cannot be combined
+# with the legacy exclude / include_only arrays in the same layer. Prove the
+# result with the environment canary in OQ-08.
+[shell_environment_policy.filters]
+"AWS_*" = "exclude"
+"*PASSWORD*" = "exclude"
+"*CREDENTIAL*" = "exclude"
+
+[history]
+persistence = "save-all"             # or "none"; align with your retention decision
+
+[analytics]
+enabled = false
+
+[feedback]
+enabled = false
+
+# Telemetry to your own collector (ignored in project-local config).
+# An OTLP exporter must be a table with endpoint and protocol.
+[otel]
+environment = "prod"
+log_user_prompt = false
+
+[otel.exporter.otlp-http]
+endpoint = "https://otel.example.com/v1/logs"
+protocol = "binary"
+
+# Trust is recorded per repository path. Untrusted projects skip project
+# config, hooks, rules and project AGENTS.md.
+[projects."/abs/path/to/validated-repo"]
+trust_level = "trusted"

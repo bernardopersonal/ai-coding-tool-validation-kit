@@ -1,0 +1,177 @@
+# Export the review record of every merged pull request as a build artifact.
+#
+# Evidence for OQ-01 and PQ-01 (REQ-01, REQ-02, REQ-05) of the AI Coding Tool
+# Validation Kit. Copy this file to .github/workflows/ in each repository in scope.
+#
+# What it exports, per merged PR (GitHub REST API, version header 2022-11-28):
+#   pull.json            the pull request (author, merged_at, merged_by, head/base SHA)
+#   reviews.jsonl        every review (user.login, user.type, state, commit_id, submitted_at)
+#   commits.jsonl        the commits of the PR (incl. AI attribution trailers)
+#   timeline.jsonl       timeline events (review requests, dismissals, pushes, merge)
+#   check-runs.jsonl     every check run on the head commit (paginated)
+#   status.json          combined commit status (legacy statuses of external CI)
+#   statuses.jsonl       every commit status on the head commit (paginated)
+#   effective-rules.json ruleset rules in force on the base branch
+#   summary.json / .md   qualifying human approval: yes / no, with the head-commit
+#                        rule when the ruleset requires last-push approval (same
+#                        rule as checks/check_github_gates.py)
+#   gates/               optional: output of checks/check_github_gates.py for the PR
+#                        when the script is copied to .github/scripts/
+#   SHA256SUMS           SHA-256 of every exported file
+#
+# Retention: artifacts and logs are kept only for the repository's artifact and log
+# retention period (default 90 days; public repositories 1-90 days, private and
+# internal up to 400). From 2026-10-01 the same period also applies to check runs,
+# workflow runs and commit statuses, so the checks shown on old PRs disappear too.
+# Set the repository variable EVIDENCE_RETENTION_DAYS to the maximum your plan
+# allows (private and internal repositories: 400) and, better, push the evidence
+# automatically to a controlled store (an evidence repository, a bucket or the
+# eQMS API; see the commented step at the end). The artifact store is not the
+# record.
+#
+# The job fails (red) when a merged PR has no qualifying human approval. A red run
+# after a merge is a signal for QA: open a deviation and assess the change.
+#
+# Security notes:
+#   - Triggered by pull_request (closed), never pull_request_target: no PR code is
+#     checked out or executed, and the token is read-only.
+#   - Pin actions to a full commit SHA in a validated workflow and record it in the
+#     configuration baseline.
+
+name: PR review evidence export
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  checks: read
+  statuses: read
+
+jobs:
+  export:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Export review record
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          dir="evidence/pr-${PR}"
+          mkdir -p "$dir"
+          api() { gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$@"; }
+          api "repos/${REPO}/pulls/${PR}" > "$dir/pull.json"
+          api --paginate "repos/${REPO}/pulls/${PR}/reviews" --jq '.[] | tojson' > "$dir/reviews.jsonl"
+          api --paginate "repos/${REPO}/pulls/${PR}/commits" --jq '.[] | tojson' > "$dir/commits.jsonl"
+          api --paginate "repos/${REPO}/issues/${PR}/timeline" --jq '.[] | tojson' > "$dir/timeline.jsonl"
+          api --paginate "repos/${REPO}/commits/${HEAD_SHA}/check-runs" --jq '.check_runs[] | tojson' > "$dir/check-runs.jsonl"
+          api "repos/${REPO}/commits/${HEAD_SHA}/status" > "$dir/status.json"
+          api --paginate "repos/${REPO}/commits/${HEAD_SHA}/statuses" --jq '.[] | tojson' > "$dir/statuses.jsonl"
+          api "repos/${REPO}/rules/branches/${BASE_REF}" > "$dir/effective-rules.json" \
+            || echo '{"error": "effective rules not readable with this token"}' > "$dir/effective-rules.json"
+
+      - name: Evaluate approvals
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          python3 - <<'PY'
+          import datetime, json, os, sys
+          d = "evidence/pr-%s" % os.environ["PR"]
+          pr = json.load(open(os.path.join(d, "pull.json")))
+          reviews = [json.loads(l) for l in open(os.path.join(d, "reviews.jsonl")) if l.strip()]
+          def ts(v):
+              return datetime.datetime.strptime(v, "%Y-%m-%dT%H:%M:%SZ") if v else None
+          author = (pr.get("user") or {}).get("login", "")
+          merged_at = ts(pr.get("merged_at"))
+          head = (pr.get("head") or {}).get("sha")
+          # head-commit rule: required when a ruleset asks for last-push approval
+          require_head = False
+          try:
+              rules = json.load(open(os.path.join(d, "effective-rules.json")))
+              require_head = any(r.get("type") == "pull_request" and
+                                 (r.get("parameters") or {}).get("require_last_push_approval")
+                                 for r in rules if isinstance(r, dict))
+          except (OSError, ValueError, AttributeError, TypeError):
+              require_head = False
+          latest, bots = {}, []
+          for r in sorted(reviews, key=lambda r: r.get("submitted_at") or ""):
+              when, user = ts(r.get("submitted_at")), r.get("user") or {}
+              if when is None or (merged_at and when > merged_at):
+                  continue
+              human = user.get("type") == "User" and not str(user.get("login", "")).endswith("[bot]")
+              if r.get("state") == "APPROVED" and not human:
+                  bots.append(user.get("login"))
+              if r.get("state") in ("APPROVED", "CHANGES_REQUESTED", "DISMISSED"):
+                  latest[(user.get("login") or "").lower()] = (r, human)
+          qualifying = [{"login": r["user"]["login"], "submitted_at": r["submitted_at"],
+                         "on_head_commit": r.get("commit_id") == head}
+                        for login, (r, human) in latest.items()
+                        if r.get("state") == "APPROVED" and human and login != author.lower()
+                        and (not require_head or r.get("commit_id") == head)]
+          summary = {"pr": pr.get("number"), "author": author, "merged_at": pr.get("merged_at"),
+                     "merged_by": (pr.get("merged_by") or {}).get("login"), "head_sha": head,
+                     "qualifying_human_approvals": qualifying,
+                     "non_human_approvals": sorted(set(bots)),
+                     "head_commit_approval_required": require_head,
+                     "result": "pass" if qualifying else "fail"}
+          json.dump(summary, open(os.path.join(d, "summary.json"), "w"), indent=2)
+          lines = ["## Review evidence for PR #%s" % summary["pr"], "",
+                   "- Result: **%s**" % summary["result"].upper(),
+                   "- Author: %s; merged by: %s at %s" % (author, summary["merged_by"], summary["merged_at"]),
+                   "- Qualifying human approvals: %s" % (", ".join(
+                       "%s%s" % (q["login"], "" if q["on_head_commit"] else " (older commit)")
+                       for q in qualifying) or "none"),
+                   "- Non-human approvals (not counted): %s" % (", ".join(summary["non_human_approvals"]) or "none"),
+                   ""]
+          open(os.path.join(d, "summary.md"), "w").write("\n".join(lines))
+          if os.environ.get("GITHUB_STEP_SUMMARY"):
+              open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(lines))
+          if not qualifying:
+              print("::error::PR #%s was merged without a qualifying human approval" % summary["pr"])
+              sys.exit(1)
+          PY
+
+      - name: Gate check with the kit script (optional)
+        if: hashFiles('.github/scripts/check_github_gates.py') != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          python3 .github/scripts/check_github_gates.py --repo "$REPO" --pr "$PR" \
+            --operator "github-actions (${GITHUB_ACTOR})" --out "evidence/pr-${PR}/gates"
+
+      - name: Hash the evidence
+        if: always()
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          cd "evidence/pr-${PR}"
+          find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS || true
+          cat SHA256SUMS
+
+      - name: Upload evidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4  # pin to a full commit SHA in a validated workflow
+        with:
+          name: review-evidence-pr-${{ github.event.pull_request.number }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: ${{ vars.EVIDENCE_RETENTION_DAYS || 90 }}
+
+      # Push to a controlled evidence store (example: a dedicated evidence repository
+      # written with a deploy key that only this workflow can use). Adapt and enable:
+      # - name: Archive to the evidence store
+      #   env:
+      #     EVIDENCE_DEPLOY_KEY: ${{ secrets.EVIDENCE_DEPLOY_KEY }}
+      #   run: |
+      #     ...clone the evidence repository, copy evidence/pr-<n>/, commit, push...

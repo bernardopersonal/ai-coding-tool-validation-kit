@@ -1,0 +1,438 @@
+# {{doc_id_06}} Configuration baseline: {{tool_name}}
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_06}} |
+| Title | Configuration baseline |
+| Organisation | {{org_name}} |
+| Tool / vendor | {{tool_name}} / {{vendor}} |
+| Configuration owner (role) | {{role_tool_owner}} |
+| Approved by (role) | {{role_approver}} |
+| Rendered | {{today}} (kit {{kit_version}}) |
+
+Related documents: {{doc_id_05}} Test protocol (IQ-03 verifies this baseline) · {{doc_id_08}} Change and revalidation (how this baseline changes) · {{doc_id_wi}} Work instruction · {{doc_id_gates}} Code-host gate qualification.
+
+## 1. Purpose
+
+This record is the approved, versioned configuration of {{tool_name}} at {{org_name}} (owner: {{role_tool_owner}}). It separates **configuration** (versionable, baselined, change-controlled: settings, permission rules, sandbox, hooks, MCP servers, instruction files, model envelope, code-host gates) from **behaviour** (variable: models can change without a version change, so behaviour is covered by monitoring, the model admission check MA-01 and periodic re-tests in {{doc_id_08}}).
+
+The binding controls live server-side (code host and CI). The tool's local configuration is defence in depth and is recorded here so that drift can be detected.
+
+Regulatory anchors:
+{{#reg_iso13485}}
+- ISO 13485:2016 §4.1.6 (validated state maintained after changes), §4.2.4 (agent configuration and instruction files are controlled items), §4.2.5 (records).
+{{/reg_iso13485}}
+{{#reg_fda_qmsr}}
+- 21 CFR Part 820 (QMSR), which incorporates ISO 13485:2016 by reference (§820.10). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+{{/reg_fda_qmsr}}
+{{#ctx_code_product}}
+- IEC 62304: tools and settings used to develop the software are supporting items under configuration control (§5.1.10, §8.1).
+{{/ctx_code_product}}
+{{#reg_gxp}}
+- EU GMP Annex 11 §10 (change and configuration management){{^reg_fda_qmsr}}; 21 CFR Part 11 for configuration records kept electronically{{/reg_fda_qmsr}}.
+{{/reg_gxp}}
+
+## 2. How to fill in this record
+
+1. The {{role_tool_owner}} writes the **approved value** of every item before IQ-03.
+2. The executor of IQ-03 captures the **effective value**:
+{{#is_claude_code}}
+   - run `python3 checks/capture_baseline.py --tool claude_code --repo <path-to-repo> --operator "<name>" --out evidence/{{tool_id}}/IQ-03/` on each reference machine and runner, and copy the values and file hashes from its output;
+{{/is_claude_code}}
+{{#is_codex}}
+   - run `python3 checks/capture_baseline.py --tool codex --repo <path-to-repo> --operator "<name>" --out evidence/{{tool_id}}/IQ-03/` on each reference machine and runner, and copy the values and file hashes from its output;
+{{/is_codex}}
+{{#is_copilot}}
+   - the capture script does not cover this tool: export or screenshot each setting below and hash every file;
+{{/is_copilot}}
+{{#is_cursor}}
+   - the capture script does not cover this tool: export or screenshot each setting below and hash every file;
+{{/is_cursor}}
+{{#is_other}}
+   - the capture script does not cover this tool: export or screenshot each setting below and hash every file;
+{{/is_other}}
+   - fill the manual fields (admin console, code host) from exports, or from dated screenshots when no export exists.
+3. Mark each row Match / No match. A "No match" is a deviation in {{doc_id_05}}.
+4. Any later change to an approved value follows {{doc_id_08}} and produces a new baseline revision; earlier revisions are kept.
+
+## 3. Baseline identification
+
+| Field | Value |
+|---|---|
+| Baseline ID / revision | {{tool_id}}-BL-__ / rev __ |
+| Capture date (UTC) | |
+| Captured by (name) | |
+| Capture method | capture script (version ___) / manual |
+| Evidence files and SHA-256 | |
+| Machines / runners captured | |
+| Supersedes revision | |
+| Change record that created this revision | |
+
+## 4. Versions per surface
+
+| Surface | Validated version(s) ({{doc_id_04}} section 3.1) | Effective version | Install method and update control | Evidence | Match |
+|---|---|---|---|---|---|
+{{#surfaces_list}}
+| {{label}} | | | | | |
+{{/surfaces_list}}
+
+{{#is_claude_code}}
+Record the output of `claude --version` and the "Auto-updates" line of `claude doctor`. Update control is set in managed settings (`requiredMinimumVersion` / `requiredMaximumVersion` set to the validated versions, `autoUpdatesChannel`, or `DISABLE_UPDATES` in `env`). Installs through a package manager need their own version pinning: Homebrew, for example, ignores the update channel key, and a version outside the managed range then refuses to start. For the GitHub Action record the pinned commit SHA (`v1` is a moving tag).
+{{/is_claude_code}}
+{{#is_codex}}
+Record the output of `codex --version`. Update control: `check_for_update_on_startup` (enforceable from requirements). Installs through a package manager need their own version pinning. For `openai/codex-action` record the pinned tag or SHA and the explicit `codex-version` input.
+{{/is_codex}}
+{{#is_copilot}}
+Record the IDE extension and Copilot CLI versions where used (display method per the vendor's current documentation). Vendor-hosted surfaces (code review, cloud agent) are recorded as "vendor-hosted" with the date.
+{{/is_copilot}}
+{{#is_cursor}}
+Record the client version as shown by the application. Vendor-hosted surfaces (Bugbot, Cloud Agents) are recorded as "vendor-hosted" with the date.
+{{/is_cursor}}
+{{#is_other}}
+Record the version with the method documented by {{vendor}}.
+{{/is_other}}
+
+## 5. Account, workspace and identity
+
+| Item | Approved value | Effective value | Evidence | Match |
+|---|---|---|---|---|
+| Plan / contract tier | | | | |
+| Organisation / workspace identifier | | | | |
+| SSO enforced (identity provider) | | | | |
+| Client login enforcement (method, organisation pin) | | | | |
+| Owners / admins of the vendor console (names) | | | | |
+| Seat list export (date, count, all trained) | | | | |
+| Personal accounts prohibited for QMS work | yes | | | |
+| CI / automation credentials (owner, scope, storage) | | | | |
+| Agent / bot identities (from IQ-04) | | | | |
+
+## 6. Permission mode and approval policy
+
+| Item | Approved value | Effective value | Source (managed / project / user) | Match |
+|---|---|---|---|---|
+| Starting permission / approval mode | | | | |
+| Modes that are disabled | | | | |
+| Who decides escalated approvals (human only) | | | | |
+| Mode used in CI / headless invocations | | | | |
+| Lower scopes may add permission rules (yes / no) | | | | |
+
+## 7. Allow, ask and deny rules
+
+| Rule | Type (allow / ask / deny / forbidden / prompt) | Source | Purpose / requirement | Known limitation |
+|---|---|---|---|---|
+| | | | | |
+| | | | | |
+
+## 8. Sandbox and network
+
+| Item | Approved value | Effective value | Source | Match |
+|---|---|---|---|---|
+| Sandbox enabled; fails closed if unavailable | | | | |
+| Unsandboxed retries allowed | | | | |
+| Writable paths beyond the workspace | | | | |
+| Read-denied paths (credentials, secrets) | | | | |
+| Network allowlist (domains) and who may extend it | | | | |
+| Secret environment variables stripped from subprocesses | | | | |
+| Cloud environment network level (if a cloud surface is used) | | | | |
+
+## 9. Hooks
+
+| Event | Matcher | Handler (command / URL) and SHA-256 | Source | Behaviour on failure (blocks / continues) | Purpose |
+|---|---|---|---|---|---|
+| | | | | | |
+
+Only managed hooks may run: yes / no (key and value): ______
+
+## 10. MCP servers, connectors and plugins
+
+| Name | Identity (command or URL) | Access (read / write) and scope | Approval mode for tool calls | Allowed by (managed / project / user) | Purpose |
+|---|---|---|---|---|---|
+| | | | | | |
+
+Only managed MCP servers may run: yes / no (key and value): ______
+
+## 11. Instruction files and hashes
+
+| Path | Scope (managed / user / repository) | SHA-256 | Commit | Protected by CODEOWNERS / code-owner review | Owner |
+|---|---|---|---|---|---|
+{{#is_claude_code}}
+| Managed `CLAUDE.md` (or managed `claudeMd` key) | managed | | | n/a | {{role_tool_owner}} |
+| `CLAUDE.md` / `CLAUDE.local.md` | repository / local | | | | |
+| `AGENTS.md` | repository | | | | |
+| `.claude/` directory (settings, hook scripts, skills, subagents) | repository | | | | |
+| `.mcp.json` | repository | | | | |
+{{/is_claude_code}}
+{{#is_codex}}
+| `AGENTS.md` / `AGENTS.override.md` in `CODEX_HOME` | user / managed image | | | n/a | |
+| `AGENTS.md` / `AGENTS.override.md` (project root down to working directory) | repository | | | | |
+| `.codex/config.toml`, `.codex/hooks.json`, `.codex/rules/` | repository | | | | |
+| Files named in `project_doc_fallback_filenames` | repository | | | | |
+{{/is_codex}}
+{{#is_copilot}}
+| `.github/copilot-instructions.md` | repository | | | | |
+| `.github/instructions/*.instructions.md` | repository | | | | |
+| `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` (agent instructions) | repository | | | | |
+| `.github/hooks/*.json` | repository | | | | |
+| `.github/skills/` | repository | | | | |
+{{/is_copilot}}
+{{#is_cursor}}
+| `.cursor/rules/` (Project Rules) | repository | | | | |
+| `AGENTS.md` | repository | | | | |
+| `.cursor/BUGBOT.md`, `.cursor/config/bugbot.yaml` | repository | | | | |
+| `.cursor/hooks.json` | repository | | | | |
+| Team Rules (dashboard export) | team | | n/a | n/a | |
+{{/is_cursor}}
+{{#is_other}}
+| Instruction / rules files used by {{tool_name}} | repository | | | | |
+{{/is_other}}
+| CI workflows that invoke AI tools | repository | | | | |
+| PR template (AI-assistance and model fields) | repository | | | | |
+| `CODEOWNERS` | repository | | | n/a | |
+
+Agent instruction files are guidance to the model, not enforcement. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of {{doc_id_08}}: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
+
+## 12. Approved models and model policy
+
+Model policy: **{{model_policy}}**.
+
+{{#policy_envelope}}
+Any model matching an entry below may be used, because its output is independently verified downstream (human review and CI). Each new model or model version passes MA-01 before use, and the model used is recorded per PR / session.
+{{/policy_envelope}}
+{{#policy_pinned}}
+Only the exact model `{{pinned_model}}` may be used, because the AI output itself counts as a control or as evidence. Any change requires the confirmatory OQ subset and MA-01 before use ({{doc_id_08}}).
+{{/policy_pinned}}
+
+| Envelope entry | Pre-authorised pattern ({{doc_id_04}} section 5.2) | Admitted ids in the enforced allow-list | Enforcement mechanism | MA-01 admission record | Date admitted |
+|---|---|---|---|---|---|
+{{#approved_models}}
+| `{{.}}` | | | | | |
+{{/approved_models}}
+
+The enforced allow-list holds admitted model ids only, never the pre-authorised patterns; an id is added after its admission record is approved.
+
+| Item | Approved value | Effective value | Match |
+|---|---|---|---|
+| Central model restriction available and enabled | | | |
+| Default / starting model | | | |
+| Fallback models (all inside the envelope) | | | |
+| How the model used is recorded (trailer, PR template, log, telemetry) | | | |
+
+{{#is_claude_code}}
+Keys: `availableModels` (the admitted exact ids), `enforceAvailableModels` true, `availableModelsMatch` `"exact"` (managed-only), `deniedModels` (managed-only, for known unadmitted ids), `model` (starting default only, not a lock), `fallbackModel`, `switchModelsOnFlag`. With the default prefix matching a listed id would also permit later versions, which would make a new model selectable before admission; the kit's glob patterns are notation for {{doc_id_04}} and {{doc_id_08}} only.
+{{/is_claude_code}}
+{{#is_codex}}
+No client-side model allowlist enforcement was verified: requirements `[models.new_thread]` only sets defaults, and explicit `--model`, `--config` or `--profile` overrides it. Unless the vendor's current documentation shows an enforcement key for your version, record "monitored, not enforced" and rely on recording (`codex.conversation_starts` telemetry, `codex exec --json`) plus PQ-01.
+{{/is_codex}}
+{{#is_copilot}}
+Record the enterprise / organisation model availability settings and the "Default availability for released models" policy (disable it or configure each model explicitly).
+{{/is_copilot}}
+{{#is_cursor}}
+Record the admin model allow / block list (models without zero data retention need admin sign-off); verify against the vendor's current documentation.
+{{/is_cursor}}
+{{#is_other}}
+Record whether {{vendor}} offers a central model restriction (verify against the vendor's current documentation); otherwise record "monitored, not enforced".
+{{/is_other}}
+
+## 13. Logging, telemetry and retention
+
+| Item | Approved value | Effective value | Match |
+|---|---|---|---|
+| Telemetry / audit export enabled, destination, set from a managed source | | | |
+| Prompt and response content logged (default redacted) | | | |
+| Local transcripts: location, retention, who can read them | | | |
+| Vendor-side logs / compliance export and their retention | | | |
+| Code-host audit log export or streaming | | | |
+| CI log, check and artifact retention (GitHub: since 2026-10-01 also checks and commit statuses; private repositories up to 400 days) | | | |
+| Evidence archived into the QMS (where, how often) | | | |
+
+## 14. Server-side controls (code host)
+
+{{#code_github}}
+Evidence: the output of `python3 checks/check_github_gates.py --repo OWNER/REPO --branch main --prs 20 --operator "<name>" --out evidence/{{tool_id}}/IQ-03/` plus the exports below, per repository.
+
+| Item | Approved value | Effective value (per repository) | Match |
+|---|---|---|---|
+| Required approving reviews (`required_approving_review_count`) | at least 1 | | |
+| Dismiss stale reviews on push | true | | |
+| Require approval of the most recent push (`require_last_push_approval`) | true | | |
+| Require code-owner review (agent instruction files and CI under CODEOWNERS) | true | | |
+| Admins included (`enforce_admins`) or no bypass actors | true | | |
+| Ruleset bypass actors and `bypass_mode` (no "exempt") | | | |
+| Required status checks, each pinned to its app (`app_id` / `integration_id`) | | | |
+| Force pushes and branch deletion blocked | true | | |
+| Actions may approve PRs (`can_approve_pull_request_reviews`, repository and organisation) | false | | |
+| Secret scanning push protection (`security_and_analysis`) | enabled | | |
+| Push-protection bypass / exemptions for bots and agents | none, or justified | | |
+| Actions log and check retention (`actions/permissions/artifact-and-log-retention`) | maximum allowed (400 days for private repositories), or check evidence exported on merge | | |
+| Agent-authored PRs (author is a bot or a machine user used by an agent) | 2 approvals, or code-owner approval by a human team | | |
+| Dependency / SOUP gate as a required check (`checks/soup_gate.py` or equivalent) | required, pinned to its app | | |
+| PR template with AI-assistance fields (`examples/github/pull_request_template.md`) | present | | |
+| AI features of the code host (for example Copilot code review approval settings), even if not the tool under validation | approvals not counted | | |
+
+Exports: `python3 checks/mirror_protection.py --from OWNER/REPO --operator "<name>" --out evidence/{{tool_id}}/IQ-03/` (export only, without `--to`), or `gh api repos/{owner}/{repo}/branches/main/protection`, `gh api "repos/{owner}/{repo}/rulesets?includes_parents=true"` and each ruleset by id, `gh api repos/{owner}/{repo}/rules/branches/main`, `gh api repos/{owner}/{repo}/actions/permissions/workflow`, `gh api orgs/{org}/actions/permissions/workflow`, `gh api repos/{owner}/{repo} --jq '.security_and_analysis'`. Ruleset history is limited to 180 days (and is an Enterprise Cloud feature), so keep each baseline export in the QMS.
+{{/code_github}}
+{{#code_gitlab}}
+| Item | Approved value | Effective value (per project) | Match |
+|---|---|---|---|
+| Author approval (`merge_requests_author_approval` / `allow_author_approval`) | false, locked | | |
+| Committer approval ("Prevent approvals by users who add commits", `merge_requests_disable_committers_approval`) | prevented, locked | | |
+| Reset approvals on push (`reset_approvals_on_push`) | true | | |
+| Overriding approvers per MR (`disable_overriding_approvers_per_merge_request`) | disabled | | |
+| Approval rules (`approval_rules`: approvals required, eligible approvers) | | | |
+| Re-authentication to approve (`require_reauthentication_to_approve`) | | | |
+| Protected branch: `push_access_levels`, `merge_access_levels`, `unprotect_access_levels`, `allow_force_push`, `code_owner_approval_required` | | | |
+| GitLab Duo review settings ("GitLab Duo can approve and request changes", automatic reviews, review on push) | decided and recorded | | |
+| Audit event saving / streaming | | | |
+
+Exports: `GET /projects/:id/approvals`, `GET /projects/:id/merge_request_approval_setting` (each value shows `value`, `locked`, `inherited_from`), `GET /projects/:id/approval_rules`, `GET /projects/:id/protected_branches/main`.
+{{/code_gitlab}}
+{{#code_other}}
+| Item | Approved value | Effective value (per repository) | Match |
+|---|---|---|---|
+| Required human approvals before merge | at least 1 | | |
+| Author and last-pusher approvals excluded | yes | | |
+| Approvals reset on new commits | yes | | |
+| Admin bypass prevented or logged | yes | | |
+| Bot / app / CI approvals not counted | yes | | |
+| Required checks (tests, SAST, secret scan, dependency gate) and their source | | | |
+| Direct push and force push blocked | yes | | |
+| Audit log export and retention | | | |
+
+Record how each value was exported (API, UI) and verify setting names against the vendor's current documentation.
+{{/code_other}}
+
+## 15. Tool-specific configuration locations
+
+{{#is_claude_code}}
+Precedence (highest first): managed settings > command-line `--settings` > `.claude/settings.local.json` > `.claude/settings.json` > `~/.claude/settings.json`. List keys such as permission rules merge across files, and a deny anywhere beats an allow anywhere. Managed sources are ranked server-managed > MDM (plist / HKLM) > managed files (`managed-settings.json`, then `managed-settings.d/*.json` in alphabetical order, later files replacing scalars and lists being combined) > HKCU; under the default `managedSourcesBehavior` `"first-wins"` only the highest source that delivers a policy is used, and `/status` names the skipped ones.
+
+| Location | Scope | What to record |
+|---|---|---|
+| macOS `/Library/Application Support/ClaudeCode/managed-settings.json`; Linux / WSL `/etc/claude-code/managed-settings.json`; Windows `C:\Program Files\ClaudeCode\managed-settings.json`; drop-ins in `managed-settings.d/*.json` beside it; `managed-mcp.json` in the same directory | managed (file) | Full content and SHA-256; file owner and permissions |
+| macOS managed preferences domain `com.anthropic.claudecode`; Windows `HKLM\SOFTWARE\Policies\ClaudeCode`, value `Settings` (JSON). `HKCU\SOFTWARE\Policies\ClaudeCode` is user-writable and not an admin source | managed (MDM) | Profile / registry export and SHA-256 |
+| claude.ai admin console: Organization settings > Claude Code > Managed settings (cached locally in `~/.claude/remote-settings.json`) | managed (server) | Export or screenshot; owner who changed it. The vendor calls this a client-side control, not a security boundary; it is skipped with third-party cloud providers or a custom base URL, and not delivered to Console API-key sessions (typical in CI) |
+| `managedSourcesBehavior` (`"first-wins"` default, or `"merge"`) | managed | Which managed sources are combined; `/status` "Skipped sources" |
+| `~/.claude/settings.json` | user | Content and SHA-256 on reference machines |
+| `.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json` | repository / local | Content and SHA-256 |
+| Managed `CLAUDE.md` (`/Library/Application Support/ClaudeCode/CLAUDE.md`, `/etc/claude-code/CLAUDE.md`, `C:\Program Files\ClaudeCode\CLAUDE.md`) | managed | SHA-256 |
+| `~/.claude/projects/<project>/<session>.jsonl`, `~/.claude/history.jsonl` | local records | Retention (`cleanupPeriodDays`), access |
+| `anthropics/claude-code-action` step (`claude_args`, `settings` inputs) and the app used | CI | Pinned SHA, inputs, app permissions |
+| Organisation switches for Remote Control and cloud sessions (admin console); per device `disableRemoteControl` | organisation | State |
+
+Keys to record (managed unless stated):
+
+- Permission mode: `permissions.defaultMode`, `permissions.disableBypassPermissionsMode` (`"disable"`), `disableAutoMode` (`"disable"`). Auto mode, in which a classifier approves actions, is the built-in starting mode for interactive sessions in recent versions, so set the mode explicitly.
+- Rules: `permissions.allow` / `ask` / `deny`, `allowManagedPermissionRulesOnly`, `permissions.blockReadsOutsideWorkingDirectories`.
+- Hooks: `hooks` (with `"onFailure": "block"` on policy hooks), `allowManagedHooksOnly`.
+- MCP: `allowManagedMcpServersOnly`.
+- Sandbox: `sandbox.enabled`, `sandbox.failIfUnavailable`, `sandbox.allowUnsandboxedCommands`, `sandbox.network.allowedDomains`, `sandbox.network.allowManagedDomainsOnly`, `sandbox.filesystem.denyRead`, `sandbox.filesystem.allowManagedReadPathsOnly`, `sandbox.credentials`.
+- Models: see section 12.
+- Login and provider: `forceLoginMethod`, `forceLoginOrgUUID`, `allowedProviders`, `forceRemoteSettingsRefresh`.
+- Versions: `requiredMinimumVersion`, `requiredMaximumVersion`, `autoUpdatesChannel`, `env.DISABLE_UPDATES`.
+- Provenance: `attribution` (`commit`, `pr`, `sessionUrl`); set it in managed settings so instruction files cannot change it.
+- Records and data: `cleanupPeriodDays`, `env.CLAUDE_CODE_ENABLE_TELEMETRY` and `OTEL_*` variables (including `OTEL_LOG_MANAGED_SETTINGS`), `env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`, `env.DISABLE_FEEDBACK_COMMAND`.
+- Built-in plugins and extensions: `pluginConfigs` (for example instruction-file selection), and the managed restriction of user-installed mods: `pluginConfigs` `cc-plugin-sec-default@builtin` option `allowManagedModsOnly` true together with `disableSideloadFlags` true (recommended for developer machines); `allowManagedHooksOnly` (recommended for CI and agent runners, where user hooks, status lines and similar conveniences are not needed). Record which extensions are allowed.
+
+Effective-configuration evidence: `/status` ("Setting sources", "Skipped sources"), `claude doctor`, and the `claude_code.managed_settings_resolved` telemetry event with `managed_settings.resolved_sha256` (identical digests mean identical policy).
+{{/is_claude_code}}
+{{#is_codex}}
+Codex has two layers: **defaults** that users can override (config files, profiles, legacy managed defaults) and **admin requirements** that users cannot override. When a user value conflicts with a requirement, the client falls back to an allowed value and notifies the user.
+
+| Location | Scope | What to record |
+|---|---|---|
+| `/etc/codex/requirements.toml` (Unix including macOS); `%ProgramData%\OpenAI\Codex\requirements.toml` (Windows) | requirements (system) | Content, SHA-256, owner and permissions |
+| Cloud-managed requirements (admin console, Agent Security / managed configurations; targets by group, user, platform) | requirements (cloud) | Export or screenshot of policy, targets and raw TOML |
+| `/etc/codex/managed_config.toml` (legacy; its fields are reinterpreted as requirements, so a "default" also acts as an allowlist) | requirements (legacy) | Content and SHA-256 |
+| macOS MDM domain `com.openai.codex`: key `requirements_toml_base64` (requirements, highest priority) and key `config_toml_base64` (managed defaults) | MDM | Decoded payload and SHA-256 |
+| `/etc/codex/config.toml` (Windows `%ProgramData%\OpenAI\Codex\config.toml`) | system defaults | Content and SHA-256 |
+| `~/.codex/config.toml` (`CODEX_HOME`); profile files `~/.codex/<name>.config.toml` | user | Content and SHA-256 on reference machines |
+| `<repo>/.codex/config.toml`, `.codex/hooks.json`, rules (loaded only for trusted projects) | repository | Content and SHA-256 |
+| `[projects."<path>"] trust_level` in user config | user | Trust state of each repository |
+| `~/.codex/hooks.json`; `rules/` folders next to config layers (for example `~/.codex/rules/default.rules`) | user | Content and SHA-256 |
+| `~/.codex/auth.json` or OS keyring (`cli_auth_credentials_store`) | credentials | Storage mode (no plaintext file when keyring is required) |
+| `~/.codex/history.jsonl`, `~/.codex/sessions`, `log_dir` | local records | Retention settings, access |
+| `openai/codex-action` step (`permission-profile`, `safety-strategy`, `codex-version`, `allow-users`, `allow-bots`) | CI | Pinned tag or SHA and inputs |
+
+Keys to record:
+
+- Approvals: `approval_policy` (`"on-request"`, `"never"` or the granular table) and requirements `allowed_approval_policies`; `approvals_reviewer` and `allowed_approvals_reviewers` (keep `"user"` so a person decides every escalation).
+- Sandbox: `sandbox_mode` (`read-only`, `workspace-write`, `danger-full-access`) and `[sandbox_workspace_write]` (`writable_roots`, `network_access`), or permission profiles (`default_permissions`, `[permissions.<name>]`; beta) with requirements `allowed_sandbox_modes` and `allowed_permission_profiles`. If `sandbox_mode` appears in any loaded config, the legacy settings win over profiles.
+- Rules and reads: requirements `[rules] prefix_rules` (decision `"prompt"` or `"forbidden"`), `[permissions.filesystem] deny_read`.
+- Hooks: `allow_managed_hooks_only`, `[features] hooks = true` in requirements; non-managed hooks must be trusted by hash.
+- MCP: requirements `[mcp_servers]` allowlist by name and identity (an empty table disables all servers).
+- Network and web: `web_search` and `allowed_web_search_modes`.
+- Environment: `shell_environment_policy` (`inherit`, `ignore_default_excludes`, `filters`).
+- Login: requirements `allowed_login_methods`, `allowed_chatgpt_workspaces`, `cli_auth_credentials_store` (honoured only in the local system file or MDM); user `forced_login_method`, `forced_chatgpt_workspace_id`.
+- Data: `enforce_residency`, `history.persistence`, `[otel]` (an OTLP exporter is a table with endpoint and protocol), `analytics.enabled`, `feedback.enabled`, `check_for_update_on_startup`.
+- Models: see section 12.
+
+Effective-configuration evidence: `codex --strict-config doctor`, `codex features list`, `codex login status`, `/status` and `/hooks` in the TUI, and the `codex.conversation_starts` telemetry event (records sandbox and approval policy).
+{{#surf_cloud_agent}}
+
+Cloud: record the workspace roles for cloud use and environment management, each environment's internet access and domain allowlist, and who can use each shared environment. Cloud environments do not inherit local device policy or MDM.
+{{/surf_cloud_agent}}
+{{/is_codex}}
+{{#is_copilot}}
+No REST API was found for the Copilot approval settings or the third-party agent policies: record them as dated screenshots and watch the enterprise audit log for policy changes.
+
+| Location | Scope | What to record |
+|---|---|---|
+| Enterprise policies: "Allow Copilot to approve pull requests" (default "Disabled everywhere"), "Default policy for new features", "Default availability for released models", cloud agent access, "Allow Claude coding agent" / "Allow Codex coding agent", model availability | enterprise | State of each policy |
+| Organisation settings: "Count Copilot approvals toward merge requirements", "Only allow Copilot code review to be triggered by authorized users", content exclusion | organisation | State of each setting |
+| Repository settings: "Allow Copilot to approve pull requests", "Allow Copilot approvals to count toward merge requirements" (and its path list), cloud agent opt-out, use of custom instructions for code review | repository | State per repository |
+| Rulesets: `copilot_code_review` rule (`review_on_push`, `review_draft_pull_requests`); "Additional approval for unattributed Copilot pull requests" | repository / organisation | Ruleset export |
+| `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `AGENTS.md`, `.github/hooks/*.json`, `.github/skills/` | repository | SHA-256 and CODEOWNERS protection |
+| `~/.copilot/hooks/*.json` | user (CLI) | Content on reference machines |
+
+When the "Default policy for new features" is not disabled, unconfigured generally available features become enabled automatically; treat its state as a baseline item.
+{{/is_copilot}}
+{{#is_cursor}}
+The vendor documentation was verified with lower confidence for this kit: confirm every setting name against the vendor's current documentation.
+
+| Location | Scope | What to record |
+|---|---|---|
+| Admin dashboard: Privacy Mode enforcement, Run Mode policy, sandboxing, model allow / block list, MCP server allow / block list, Team Rules (enforced), team and enterprise hooks, audit logs / Admin API | team / enterprise | Export or screenshot of each |
+| `.cursor/rules/`, `AGENTS.md` | repository | SHA-256 and CODEOWNERS protection |
+| `.cursor/BUGBOT.md` and `.cursor/config/bugbot.yaml` (read from the base branch) | repository | SHA-256; whether Bugbot fails on unresolved issues; Autofix mode |
+| `.cursor/hooks.json` (project) and `~/.cursor/hooks.json` (user; does not run in Cloud Agents) | repository / user | Content and SHA-256 |
+| Bugbot learned rules (added by PR comments) | team | Current list |
+{{/is_cursor}}
+{{#is_other}}
+| Location | Scope | What to record |
+|---|---|---|
+| Vendor admin console | organisation | Every enforceable setting (export or screenshot) |
+| System / managed configuration files | managed | Content, SHA-256, owner and permissions |
+| User configuration files | user | Content on reference machines |
+| Repository configuration and instruction files | repository | SHA-256 and CODEOWNERS protection |
+
+Identify the locations from the vendor's current documentation and record the source URL and access date.
+{{/is_other}}
+
+## 16. Who may change the configuration
+
+| Configuration item | Owner | Who may change it | How the change is approved | Record |
+|---|---|---|---|---|
+| Managed / admin-enforced settings and requirements | {{role_tool_owner}} | Named administrators below | Change record approved by the {{role_approver}} before deployment ({{doc_id_08}}) | New baseline revision |
+| Vendor admin console (workspace, SSO, policies, model availability) | {{role_tool_owner}} | Named console administrators below | As above | Console audit log export + baseline revision |
+| Repository agent configuration that alters permissions, hooks or MCP servers | Repository owner | Any developer, through a PR | Change record approved by the {{role_approver}} (T8a) plus code-owner review | Change record + PR history + baseline revision |
+| Other repository instruction files and agent configuration | Repository owner | Any developer, through a PR | Code-owner review by a designated QA reviewer; the reviewed PR is the change record (T8b); hashes refreshed at the periodic review | PR history |
+| CI workflows that invoke AI tools | Repository owner | Any developer, through a PR | Code-owner review | PR history |
+| Code-host protection, rulesets, Actions / approval settings | {{role_tool_owner}} | Organisation owners only | Change record approved before the change | Ruleset history / audit log export + baseline revision |
+| Approved model envelope{{#policy_pinned}} and pinned model{{/policy_pinned}} | {{role_tool_owner}} | Through an admission record (MA-01) or change record | {{role_approver}} | {{doc_id_08}} |
+| User-level settings | Each developer | Each developer | Not controlled; they cannot weaken enforced settings (OQ-09) | n/a |
+
+Named people with administrative rights (reviewed at every periodic review):
+
+| Name | System | Right (owner / admin / local admin) | Granted on | Last reviewed |
+|---|---|---|---|---|
+| | | | | |
+
+## 17. Approval of this baseline revision
+
+Signed by the people themselves in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU); never typed by the AI tool or by another person.
+
+| Step | Role | Name | Signature (eQMS / e-signature) | Date and time (UTC) |
+|---|---|---|---|---|
+| Approved values defined | {{role_tool_owner}} | | | |
+| Effective values captured (IQ-03) | {{role_executor}} | | | |
+| Baseline approved | {{role_approver}} | | | |

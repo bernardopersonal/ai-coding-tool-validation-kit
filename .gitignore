@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# company-specific answers and rendered packages stay out of the kit repo
+/kit.config.json
+/output/
+/tests/deid-local.txt

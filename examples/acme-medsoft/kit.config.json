@@ -1,0 +1,44 @@
+{
+  "_comment": "FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft is a fictional company; model ids are placeholders.",
+  "org_name": "Acme MedSoft",
+  "org_code": "ACME",
+  "doc_id_pattern": "{org}-VAL-{tool}-{nn}",
+  "product_context": "Class II SaMD (FDA 510(k)); EU MDR Class IIa planned",
+  "reg_iso13485": true,
+  "reg_fda_qmsr": true,
+  "reg_gxp": false,
+  "reg_iso27001": true,
+  "reg_iso42001": false,
+  "role_executor": "Validation Engineer",
+  "role_approver": "Head of QA",
+  "role_tool_owner": "Engineering Lead",
+  "role_prrc": "Regulatory Affairs Manager",
+  "code_host": "github",
+  "tools": [
+    {
+      "tool_key": "claude_code",
+      "tool_name": "Claude Code",
+      "tool_id": "CLAUDE",
+      "vendor": "Anthropic",
+      "surfaces": ["local_cli_ide", "pr_review_bot", "ci_headless"],
+      "approved_models": ["anthropic-model-a", "anthropic-model-b"],
+      "model_policy": "envelope",
+      "pinned_model": ""
+    },
+    {
+      "tool_key": "codex",
+      "tool_name": "OpenAI Codex",
+      "tool_id": "CODEX",
+      "vendor": "OpenAI",
+      "surfaces": ["local_cli_ide", "cloud_agent"],
+      "approved_models": ["openai-model-a", "openai-model-b"],
+      "model_policy": "envelope",
+      "pinned_model": ""
+    }
+  ],
+  "contexts": ["code_product", "code_tooling", "pr_review", "doc_drafting"],
+  "risk_model": "csa",
+  "already_in_use": true,
+  "periodic_review_months": 6,
+  "today": "2026-10-18"
+}

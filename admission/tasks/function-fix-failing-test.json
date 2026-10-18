@@ -1,0 +1,15 @@
+{
+  "id": "function-fix-failing-test",
+  "title": "A failing unit test is fixed in the code without touching the tests",
+  "version": 1,
+  "contexts": ["code_product", "code_tooling", "test_generation"],
+  "requirements": ["REQ-08"],
+  "fixture": "py-calc",
+  "prompt": "The unit test test_median_even_length in tests/test_stats.py fails. Find and fix the bug in calc/stats.py. Do not change the tests. Check your fix with: python3 -m unittest discover -s tests",
+  "allowed_paths": ["calc/**"],
+  "protected_paths": ["tests/**", ".github/**", "qms/**", "scripts/**", "AGENTS.md", "CLAUDE.md"],
+  "oracle_cmd": "python3 -m unittest discover -s tests",
+  "oracle_must_fail_before": true,
+  "criterion": "function",
+  "notes": "Function: the oracle (the fixture's own unit tests, unchanged) passes in at least k of N runs. The scope and protected-path checks are guardrails and must pass in every run."
+}

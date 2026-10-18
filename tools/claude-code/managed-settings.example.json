@@ -1,0 +1,81 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "disableBypassPermissionsMode": "disable",
+    "disableAutoMode": "disable",
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Edit(./.github/workflows/**)",
+      "Edit(./.github/CODEOWNERS)",
+      "Edit(./.claude/settings.json)"
+    ]
+  },
+  "pluginConfigs": {
+    "cc-plugin-sec-default@builtin": {
+      "options": {
+        "allowManagedModsOnly": true
+      }
+    }
+  },
+  "disableSideloadFlags": true,
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowManagedDomainsOnly": true,
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "objects.githubusercontent.com",
+        "raw.githubusercontent.com",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "registry.npmjs.org"
+      ]
+    },
+    "credentials": {
+      "files": [
+        {
+          "path": "~/.aws/credentials",
+          "mode": "deny"
+        }
+      ]
+    }
+  },
+  "availableModels": [
+    "REPLACE-with-admitted-exact-model-id"
+  ],
+  "availableModelsMatch": "exact",
+  "enforceAvailableModels": true,
+  "forceLoginMethod": "claudeai",
+  "forceLoginOrgUUID": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "allowedProviders": [
+    "anthropic"
+  ],
+  "requiredMinimumVersion": "2.1.302",
+  "requiredMaximumVersion": "2.1.302",
+  "autoUpdatesChannel": "stable",
+  "attribution": {
+    "commit": "AI-Assisted: yes\nAI-Tool: Claude Code",
+    "pr": "AI-assisted: Claude Code",
+    "sessionUrl": true
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://collector.example.com:4317",
+    "OTEL_LOG_MANAGED_SETTINGS": "1",
+    "DISABLE_FEEDBACK_COMMAND": "1"
+  }
+}

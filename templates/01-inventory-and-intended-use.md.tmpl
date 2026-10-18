@@ -1,0 +1,319 @@
+# {{doc_id_01}} Inventory and intended use: {{tool_name}}
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_01}} |
+| Title | Inventory and intended use: {{tool_name}} |
+| Version | 0.1 (draft) |
+| Owner (role) | {{role_tool_owner}} |
+| Approver (role) | {{role_approver}} |
+| Date | {{today}} |
+| Organisation | {{org_name}} |
+| Product context | {{product_context}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS (or with an electronic signature); never type a name or signature into this document on someone else's behalf, and never let the AI tool do it.
+
+## 1. Purpose and scope
+
+This document registers {{tool_name}} ({{vendor}}) in the software inventory of {{org_name}}, decides whether its use is QMS-relevant, and defines the intended use for each context of use. It is the input to the requirements ({{doc_id_02}}), the risk assessment ({{doc_id_03}}) and the validation plan ({{doc_id_04}}).
+
+The validation unit is **tool + vendor + surface + context of use**. The language model behind the tool is not qualified as such. What is validated is the intended use, the guardrails around the tool, and the verification of its output. Models are handled through an approved model envelope (section 4) and the model admission check MA-01.
+
+## 2. References
+
+{{#reg_iso13485}}
+- ISO 13485:2016 §4.1.6 (validation of computer software used in the QMS), §4.2.4 (control of documents: instruction and settings files are controlled configuration items), §6.2 (competence), §7.4 (purchasing: evaluation of the AI vendor).
+- ISO 13485:2016 §4.1.5 (outsourced processes): interpretation, relevant when agents run on vendor infrastructure (cloud agents). Document either the quality agreement / terms review or why the clause does not apply.
+{{/reg_iso13485}}
+{{#reg_fda_qmsr}}
+- 21 CFR Part 820 (QMSR), §820.10, which incorporates ISO 13485:2016 by reference (§820.7). Software validation duties come from ISO 13485 §4.1.6, §7.5.6 and §7.6 as incorporated; the former §820.70(i) no longer exists and is not cited. 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+{{/reg_fda_qmsr}}
+{{#reg_gxp}}
+- EU GMP Annex 11 (2011): clause 1 (risk management), 3 (suppliers and service providers), 4 (validation), 10 (change and configuration management), 11 (periodic evaluation).{{^reg_fda_qmsr}} 21 CFR Part 11 for electronic records and signatures.{{/reg_fda_qmsr}}
+{{/reg_gxp}}
+{{#reg_iso27001}}
+- ISO/IEC 27001 (cross-reference): supplier relationships, secure development, configuration and change management controls. [fill in: control IDs from the Statement of Applicability]
+{{/reg_iso27001}}
+{{#reg_iso42001}}
+- ISO/IEC 42001 (cross-reference): AI system inventory, third-party AI suppliers, AI impact assessment. [fill in: clause / control references from the AI management system]
+{{/reg_iso42001}}
+{{^reg_iso13485}}
+{{^reg_fda_qmsr}}
+- [fill in: the QMS requirement that obliges {{org_name}} to validate software used in the quality system]
+{{/reg_fda_qmsr}}
+{{/reg_iso13485}}
+- Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026); ISO/TR 80002-2:2017; ISPE GAMP 5 Second Edition (2022), Appendix D9 (Software Tools) and D11 (AI/ML).
+- Internal: {{doc_id_wi}} AI-assisted development work instruction; {{doc_id_discovery}} Tool discovery checklist; [fill in: software validation procedure]; [fill in: supplier evaluation record for {{vendor}}].
+
+## 3. Tool identification
+
+| Field | Value |
+|---|---|
+| Tool | {{tool_name}} |
+| Tool type | `{{tool_key}}` |
+| Tool ID (used in document IDs and evidence folders) | {{tool_id}} |
+| Vendor | {{vendor}} |
+| Product / plan | [fill in: commercial plan, e.g. team or enterprise tier] |
+| Organisation account / workspace | [fill in: organisation or workspace name and identifier] |
+| Account ownership | Organisation-owned, single sign-on via [fill in: identity provider]. Personal accounts are prohibited for QMS use (REQ-16). |
+| Console administrators | [fill in: roles holding owner or admin rights in the vendor console] |
+| Surfaces in use (detail in section 5) | {{#surfaces}}`{{.}}` {{/surfaces}} |
+| Validated version / release channel | [fill in: version or version range, and update channel] |
+| Update control | [fill in: how updates are controlled, e.g. pinned version range, managed update channel, pinned CI image or action reference] |
+| Model policy | {{model_policy}}{{#policy_pinned}} (pinned model: `{{pinned_model}}`){{/policy_pinned}} |
+| Approved model envelope | {{#approved_models}}`{{.}}` {{/approved_models}} |
+| Code hosting | {{#code_github}}GitHub{{/code_github}}{{#code_gitlab}}GitLab{{/code_gitlab}}{{#code_other}}[fill in: Git hosting platform]{{/code_other}} |
+{{#already_in_use}}
+| Status | In use before validation is complete: retrospective validation and interim-use justification apply (see {{doc_id_04}}, interim-use section) |
+| Date of first known use | [fill in: earliest known use for any QMS-relevant purpose, and how it was established (billing, repository history, interviews)] |
+{{/already_in_use}}
+{{^already_in_use}}
+| Status | Not yet in use. Validation is completed and approved before first use in any QMS-relevant context. |
+{{/already_in_use}}
+| GAMP 5 category | See section 7 |
+| Criticality | [fill in: result of {{doc_id_03}}] |
+| Periodic review | Every {{periodic_review_months}} months, and on the triggers in {{doc_id_08}} |
+| Last validation | [fill in: date and report {{doc_id_07}}] |
+
+{{#is_claude_code}}
+Version evidence for Claude Code: `claude --version` and `claude doctor` (which reports the auto-update state). Update control options: the `autoUpdatesChannel` setting (`"stable"` or `"latest"`), the `DISABLE_UPDATES=1` environment variable, and the managed-only `requiredMinimumVersion` / `requiredMaximumVersion` keys. Invalid values of the two version keys are dropped instead of enforced, so confirm the effect with `claude --version` on a test machine before rollout. Releases are very frequent; the validated range must be explicit.
+{{/is_claude_code}}
+{{#is_codex}}
+Version evidence for Codex: `codex --version` (prints `codex-cli <version>`) and `codex doctor`. In CI, pin the GitHub Action to a tag or commit SHA and set its `codex-version` input explicitly: leaving it blank installs the latest published CLI.
+{{/is_codex}}
+{{#is_copilot}}
+Version evidence for GitHub Copilot: IDE extension and CLI versions per machine [fill in]. Features hosted on GitHub.com are versionless services, so the baseline records policy states instead (enterprise and organisation Copilot policies).
+{{/is_copilot}}
+{{#is_cursor}}
+Version evidence for Cursor: application version per machine [fill in] and the team or enterprise settings in the admin dashboard (dated export or screenshot).
+{{/is_cursor}}
+{{#is_other}}
+Version evidence for {{tool_name}}: [fill in: command or console page that shows the version, and how updates are controlled].
+{{/is_other}}
+
+## 4. Approved model envelope and model policy
+
+Approved models (ids or family patterns, as entered in the kit configuration):
+
+{{#approved_models}}
+- `{{.}}`
+{{/approved_models}}
+
+{{#policy_envelope}}
+Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route, not the model itself.
+{{/policy_envelope}}
+{{#policy_pinned}}
+Policy: **pinned**. The AI output itself counts as a control or as evidence in at least one context, so only `{{pinned_model}}` may be used. Any change of model or model version requires the confirmatory OQ subset and MA-01 before use (REQ-08, {{doc_id_08}}).
+{{/policy_pinned}}
+
+The rationale for the policy is in {{doc_id_03}}. The approved envelope at release is restated in {{doc_id_07}}.
+
+## 5. Surfaces and identities
+
+Input to IQ-04 (surface to identity mapping). Surfaces not listed here are not permitted.
+
+| Surface | Who starts it | Identity that writes (commits, PRs, comments, records) | Where it writes | Configuration delivery path | Evidence ref |
+|---|---|---|---|---|---|
+{{#surfaces_list}}
+| {{label}} | [fill in] | [fill in] | [fill in] | [fill in] | [fill in] |
+{{/surfaces_list}}
+
+{{#is_claude_code}}
+Claude Code notes: device-deployed managed settings (file or MDM) never reach Anthropic-hosted cloud sessions; server-managed settings are not delivered to sessions that authenticate with a Console API key (typical in CI) and are skipped when a third-party provider or a custom `ANTHROPIC_BASE_URL` is used. Each surface therefore needs its own delivery path and its own IQ evidence.
+{{/is_claude_code}}
+{{#is_codex}}
+Codex notes: cloud environments do not inherit local device policy or MDM; cloud-managed requirements are configured in the workspace admin console. Vendor documentation does not state which GitHub identity authors commits and PRs created from cloud tasks: establish it empirically in IQ-04.
+{{/is_codex}}
+{{#is_copilot}}
+GitHub Copilot notes: commits from the Copilot cloud agent are authored by Copilot with the requester as co-author and are pushed to `copilot/` branches; the requester's approval does not count toward the required review.
+{{/is_copilot}}
+{{#is_cursor}}
+Cursor notes: Cloud Agents act through the Cursor GitHub/GitLab app and have internet access by default. Record the app identity, the repositories it can reach and the egress setting.
+{{/is_cursor}}
+{{#is_other}}
+{{tool_name}} notes: [fill in: which identity each surface uses and how configuration reaches it].
+{{/is_other}}
+
+## 6. QMS-relevance determination
+
+Answer each question for the contexts in section 8. One "yes" makes the use QMS-relevant.
+
+| # | Question | Answer | Rationale |
+|---|---|---|---|
+| Q1 | Is the tool used to create or change software that is part of the device, or that is used to produce, test or release it? | [yes/no] | [fill in] |
+| Q2 | Does its output become part of a controlled document or a QMS record? | [yes/no] | [fill in] |
+| Q3 | Is it used in verification (tests, reviews) whose results are relied on? | [yes/no] | [fill in] |
+| Q4 | Does it read or write QMS systems (eQMS, issue tracker used for CAPA or change control, document repository)? | [yes/no] | [fill in] |
+| Q5 | Could a failure affect product conformity or QMS compliance without another control detecting it? | [yes/no] | [fill in] |
+| Q6 | Does it process confidential design data, personal data or health data? | [yes/no] | [fill in] |
+
+Decision: [QMS-relevant / not QMS-relevant].{{#reg_iso13485}} If QMS-relevant, it is validated under ISO 13485:2016 §4.1.6 before (further) use.{{/reg_iso13485}}{{^reg_iso13485}} If QMS-relevant, it is validated before (further) use.{{/reg_iso13485}} If not QMS-relevant, record why and keep the tool on the inventory for periodic re-check.
+
+## 7. GAMP 5 category
+
+Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is not categorised; it is managed through the envelope.
+
+Selected category: [fill in]. If Category 3 is selected, justify why no configuration is used and how that is enforced: [fill in]. A configurable tool classified as non-configured, with its configuration never baselined, is a common audit finding.
+
+## 8. Contexts of use
+
+Boundary for every context: **the AI never approves, merges, signs or closes records.** Approval is always given by the responsible human role named below, under that person's own identity.
+{{#ctx_code_product}}
+
+### Context: Product code (`code_product`)
+
+| Item | Intended use |
+|---|---|
+| Who | [fill in: developer roles trained on {{doc_id_wi}}] |
+| Where | [fill in: product repositories and protected branches] |
+| Inputs | Work items, requirements, existing source code, test results |
+| Outputs | Proposed code changes in branches and pull requests |
+| Who approves | A qualified human reviewer other than the author and the agent launcher ([fill in: code review procedure]) |
+| Boundary | The AI never approves, merges, signs or closes records. Changes reach protected branches only through the server-side gate (REQ-01 to REQ-04). |
+| Prohibited | Direct pushes to protected branches; editing CI, gate or tool configuration files without code-owner review; changes to safety-classified items without [fill in: additional scrutiny required by the development plan] |
+| Data rules | Section 10 |
+{{/ctx_code_product}}
+{{#ctx_code_tooling}}
+
+### Context: Internal tooling (`code_tooling`)
+
+| Item | Intended use |
+|---|---|
+| Who | [fill in] |
+| Where | [fill in: internal tooling repositories] |
+| Inputs | Work items, existing scripts and automation |
+| Outputs | Changes to internal tools, scripts and automation in pull requests |
+| Who approves | A qualified human reviewer other than the author and the agent launcher |
+| Boundary | The AI never approves, merges, signs or closes records. A tool that itself produces QMS records or verification results is validated separately under the software validation procedure. |
+| Prohibited | Direct pushes; using AI-written tooling to generate QMS evidence before that tooling is validated |
+| Data rules | Section 10 |
+{{/ctx_code_tooling}}
+{{#ctx_pr_review}}
+
+### Context: Advisory AI PR review (`pr_review`)
+
+| Item | Intended use |
+|---|---|
+| Who | Triggered automatically or by developers [fill in] |
+| Where | [fill in: repositories] |
+| Inputs | Pull request diff and repository context |
+| Outputs | Review comments only |
+| Who approves | The human reviewer; AI comments are advisory |
+| Boundary | The AI never approves, merges, signs or closes records. AI review is never a required approval and never the only verification (REQ-15). |
+| Prohibited | Enabling settings that let AI approvals count toward merge requirements; treating an AI check that concludes neutral as a gate |
+| Data rules | Section 10 |
+{{/ctx_pr_review}}
+{{#ctx_test_generation}}
+
+### Context: Test generation (`test_generation`)
+
+| Item | Intended use |
+|---|---|
+| Who | [fill in] |
+| Where | [fill in: repositories and test suites] |
+| Inputs | Requirements, code under test, existing tests |
+| Outputs | Proposed unit, integration or regression tests and test data |
+| Who approves | A qualified human reviewer, who checks that each test verifies the intended requirement |
+| Boundary | The AI never approves, merges, signs or closes records. Generated tests that serve as verification evidence trace to a requirement. |
+| Prohibited | Changing expected values or deleting assertions to make tests pass; generating test data from real patient or personal data |
+| Data rules | Section 10 |
+{{/ctx_test_generation}}
+{{#ctx_doc_drafting}}
+
+### Context: Document drafting (`doc_drafting`)
+
+| Item | Intended use |
+|---|---|
+| Who | [fill in: document authors] |
+| Where | [fill in: document types and systems, e.g. technical documentation sections, procedures, records] |
+| Inputs | Approved source documents and records named in the request |
+| Outputs | Draft text, with each factual claim citing its source |
+| Who approves | The document owner and approver defined by the document control procedure |
+| Boundary | The AI never approves, merges, signs or closes records. The human previews the exact content before any write to a controlled record (REQ-13). |
+| Prohibited | Writing to a controlled record without preview; releasing a document; drafting the conclusion of the tool's own validation without independent human authorship |
+| Data rules | Section 10 |
+{{/ctx_doc_drafting}}
+{{#ctx_agents_qms}}
+
+### Context: QMS agents (`agents_qms`)
+
+| Item | Intended use |
+|---|---|
+| Who | Configured by [fill in]; runs scheduled or event-driven |
+| Where | [fill in: QMS systems read; the bounded list of write targets] |
+| Inputs | [fill in: records read] |
+| Outputs | [fill in: e.g. findings, reminders, draft entries marked unconfirmed] |
+| Who approves | [fill in: responsible role who confirms every agent output before it takes effect] |
+| Boundary | The AI never approves, merges, signs or closes records. Writes are limited to the declared targets and outputs are verified against an independently computed expected result (REQ-14). |
+| Prohibited | Writes outside the declared targets; running under an identity other than the one recorded in IQ-04; changing prompts or schedules outside change control |
+| Data rules | Section 10 |
+{{/ctx_agents_qms}}
+
+## 9. Uses outside the intended use
+
+The following are not part of the intended use and are prohibited unless this document is revised and the change is validated:
+
+- any use not covered by a context in section 8;
+- use through a surface not listed in section 5, or with a model outside the envelope;
+- AI approving, merging, signing or closing anything, or acting as the reviewer of record;
+- the tool executing, concluding or approving its own validation;
+- use with personal accounts for any QMS-relevant work.
+
+## 10. Data rules
+
+- No secrets (keys, tokens, passwords), no patient or health data and no personal data in prompts, context files or repositories reachable by the tool, unless covered by contract and by [fill in: data protection assessment].
+- Confidential design data only under the organisation account and the contracted terms (section 11).
+- Local transcripts and logs on developer machines are [fill in: QMS records with a retention period / transient data minimised for privacy]; decide and record it in {{doc_id_06}}.
+- Full rules: {{doc_id_wi}}.
+
+## 11. Supplier and contractual terms (input to IQ-05)
+
+| Item | Value |
+|---|---|
+| Contract / terms reference | [fill in] |
+| Data retention by the vendor | [fill in, from the contract] |
+| Use of data for model training | [fill in, from the contract] |
+| Processing region / residency | [fill in] |
+| Certifications (scope and expiry as stated on the certificate) | [fill in] |
+| Change and deprecation notification commitments | [fill in] |
+| Supplier evaluation record | [fill in]{{#reg_iso13485}} (ISO 13485 §7.4){{/reg_iso13485}} |
+
+{{#is_claude_code}}
+Anthropic points to its Trust Center (trust.anthropic.com) for the SOC 2 Type 2 report and ISO/IEC 27001 certificate, and holds an ISO/IEC 42001 certificate. Record the certificate scope text; public statements do not explicitly name Claude Code within those scopes.
+{{/is_claude_code}}
+{{#is_codex}}
+OpenAI publishes certifications on its Trust Portal (trust.openai.com). Whether the scope covers Codex was not verified: record the scope text and expiry. With ChatGPT sign-in, data follows the workspace retention and residency settings; with an API key, it follows the API organisation's settings.
+{{/is_codex}}
+{{#is_copilot}}
+GitHub Copilot terms and data handling depend on the plan (Business or Enterprise) and on enterprise policies: [fill in: terms reference and policy states].
+{{/is_copilot}}
+{{#is_cursor}}
+Cursor offers a Privacy Mode that admins can enforce organisation-wide: record whether it is enforced and the terms reference.
+{{/is_cursor}}
+{{#is_other}}
+{{tool_name}}: [fill in: vendor trust or compliance page and terms reference].
+{{/is_other}}
+
+## 12. Related documents
+
+| ID | Title |
+|---|---|
+| {{doc_id_02}} | Requirements |
+| {{doc_id_03}} | Risk assessment |
+| {{doc_id_04}} | Validation plan |
+| {{doc_id_05}} | Test protocol |
+| {{doc_id_06}} | Configuration baseline |
+| {{doc_id_07}} | Validation report |
+| {{doc_id_08}} | Change and revalidation |
+| {{doc_id_wi}} | AI-assisted development work instruction |
+| {{doc_id_discovery}} | Tool discovery checklist |
+
+## 13. Approval
+
+Reviewed and approved in the eQMS by the {{role_approver}}. Author: [fill in: name of the human author]. State whether the AI tool assisted in drafting this document: [yes/no; if yes, which sections].
+
+## Revision history
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft generated with the kit ({{kit_version}}) |

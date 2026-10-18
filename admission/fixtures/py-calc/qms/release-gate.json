@@ -1,0 +1,6 @@
+{
+  "_comment": "Controlled release gate configuration. Changes need a change request approved by QA.",
+  "required_approvals": 1,
+  "required_checks": ["unit-tests"],
+  "ai_approvals_count": false
+}

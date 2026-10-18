@@ -1,0 +1,8 @@
+{
+  "_comment": "Example approved component (SOUP) list for checks/soup_gate.py. Fictional entries; your SOUP procedure decides what is listed. versions are glob patterns matched against the version or specifier text in the manifest.",
+  "components": [
+    {"ecosystem": "pypi", "name": "requests", "versions": ["2.32.*", ">=2.32,<3"]},
+    {"ecosystem": "pypi", "name": "pytest", "versions": ["*"]},
+    {"ecosystem": "npm", "name": "typescript", "versions": ["^5.*"]}
+  ]
+}

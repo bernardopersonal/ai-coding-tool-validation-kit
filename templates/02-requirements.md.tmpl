@@ -1,0 +1,414 @@
+# {{doc_id_02}} Requirements: {{tool_name}}
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_02}} |
+| Title | Requirements (control objectives): {{tool_name}} |
+| Version | 0.1 (draft) |
+| Owner (role) | {{role_tool_owner}} |
+| Approver (role) | {{role_approver}} |
+| Date | {{today}} |
+| Organisation | {{org_name}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS.
+
+## 1. Purpose and scope
+
+This document states the requirements for using {{tool_name}} ({{vendor}}) in the intended use defined in {{doc_id_01}}. Each requirement states a condition that the code host, the tool configuration, the identities and the records must meet, whichever model produced the output, so that the tool's output cannot reach the product or the QMS without qualified human control.
+
+Every requirement is testable, is traced to the tests in {{doc_id_05}} and to the risks in {{doc_id_03}}, and applies to every in-scope surface ({{#surfaces}}`{{.}}` {{/surfaces}}) and to every model in the approved envelope. A requirement marked "Not applicable" keeps its ID so that traceability stays complete; the reason is stated.
+
+## 2. References
+
+{{#reg_iso13485}}
+- ISO 13485:2016 §4.1.6 (software validation for the intended use), §4.2.4 and §4.2.5 (documents and records), §6.2 (competence), §7.4 (purchasing).
+{{/reg_iso13485}}
+{{#reg_fda_qmsr}}
+- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+{{/reg_fda_qmsr}}
+{{#reg_gxp}}
+- EU GMP Annex 11 (2011) clauses 1, 3, 4, 10 and 11{{^reg_fda_qmsr}}; 21 CFR Part 11 (electronic records, audit trails and signatures){{/reg_fda_qmsr}}.
+{{/reg_gxp}}
+{{#reg_iso27001}}
+- ISO/IEC 27001 (cross-reference for REQ-09, REQ-12, REQ-16): [fill in: control IDs from the Statement of Applicability].
+{{/reg_iso27001}}
+{{#reg_iso42001}}
+- ISO/IEC 42001 (cross-reference for REQ-08, REQ-12, REQ-14): [fill in: clause / control references].
+{{/reg_iso42001}}
+{{^reg_iso13485}}
+{{^reg_fda_qmsr}}
+- [fill in: the QMS requirement for validation of software used in the quality system]
+{{/reg_fda_qmsr}}
+{{/reg_iso13485}}
+- Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026); ISO/TR 80002-2:2017.
+- Internal: {{doc_id_01}} Inventory and intended use; {{doc_id_wi}} AI-assisted development work instruction.
+
+## 3. Contexts of use served
+
+{{#contexts_list}}
+- `{{key}}`: {{label}}. {{description}}
+{{/contexts_list}}
+
+"all" in the tables below means every selected context.
+
+## 4. Requirements and traceability
+
+| ID | Control objective | Serves | Applies | Verified by |
+|---|---|---|---|---|
+| REQ-01 | Human approval gate: every change to a protected branch needs at least one approval by a qualified human other than the author and the agent launcher, on the final commit | all | Yes | OQ-01, OQ-02, OQ-05, PQ-01, PQ-02 |
+| REQ-02 | AI cannot approve or merge: approvals by AI, bots, apps or CI tokens are not counted; AI identities cannot merge | all | Yes | OQ-04, OQ-05, OQ-40, PQ-01 |
+| REQ-03 | Required checks before merge: tests, SAST, secret scanning, dependency / SOUP gate; violations are blocked | all | Yes | OQ-07 |
+| REQ-04 | No direct push and no silent bypass: direct pushes blocked; admin bypass prevented, or logged and reviewed | all | Yes | OQ-03, OQ-06, PQ-01 |
+| REQ-05 | Attributability: every change traceable to a named human; agent activity distinguishable from human activity | all | Yes | IQ-02, IQ-04, OQ-01 |
+| REQ-06 | Configuration under control: baseline of managed settings, permission mode, deny rules, sandbox, hooks, MCP allow-list, instruction files; users cannot override managed settings | all | Yes | IQ-01, IQ-03, OQ-09 |
+{{#surf_local_cli_ide}}
+| REQ-07 | Local guardrails behave as configured: denied commands, writes outside the workspace, network restrictions | all | Yes (local CLI / IDE in scope) | OQ-08, OQ-40 |
+{{/surf_local_cli_ide}}
+{{^surf_local_cli_ide}}
+{{#surf_ci_headless}}
+| REQ-07 | Local guardrails behave as configured: denied commands, writes outside the workspace, network restrictions | all | Yes (CI / headless in scope) | OQ-08, OQ-40 |
+{{/surf_ci_headless}}
+{{^surf_ci_headless}}
+| REQ-07 | Local guardrails behave as configured: denied commands, writes outside the workspace, network restrictions | all | Not applicable: no local CLI / IDE or CI / headless surface in scope | - |
+{{/surf_ci_headless}}
+{{/surf_local_cli_ide}}
+| REQ-08 | Model envelope: only approved models (enforced where the tool allows), model recorded per PR / session, new models admitted via MA-01{{#policy_pinned}}; pinned policy: exact model id `{{pinned_model}}`{{/policy_pinned}} | all | Yes | OQ-10, MA-01, PQ-01 |
+| REQ-09 | Data handling: no secrets, PHI or personal data in prompts / repositories beyond what is contractually covered; vendor retention and training terms as contracted{{#reg_iso13485}} (supplier requirement, ISO 13485 §7.4){{/reg_iso13485}} | all | Yes | IQ-05, OQ-07 |
+| REQ-10 | Provenance labelling: AI-assisted changes are declared (commit trailer and / or PR template) | all | Yes | OQ-11 |
+| REQ-11 | Reversibility: AI-assisted changes can be reverted with full traceability | all | Yes | OQ-12 |
+| REQ-12 | Vendor change monitoring: releases, deprecations, model changes and terms are monitored and trigger the defined tests | all | Yes | OQ-13 |
+{{#ctx_doc_drafting}}
+| REQ-13 | Source citation and human preview before any AI-assisted write to a controlled record | `doc_drafting` | Yes | OQ-20, MA-01 (citation probes, per model) |
+{{/ctx_doc_drafting}}
+{{^ctx_doc_drafting}}
+| REQ-13 | Source citation and human preview before any AI-assisted write to a controlled record | `doc_drafting` | Not applicable: context `doc_drafting` not selected | - |
+{{/ctx_doc_drafting}}
+{{#ctx_agents_qms}}
+| REQ-14 | Bounded write scope and oracle-based verification of agent outputs | `agents_qms` | Yes | OQ-30, MA-01 (oracle-based agent check, per model) |
+{{/ctx_agents_qms}}
+{{^ctx_agents_qms}}
+| REQ-14 | Bounded write scope and oracle-based verification of agent outputs | `agents_qms` | Not applicable: context `agents_qms` not selected | - |
+{{/ctx_agents_qms}}
+{{#ctx_pr_review}}
+| REQ-15 | AI review is advisory only: never a required approval or the only verification | `pr_review` | Yes (advisory AI PR review selected) | OQ-04 |
+{{/ctx_pr_review}}
+{{^ctx_pr_review}}
+{{#surf_pr_review_bot}}
+| REQ-15 | AI review is advisory only: never a required approval or the only verification | `pr_review` | Yes (PR review bot surface in scope) | OQ-04 |
+{{/surf_pr_review_bot}}
+{{^surf_pr_review_bot}}
+| REQ-15 | AI review is advisory only: never a required approval or the only verification | `pr_review` | Not applicable: no AI PR review context or surface in scope | - |
+{{/surf_pr_review_bot}}
+{{/ctx_pr_review}}
+| REQ-16 | Organisation-owned accounts / workspace with SSO; no personal accounts for QMS use | all | Yes | IQ-02 |
+| REQ-17 | Competence: users trained on the work instruction ({{doc_id_wi}}) before use{{#reg_iso13485}} (ISO 13485 §6.2){{/reg_iso13485}} | all | Yes | IQ-02 (seat list reconciled with training records); approvers in the OQ-01 and PQ-01 samples checked against training records; result recorded in {{doc_id_07}} |
+
+Risk traceability (risk to requirement to test) is in {{doc_id_03}}, section 4.
+
+## 5. Requirement details
+
+Each requirement lists the objective, the acceptance criteria used by the tests (fixed in {{doc_id_05}} before execution), and implementation notes. Implementation notes describe known ways to meet the objective; they are not the acceptance criteria, and settings must be confirmed against the vendor's current documentation at IQ.
+
+### REQ-01 Human approval gate
+
+- **Objective:** every change to a protected branch of an in-scope repository requires at least [fill in: N, minimum 1] approval(s) by a qualified human who is neither the author nor the person who launched the agent, given on the final commit.
+- **Acceptance:** the platform rule requires the approvals; approvals become stale on a new push; 100% of sampled merged AI-assisted PRs had a qualified human approval submitted before merge on the head commit; merge without approval is refused (negative test); PRs authored by a bot or agent identity need 2 approvals or code-owner approval by a human team (compensating control, because the platform counts the launcher's approval of such a PR).
+- **Qualified reviewer:** trained on {{doc_id_wi}} and authorised by [fill in: code review procedure or role list].
+{{#code_github}}
+- **GitHub:** classic branch protection `required_approving_review_count` of 1 or more, `dismiss_stale_reviews`, `require_last_push_approval` (the most recent push must be approved by someone other than the pusher; enable stale-review dismissal as well), `require_code_owner_reviews` for protected paths; or a ruleset `pull_request` rule with `required_approving_review_count`, `dismiss_stale_reviews_on_push`, `require_last_push_approval` and `require_code_owner_review`. Only approvals from reviewers with write permission count.
+{{/code_github}}
+{{#code_gitlab}}
+- **GitLab:** an approval rule with `approvals_required` of 1 or more (without a default approval rule, any user can approve); project approval settings `merge_requests_author_approval` false, `merge_requests_disable_committers_approval` true ("Prevent approvals by users who add commits", not enabled by default), `reset_approvals_on_push` true and `disable_overriding_approvers_per_merge_request` true. Lock the settings at group level where possible.
+{{/code_gitlab}}
+{{#code_other}}
+- **Git hosting:** [fill in: the server-side setting that enforces required human approval, stale-approval reset and author exclusion].
+{{/code_other}}
+
+### REQ-02 AI cannot approve or merge
+
+- **Objective:** approvals submitted by the AI tool, bots, apps or CI tokens are not counted toward the required approval, and no AI identity can merge.
+- **Acceptance:** negative tests show that an approval from each AI / bot / CI identity in scope does not satisfy the merge requirement and that a merge attempt by an AI identity is refused; settings that let AI approvals count are off and recorded in {{doc_id_06}}.
+{{#code_github}}
+- **GitHub:** Actions workflow permission `can_approve_pull_request_reviews` false at organisation and repository level ("Allow GitHub Actions to create and approve pull requests" off). GitHub documentation does not say whether approvals by a GitHub App count; prove it with OQ-04. If Copilot code review is enabled anywhere in the organisation, keep "Allow Copilot approvals to count toward merge requirements" off and the enterprise policy "Allow Copilot to approve pull requests" at "Disabled everywhere".
+{{/code_github}}
+{{#code_gitlab}}
+- **GitLab:** current documentation states that an approval from GitLab Duo does not count toward required approvals (the "GitLab Duo can approve and request changes" setting is beta). Record the setting and prove the behaviour with OQ-04.
+{{/code_gitlab}}
+{{#code_other}}
+- **Git hosting:** [fill in: how bot and app approvals are excluded, and how this is proven].
+{{/code_other}}
+{{#is_claude_code}}
+- **Claude Code:** the Claude Code GitHub Action documents that it cannot approve pull requests, submit formal reviews or merge. This is behaviour of the action, not a platform boundary (its GitHub App holds pull-request write permission), so the platform settings above remain the control. The managed Code Review service never approves or blocks a PR; its check run concludes neutral.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** vendor documentation says Codex review rules "don't replace tests, branch protections, or required approvals". Whether Codex review can submit an approving review is not documented: establish it in OQ-04.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** by default Copilot code review leaves a "Comment" review that does not count, but approving can be enabled at repository, organisation and enterprise level: keep it disabled. The Copilot cloud agent cannot approve or merge, and the requester's approval of its PR does not count.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** Bugbot posts comments and a check; it does not count as an approval. See REQ-15 for its check semantics.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in: identities the tool uses on the code host and whether any of them can approve or merge].
+{{/is_other}}
+
+### REQ-03 Required checks before merge
+
+- **Objective:** [fill in: list of required checks, e.g. unit tests, SAST, secret scanning, dependency / SOUP gate] run on every PR to a protected branch and block merge on failure.
+- **Acceptance:** canary PRs containing a failing test, an unapproved dependency and a test secret are each blocked (OQ-07); required checks are bound to the expected source so that a status set by another identity does not satisfy them.
+- **Dependency / SOUP gate:** new or changed dependencies are checked against [fill in: approved component list or SOUP procedure]; this also catches hallucinated package names. A minimal reference gate is `checks/soup_gate.py` (workflow `examples/github-workflow-soup-gate.yml`).
+{{#code_github}}
+- **GitHub:** any person or integration with write access can set a commit status, so bind required checks to the expected app (classic `checks[].app_id`; rulesets `required_status_checks[].integration_id`). A required check passes when it is successful, skipped or neutral, so an AI review check that concludes neutral is not a gate. Enable secret scanning push protection (`security_and_analysis.secret_scanning_push_protection`).
+{{/code_github}}
+{{#code_gitlab}}
+- **GitLab:** require a successful pipeline before merge [verify the setting name against GitLab's current documentation] and protect the pipeline definition with code-owner approval.
+{{/code_gitlab}}
+{{#code_other}}
+- **Git hosting:** [fill in: how required checks are enforced and protected against spoofing].
+{{/code_other}}
+
+### REQ-04 No direct push and no silent bypass
+
+- **Objective:** nobody, including administrators and AI identities, can push directly to a protected branch; any bypass of the rules is either impossible or logged and reviewed.
+- **Acceptance:** direct push refused (OQ-03); admin bypass refused, or the bypass appears in the audit records and is reviewed (OQ-06); no bypass in the PQ-01 period without a review record.
+{{#code_github}}
+- **GitHub:** classic `enforce_admins` true ("Do not allow bypassing the above settings"), or rulesets with reviewed `bypass_actors`. Do not use `bypass_mode` "exempt" on QMS branches: exempt actors are not evaluated and no bypass audit entry is created. The organisation audit log shows 180 days and Git events only 7 days; export or stream it, and export ruleset and rule-suite (bypass) records periodically.
+{{/code_github}}
+{{#code_gitlab}}
+- **GitLab:** protected branch with push access restricted [fill in]; record `push_access_levels`, `merge_access_levels` and `allow_force_push` from the protected branches API.
+{{/code_gitlab}}
+{{#code_other}}
+- **Git hosting:** [fill in: push restriction and bypass logging].
+{{/code_other}}
+
+### REQ-05 Attributability
+
+- **Objective:** every change and every write is traceable to a named human (requester or author, and approver); activity of the AI agent is distinguishable from human activity.
+- **Acceptance:** the surface to identity mapping (IQ-04) shows no shared or anonymous identities; account ownership and SSO are confirmed (IQ-02); in the OQ-01 sample every PR shows a named human requester and approver, and AI involvement is identifiable.
+- **Note:** give agents a dedicated identity, or a mandatory label (REQ-10) that the reviewer checks.
+{{#is_claude_code}}
+- **Claude Code:** in telemetry `user.id` is an anonymous identifier, not a person; user identity attributes (such as `user.email`) are present only with a claude.ai or Team / Enterprise login. For API-key fleets add an identity attribute through `OTEL_RESOURCE_ATTRIBUTES`.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** the identity under which cloud tasks commit and open PRs is not documented; record what is observed in IQ-04.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** cloud agent commits are authored by Copilot with the requester as co-author.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** record the identity used by Cloud Agents and Bugbot autofix commits.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in].
+{{/is_other}}
+
+### REQ-06 Configuration under control
+
+- **Objective:** the tool configuration that governs behaviour (managed or admin settings, permission mode, allow / deny rules, sandbox, hooks, MCP or extension allow-list, instruction files) is baselined with hashes, changed only through change control, and cannot be overridden by users.
+- **Acceptance:** baseline captured and hashed (`python3 checks/capture_baseline.py`, IQ-03) and recorded in {{doc_id_06}}; version recorded per surface (IQ-01); a user-level attempt to override a managed setting has no effect (OQ-09); instruction and configuration files in repositories require code-owner review.
+{{#is_claude_code}}
+- **Claude Code:** managed settings (system `managed-settings.json`, MDM, or server-managed from the admin console) take precedence over `--settings`, `.claude/settings.local.json`, `.claude/settings.json` and `~/.claude/settings.json`. Candidate locks: `permissions.disableBypassPermissionsMode` = `"disable"`; `disableAutoMode` = `"disable"` or an explicit managed `permissions.defaultMode`; `allowManagedPermissionRulesOnly`; `allowManagedHooksOnly` (CI and agent runners) or, on developer machines, `pluginConfigs` `cc-plugin-sec-default@builtin` option `allowManagedModsOnly` with `disableSideloadFlags`; `allowManagedMcpServersOnly`; `availableModels` with `availableModelsMatch` = `"exact"` and `enforceAvailableModels`. `CLAUDE.md` is guidance, not enforcement. Verify the effective sources with `/status` ("Setting sources") and `claude doctor`. Server-managed settings are a client-side control, not a security boundary; endpoint-managed settings give stronger guarantees.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** admin-enforced `requirements.toml` (`/etc/codex/requirements.toml`, Windows `%ProgramData%\OpenAI\Codex\requirements.toml`, macOS MDM, or cloud-managed requirements); a conflicting user value falls back to an allowed value with a notice. Candidate keys: `allowed_approval_policies`, `allowed_sandbox_modes` or `allowed_permission_profiles`, `allow_managed_hooks_only`, `[mcp_servers]` identity allow-list, `[rules]` with `prompt` or `forbidden` decisions, `allowed_approvals_reviewers = ["user"]`. `managed_config.toml` only supplies startup defaults that users can change during a run. Project `.codex/config.toml` loads only for trusted projects.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** enterprise and organisation policies (capture dated screenshots; no REST export was verified), repository instruction files (`.github/copilot-instructions.md`, `.github/instructions/`, `AGENTS.md`) and hooks (`.github/hooks/`). Copilot code review reads instructions from the PR head branch, so protect these files with CODEOWNERS and required code-owner review. Set the "Default policy for new features" and "Default availability for released models" policies explicitly so that new features and models are not enabled outside change control.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** team or enterprise admin settings (Privacy Mode enforced, Run Mode policy, model and MCP allow / block lists), Team Rules, project `.cursor/rules`, `.cursor/BUGBOT.md`, hooks. Cursor describes terminal and MCP allow-lists as best-effort, not a security boundary.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in: configuration sources, precedence, and which ones users cannot override].
+{{/is_other}}
+
+### REQ-07 Local guardrails behave as configured
+
+{{#surf_local_cli_ide}}
+Applies: the local CLI / IDE surface is in scope.
+{{/surf_local_cli_ide}}
+{{^surf_local_cli_ide}}
+{{#surf_ci_headless}}
+Applies: the CI / headless surface is in scope.
+{{/surf_ci_headless}}
+{{^surf_ci_headless}}
+Not applicable: no local CLI / IDE or CI / headless surface is in scope. Re-assess if such a surface is added (re-baseline trigger in {{doc_id_04}}).
+{{/surf_ci_headless}}
+{{/surf_local_cli_ide}}
+
+- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks rather than allows).
+- **Acceptance:** OQ-08 negative cases (denied command, write outside workspace, non-approved network destination) are all refused; the failure-mode case blocks; OQ-40 shows that instructions planted in untrusted content do not lead to a denied action.
+{{#is_claude_code}}
+- **Claude Code:** Bash deny rules match the command text and are not a security boundary (for example `Bash(curl *)` does not stop `/usr/bin/curl`); use the OS sandbox with `sandbox.enabled`, `sandbox.failIfUnavailable` and `sandbox.allowUnsandboxedCommands` = false (the sandbox is not available on native Windows; built-in file tools, hooks and MCP servers run outside it). Hooks fail open on errors and timeouts unless the hook sets `"onFailure": "block"`. In CI always pass `--permission-mode` explicitly.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** `sandbox_mode = "workspace-write"` with `[sandbox_workspace_write] network_access = false` (the default), or the `:workspace` permission profile; `.git`, `.codex` and `.agents` stay read-only inside writable roots. `shell_environment_policy.ignore_default_excludes` defaults to true, so variables named like KEY, SECRET or TOKEN reach spawned commands unless it is set to false. Only an explicit deny in a PreToolUse hook blocks; hook errors and timeouts let the call continue. `codex exec` runs read-only by default.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** the Copilot CLI and IDE agent modes are governed by separate client policies; [verify the available local guardrails against the vendor's current documentation]. Repository hooks in `.github/hooks/*.json` can deny tool execution in `preToolUse`.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** set the organisation Run Mode policy to auto-review (not "run everything") with sandboxing enabled; allow-lists are best-effort; a `beforeShellExecution` hook exiting with code 2 blocks the command.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in: permission, sandbox and network controls, and their failure behaviour].
+{{/is_other}}
+
+### REQ-08 Model envelope
+
+- **Objective:** only models in the approved envelope are used; the model is restricted where the tool can enforce it, otherwise recorded and monitored; the model used is recorded per PR or session; a new model or model version is used only after MA-01 passes.
+- **Approved envelope:** {{#approved_models}}`{{.}}` {{/approved_models}}
+{{#policy_envelope}}
+- **Policy:** envelope. Any model in the envelope may be used once admitted by MA-01.
+{{/policy_envelope}}
+{{#policy_pinned}}
+- **Policy:** pinned to `{{pinned_model}}`. Any change requires the confirmatory OQ subset and MA-01 before use.
+{{/policy_pinned}}
+- **Acceptance:** OQ-10: selecting a model outside the envelope is refused where the tool can enforce it, and detected in the records where it cannot; the enforced allow-list equals the admitted ids in {{doc_id_06}} section 12; the model used is recorded for 100% of sampled PRs / sessions; an MA-01 pass record exists for every model in use; PQ-01: every model observed during the period is inside the envelope.
+- **Note:** envelope entries and the pre-authorised patterns of {{doc_id_04}} section 5.2 are glob patterns used by the kit's records and checks. The vendor's own allow-list syntax may differ (for example prefix matching); the enforced allow-list holds admitted exact ids only, and the translation is recorded in {{doc_id_06}}.
+{{#is_claude_code}}
+- **Claude Code:** managed `availableModels` restricts selection (`/model`, `--model`, the `model` key); with the default prefix matching an entry also permits later versions, so list admitted exact ids with the managed-only `availableModelsMatch` = `"exact"` and `deniedModels` for known unadmitted ids; set `enforceAvailableModels` true so the Default option resolves inside the list. A managed `model` is only a starting default. Automatic fallbacks (overload, content-based) can change the model during a session; their targets are checked against `availableModels`.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** no verified admin control that restricts the selectable model was found: requirements `[models.new_thread]` supplies defaults only, and explicit `--model`, `--config` or `--profile` override them. Record the model from the OpenTelemetry event `codex.conversation_starts` (export is off by default) or from the PR template, and verify against the vendor's current documentation.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** model availability is set by enterprise / organisation policy; the "Default availability for released models" policy can enable new models automatically, so set it explicitly.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** admins can allow or block models in the team settings; record the list in {{doc_id_06}}.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in: how models are restricted or, if they cannot be, how the model used is recorded].
+{{/is_other}}
+
+### REQ-09 Data handling
+
+- **Objective:** prompts, context and repositories reachable by the tool contain no secrets, health data or personal data beyond what the contract and the data protection assessment cover; vendor retention, training use and region are as contracted.
+- **Acceptance:** vendor terms recorded and matched to the contract (IQ-05); the secret canary in OQ-07 is blocked; local transcript retention is set as decided in {{doc_id_06}}.
+{{#reg_iso13485}}
+- **Supplier requirement:** the vendor is evaluated and monitored under ISO 13485 §7.4: [fill in: supplier evaluation record].
+{{/reg_iso13485}}
+{{#is_claude_code}}
+- **Claude Code:** local transcripts are plaintext JSONL under `~/.claude/projects/`, deleted after `cleanupPeriodDays` (default 30); pin the value in managed settings according to the retention decision.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** local history in `~/.codex/history.jsonl` is controlled by `history.persistence` (`"save-all"` default or `"none"`); see REQ-07 for environment-variable pass-through.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** content exclusion is not supported in the Edit and Agent modes of Copilot Chat in VS Code and other editors, so it is not a confidentiality control for agentic use.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** enforce Privacy Mode organisation-wide so that members cannot disable it.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in: data retention, training and local storage controls].
+{{/is_other}}
+
+### REQ-10 Provenance labelling
+
+- **Objective:** every AI-assisted change is declared using the labels defined in {{doc_id_wi}} (commit trailer and / or PR template field; the model used is recorded once per PR or from telemetry).
+- **Acceptance:** OQ-11: 100% of sampled AI-assisted PRs carry the label; [fill in: optional CI check that rejects AI-assisted PRs without the label, for example `examples/github-workflow-label-check.yml`].
+{{#is_claude_code}}
+- **Claude Code:** the default commit trailer is `Co-Authored-By: <model name> <noreply@anthropic.com>`; the `attribution` setting customises commit and PR text. Attribution is an instruction to the model, not a git hook, so it is not proof that every AI-assisted commit is labelled.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** the current configuration has no built-in commit attribution setting; enforce the label with the PR template, a commit-msg hook or a CI check.
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** cloud agent commits are authored by Copilot; for local IDE use, rely on the PR template field.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** rely on the PR template field and a CI check.
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in: any built-in attribution, otherwise PR template and CI check].
+{{/is_other}}
+
+### REQ-11 Reversibility
+
+- **Objective:** any AI-assisted change can be reverted through the normal reviewed process, and the history keeps the original change, its approval and the revert.
+- **Acceptance:** OQ-12: a merged AI-assisted change in a test repository is reverted through a reviewed PR; original commit, approval and revert are linked; force-push and history rewrite on protected branches are refused.
+
+### REQ-12 Vendor change monitoring
+
+- **Objective:** releases, deprecations, model changes, policy defaults and terms of {{vendor}} are monitored at least [fill in: e.g. weekly]; each relevant change gets an impact assessment and triggers the tests defined in {{doc_id_04}} and {{doc_id_08}} before rollout.
+- **Acceptance:** OQ-13: the monitoring log has no gap longer than the defined frequency over the period fixed in {{doc_id_04}}; every guardrail-relevant release has an impact assessment dated before rollout; every model in use has an MA-01 record dated before its first QMS-relevant use{{#already_in_use}} (retrospective validation: exceptions listed and covered by the interim-use nonconformity){{/already_in_use}}. Sources to watch are listed in {{doc_id_08}}.
+
+### REQ-13 Source citation and preview before write
+
+{{#ctx_doc_drafting}}
+- **Objective:** in AI-assisted drafting, every factual claim cites a source the reviewer can check; before any write to a controlled document or record, the human previews the exact content to be written and decides; the write is attributed to that human; the AI does not release documents.
+- **Acceptance:** OQ-20: source-citation probes during normal drafting work; a statement without a supporting source fails; for sampled writes, a preview record precedes the write and the write is attributed to the human who approved the preview.
+{{/ctx_doc_drafting}}
+{{^ctx_doc_drafting}}
+Not applicable: the `doc_drafting` context is not selected. Selecting it later is a new context of use (re-baseline trigger).
+{{/ctx_doc_drafting}}
+
+### REQ-14 Bounded write scope and oracle-based verification
+
+{{#ctx_agents_qms}}
+- **Objective:** QMS agents write only to a declared list of targets ([fill in]); everything else is read-only; agents cannot approve or close records; their outputs are verified against an expected result computed independently before the agent output is read.
+- **Acceptance:** OQ-30 on a frozen snapshot: expected results computed independently first; at least one expected positive and one expected negative case; false negatives = 0 for [fill in: critical categories] and false positives at most [fill in]; declared writes match the actual write history.
+{{/ctx_agents_qms}}
+{{^ctx_agents_qms}}
+Not applicable: the `agents_qms` context is not selected. Selecting it later is a new context of use (re-baseline trigger).
+{{/ctx_agents_qms}}
+
+### REQ-15 AI review is advisory only
+
+{{#ctx_pr_review}}
+- **Objective:** AI review comments and checks are advisory: never a required approval, never counted as verification evidence on their own, and never the only review of a change.
+- **Acceptance:** OQ-04 shows that the AI review does not satisfy the approval requirement; the required-check list in {{doc_id_06}} contains no AI review check, or only one that fails closed and is additional to human review.
+{{/ctx_pr_review}}
+{{^ctx_pr_review}}
+{{#surf_pr_review_bot}}
+- **Objective:** AI review comments and checks are advisory: never a required approval, never counted as verification evidence on their own, and never the only review of a change.
+- **Acceptance:** OQ-04 shows that the AI review does not satisfy the approval requirement; the required-check list in {{doc_id_06}} contains no AI review check, or only one that fails closed and is additional to human review.
+{{/surf_pr_review_bot}}
+{{^surf_pr_review_bot}}
+Not applicable: no AI PR review context or PR review bot surface is in scope.
+{{/surf_pr_review_bot}}
+{{/ctx_pr_review}}
+{{#is_claude_code}}
+- **Claude Code:** the Code Review check run concludes neutral or skipped, never failure, so it cannot act as a gate unless your own CI parses its result.
+{{/is_claude_code}}
+{{#is_cursor}}
+- **Cursor:** the "Cursor Bugbot" check concludes neutral when it finds issues unless configured to fail, so requiring the check alone does not block merges.
+{{/is_cursor}}
+
+### REQ-16 Organisation-owned accounts and SSO
+
+- **Objective:** the tool is used only through organisation-owned accounts or workspaces with single sign-on; personal accounts, and accounts belonging to other organisations, are not used for QMS-relevant work.
+- **Acceptance:** IQ-02: seat or member list reconciled with the identity provider; a login with a personal or foreign account is refused where the tool can enforce it, and otherwise detected by the reconciliation.
+{{#is_claude_code}}
+- **Claude Code:** managed `forceLoginMethod` and `forceLoginOrgUUID`. `claude setup-token` and `/install-github-app` enforce only `forceLoginMethod`, so tokens for CI are reviewed separately.
+{{/is_claude_code}}
+{{#is_codex}}
+- **Codex:** `allowed_login_methods` and `allowed_chatgpt_workspaces` in the local system `requirements.toml` or macOS MDM (these fields are ignored in cloud-managed requirements).
+{{/is_codex}}
+{{#is_copilot}}
+- **GitHub Copilot:** seats assigned by the organisation or enterprise; set "Only allow Copilot code review to be triggered by authorized users" so that external licences cannot be used in your repositories.
+{{/is_copilot}}
+{{#is_cursor}}
+- **Cursor:** [verify SSO enforcement and team membership controls against the vendor's current documentation].
+{{/is_cursor}}
+{{#is_other}}
+- **{{tool_name}}:** [fill in].
+{{/is_other}}
+
+### REQ-17 Competence
+
+- **Objective:** every user of the tool and every reviewer who approves AI-assisted changes is trained on {{doc_id_wi}} before access or first approval, with records.
+- **Acceptance:** 100% of the users with access and of the approvers in the OQ-01 and PQ-01 samples have a training record dated before their access or first approval; result recorded in {{doc_id_07}}.
+
+## 6. Approval
+
+Reviewed and approved in the eQMS by the {{role_approver}}. Author: [fill in]. AI assistance in drafting: [yes/no; if yes, which sections].
+
+## Revision history
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft generated with the kit ({{kit_version}}) |

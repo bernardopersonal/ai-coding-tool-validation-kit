@@ -1,0 +1,30 @@
+# Example CODEOWNERS entries for AI agent configuration, instruction files and gates.
+# Copy the relevant lines into .github/CODEOWNERS and require code-owner review in
+# branch protection or the ruleset ("require_code_owner_reviews" /
+# "require_code_owner_review"). Replace the team names with your own.
+# Review bots can read instruction files from the PR branch, so a PR must not be
+# able to change its own review rules without a code owner.
+
+# Gates and CI
+/.github/workflows/                 @your-org/qms-code-owners
+/.github/CODEOWNERS                 @your-org/qms-code-owners
+/.github/pull_request_template.md   @your-org/qms-code-owners
+/.github/approved-components.json   @your-org/qms-code-owners
+
+# Claude Code
+/CLAUDE.md                          @your-org/qms-code-owners
+**/CLAUDE.md                        @your-org/qms-code-owners
+/.claude/                           @your-org/qms-code-owners
+/.mcp.json                          @your-org/qms-code-owners
+
+# Codex and shared agent instructions
+/AGENTS.md                          @your-org/qms-code-owners
+**/AGENTS.md                        @your-org/qms-code-owners
+**/AGENTS.override.md               @your-org/qms-code-owners
+/.codex/                            @your-org/qms-code-owners
+
+# GitHub Copilot and Cursor (if used)
+/.github/copilot-instructions.md    @your-org/qms-code-owners
+/.github/instructions/              @your-org/qms-code-owners
+/.github/hooks/                     @your-org/qms-code-owners
+/.cursor/                           @your-org/qms-code-owners

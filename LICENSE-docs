@@ -1,0 +1,34 @@
+AI Coding Tool Validation Kit - documentation and templates licence
+
+Copyright (c) 2026 Bernardo Plaza
+
+The following material is licensed under the Creative Commons Attribution 4.0
+International licence (CC BY 4.0):
+
+  - the document templates in templates/
+  - the documentation: README.md, GUIDE.md, CONTRIBUTING.md, CHANGELOG.md,
+    README_DEV.md, docs/, the README.md files in tools/, checks/ and admission/
+  - the narrative content of the fictional example in examples/
+
+Licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary:      https://creativecommons.org/licenses/by/4.0/
+
+You may share and adapt this material for any purpose, including commercially,
+as long as you give appropriate credit, provide a link to the licence and
+indicate whether changes were made, as set out in the licence. Suggested
+attribution:
+
+  Based on the AI Coding Tool Validation Kit by Bernardo Plaza, licensed under
+  CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+
+The software (kit.py, kit/, checks/, admission/, tests/ and the configuration
+and workflow examples in tools/ and examples/) is licensed under the MIT
+licence in LICENSE.
+
+Documents that you render from the templates and fill in with your own
+organisation's content are your own records. The licence conditions apply to
+the kit's material that they contain when you share it; see the licence text
+for the exact conditions.
+
+No warranty. The material is provided "as is". It is not legal or regulatory
+advice and does not replace your own quality management system procedures.

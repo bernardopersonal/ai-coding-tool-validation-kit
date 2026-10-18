@@ -1,0 +1,69 @@
+# OpenAI Codex: example ADMIN-ENFORCED requirements for a validated state.
+#
+# Deploy as /etc/codex/requirements.toml (Unix, including macOS),
+# %ProgramData%\OpenAI\Codex\requirements.toml (Windows), via macOS MDM
+# (domain com.openai.codex, key requirements_toml_base64), or paste the
+# policy part into the cloud-managed requirements (Agent Security).
+# Users cannot override these. When a user value conflicts, Codex falls
+# back to an allowed value and notifies the user: OQ-09 evidences this.
+# Keys checked against the Codex 0.163.0 source on 2026-10-18.
+# Explanations: README.md in this folder.
+#
+# Top-level keys must come before the first [table] header in TOML.
+
+allowed_approval_policies = ["on-request"]
+allowed_approvals_reviewers = ["user"]
+
+# Legacy sandbox modes. If you deploy permission profiles instead (0.138.0+),
+# add allowed_permission_profiles and remove sandbox_mode from configs;
+# keep allowed_sandbox_modes for mixed fleets.
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+
+# "disabled" is always allowed.
+allowed_web_search_modes = ["cached"]
+
+check_for_update_on_startup = false
+
+# Residency: currently only "us" is accepted, and enabling it in a cloud
+# policy disables local computer access.
+# enforce_residency = "us"
+
+# Authentication: honoured ONLY in the local system file or macOS MDM,
+# ignored in cloud-managed requirements. Replace the workspace id.
+allowed_login_methods = ["chatgpt"]
+allowed_chatgpt_workspaces = ["00000000-0000-0000-0000-000000000000"]
+# Values: "file" (plaintext ~/.codex/auth.json), "keyring", "auto",
+# "ephemeral". "keyring" breaks login where no OS credential store exists
+# (headless Linux, WSL, devcontainers, disposable admission VMs). "auto" is
+# the friction-free choice; check its fallback behaviour against the vendor's
+# current documentation, or set the value per platform, and test login on
+# each platform in IQ-02.
+cli_auth_credentials_store = "auto"
+
+# Enable together with [features] hooks = true when you deploy managed hooks
+# (deliver the hook scripts by MDM; Codex does not distribute them):
+# allow_managed_hooks_only = true
+
+# Command rules: decision must be "prompt" or "forbidden"; the most
+# restrictive decision across rule sources wins. Not a complete OS policy
+# engine: the binding controls are branch protection and CI.
+[rules]
+prefix_rules = [
+  { pattern = [{ token = "git" }, { token = "push" }], decision = "prompt", justification = "Pushes are confirmed by a person; the protected branch is enforced by the code host." },
+  { pattern = [{ token = "gh" }, { token = "pr" }, { token = "merge" }], decision = "forbidden", justification = "AI does not merge (REQ-02). A person merges after approval." },
+  { pattern = [{ token = "gh" }, { token = "pr" }, { token = "review" }], decision = "forbidden", justification = "AI does not submit reviews or approvals (REQ-02)." },
+]
+
+# Read denies; when present, full-access permissions are rejected.
+# Denying ~/.ssh also blocks git over SSH from agent commands.
+[permissions.filesystem]
+deny_read = ["/**/*.env", "~/.ssh"]
+
+# MCP allowlist by name AND identity (command for stdio, url for HTTP).
+# Shipped commented out: deployed as an EMPTY table it disables every MCP
+# server for everyone. Uncomment it together with your approved servers:
+# [mcp_servers.docs]
+# identity = { command = "codex-mcp" }
+
+# [features]
+# hooks = true

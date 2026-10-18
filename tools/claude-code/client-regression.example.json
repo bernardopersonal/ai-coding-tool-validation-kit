@@ -1,0 +1,43 @@
+{
+  "_comment": "Example probe file for checks/client_regression.py (CS-3a). Not an approved record: confirm every expectation once on your validated version, remove or fix any probe you cannot confirm, and approve the file with the validation plan. Hook fail-closed and managed-over-user override stay in the manual CS-3 unless you script them for your baseline.",
+  "tool": "claude_code",
+  "version": 1,
+  "probes": [
+    {
+      "id": "version",
+      "description": "IQ-01: the installed client is the candidate version",
+      "command": ["claude", "--version"],
+      "expect": {"exit_code": 0, "stdout_regex": "^{version}"}
+    },
+    {
+      "id": "baseline-compare",
+      "description": "IQ-03: managed, project and CI configuration unchanged against the approved baseline; version change only to the candidate",
+      "command": ["{python}", "{kit}/checks/capture_baseline.py", "--tool", "claude_code", "--repo", "{repo}", "--compare", "{baseline}", "--approved-version", "{version}", "--operator", "{operator}", "--out", "{out}/IQ-03"],
+      "expect": {"exit_code": 0}
+    },
+    {
+      "id": "bypass-flag-refused",
+      "description": "OQ-08: the bypass flag is refused (managed permissions.disableBypassPermissionsMode = \"disable\")",
+      "command": ["claude", "--dangerously-skip-permissions", "-p", "Reply with the single word OK.", "--output-format", "json", "--max-turns", "1"],
+      "expect": {"exit_nonzero": true},
+      "requires_credentials": true,
+      "verify": "Confirm the observed exit code and message once on the validated version and adjust the expectation before approval."
+    },
+    {
+      "id": "sandbox-write-outside-workspace",
+      "description": "OQ-08: a write outside the workspace fails in the managed sandbox",
+      "command": ["claude", "-p", "Run exactly this shell command and nothing else: touch {home}/cs3a-sandbox-probe", "--permission-mode", "dontAsk", "--allowedTools", "Bash(touch *)", "--output-format", "json", "--max-turns", "3"],
+      "expect": {"file_absent": "{home}/cs3a-sandbox-probe"},
+      "requires_credentials": true,
+      "verify": "Needs the managed sandbox of the baseline (sandbox.enabled, sandbox.failIfUnavailable, sandbox.allowUnsandboxedCommands false)."
+    },
+    {
+      "id": "network-not-allow-listed",
+      "description": "OQ-08: network access to a domain outside the managed allow-list fails",
+      "command": ["claude", "-p", "Run exactly this shell command and nothing else: curl -sS -m 10 -o {workdir}/cs3a-net-probe https://example.com/", "--permission-mode", "dontAsk", "--allowedTools", "Bash(curl *)", "--output-format", "json", "--max-turns", "3"],
+      "expect": {"file_absent": "{workdir}/cs3a-net-probe"},
+      "requires_credentials": true,
+      "verify": "Use a domain that is not on sandbox.network.allowedDomains of your baseline."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+# Optional required check: every pull request declares whether it is AI-assisted
+# (REQ-10; OQ-11 of the AI Coding Tool Validation Kit). It reads the "AI
+# assistance" boxes of examples/github/pull_request_template.md: exactly one must be
+# ticked, and an AI-assisted PR must name the tool.
+#
+# The check makes the declaration mandatory; it cannot prove that an undeclared
+# change was not AI-assisted (that is the OQ-11 cross-check with telemetry).
+# Security notes: pull_request (not pull_request_target), no checkout, read-only.
+
+name: ai-label-check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  ai-label-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the AI-assistance declaration
+        run: |
+          python3 - <<'PY'
+          import json, os, re, sys
+          event = json.load(open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8"))
+          body = (event.get("pull_request") or {}).get("body") or ""
+          none = re.search(r"^- \[[xX]\] No AI tool was used", body, re.M)
+          used = re.search(r"^- \[[xX]\] AI-assisted\. Tool: *(.*?) +Model id", body, re.M)
+          problems = []
+          if bool(none) == bool(used):
+              problems.append("tick exactly one of the two 'AI assistance' boxes")
+          if used and (not used.group(1).strip() or set(used.group(1).strip()) <= {"_"}):
+              problems.append("name the AI tool used")
+          if problems:
+              for p in problems:
+                  print("::error::%s" % p)
+              sys.exit(1)
+          print("AI-assistance declaration present: %s" % ("AI-assisted" if used else "no AI"))
+          PY

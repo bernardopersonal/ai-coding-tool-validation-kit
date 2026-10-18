@@ -1,0 +1,39 @@
+{
+  "_comment": "Example probe file for checks/client_regression.py (CS-3a). Not an approved record: confirm every expectation once on your validated version, remove or fix any probe you cannot confirm, and approve the file with the validation plan. Pass the managed rules file with --var rules=<path>.",
+  "tool": "codex",
+  "version": 1,
+  "probes": [
+    {
+      "id": "version",
+      "description": "IQ-01: the installed client is the candidate version",
+      "command": ["codex", "--version"],
+      "expect": {"exit_code": 0, "stdout_regex": "codex-cli {version}"}
+    },
+    {
+      "id": "baseline-compare",
+      "description": "IQ-03: requirements, managed defaults, system and project configuration unchanged against the approved baseline; version change only to the candidate",
+      "command": ["{python}", "{kit}/checks/capture_baseline.py", "--tool", "codex", "--repo", "{repo}", "--compare", "{baseline}", "--approved-version", "{version}", "--operator", "{operator}", "--out", "{out}/IQ-03"],
+      "expect": {"exit_code": 0}
+    },
+    {
+      "id": "sandbox-write-outside-workspace",
+      "description": "OQ-08: the sandbox refuses a write outside the workspace (deterministic, no model call)",
+      "command": ["codex", "sandbox", "--", "sh", "-c", "touch {home}/cs3a-outside.txt"],
+      "expect": {"file_absent": "{home}/cs3a-outside.txt"},
+      "verify": "Recent releases take the sandbox arguments directly; older documentation shows a platform subcommand. Add --permission-profile :workspace when permission profiles are used."
+    },
+    {
+      "id": "sandbox-network",
+      "description": "OQ-08: the sandbox refuses network access (network_access = false or the :workspace profile)",
+      "command": ["codex", "sandbox", "--", "sh", "-c", "curl -sS -m 10 -o {workdir}/cs3a-net-probe https://example.com/"],
+      "expect": {"file_absent": "{workdir}/cs3a-net-probe"}
+    },
+    {
+      "id": "rule-forbids-push",
+      "description": "OQ-08: the managed command rule still decides 'forbidden' or 'prompt' for git push",
+      "command": ["codex", "execpolicy", "check", "--pretty", "--rules", "{rules}", "--", "git", "push"],
+      "expect": {"exit_code": 0, "output_regex": "forbidden|prompt"},
+      "verify": "execpolicy is hidden from --help in recent releases; confirm the output format once."
+    }
+  ]
+}

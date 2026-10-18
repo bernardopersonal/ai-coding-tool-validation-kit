@@ -1,0 +1,47 @@
+# Required check: new or changed dependencies must be on the approved component
+# (SOUP) list and must exist in their registry (REQ-03; OQ-07 b of the AI Coding
+# Tool Validation Kit).
+#
+# Set-up:
+#   1. Copy checks/soup_gate.py from the kit to .github/scripts/soup_gate.py
+#      (standalone, Python standard library only) and record its SHA-256 in the
+#      configuration baseline.
+#   2. Keep the approved list in .github/approved-components.json (format:
+#      examples/github/approved-components.example.json) under CODEOWNERS.
+#   3. Make the job "soup-gate" a required status check pinned to the GitHub
+#      Actions app (classic checks[].app_id, ruleset integration_id).
+#
+# Security notes: pull_request (not pull_request_target), read-only token; the
+# script reads the manifests with git and calls the public PyPI / npm registries.
+# Pin actions to a full commit SHA in a validated workflow.
+
+name: soup-gate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  soup-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # pin to a full commit SHA in a validated workflow
+        with:
+          fetch-depth: 0
+      - name: Check new and changed dependencies
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          python3 .github/scripts/soup_gate.py \
+            --approved .github/approved-components.json \
+            --base "origin/${BASE_REF}" --head HEAD \
+            --check-registry --out soup-evidence
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4  # pin to a full commit SHA in a validated workflow
+        with:
+          name: soup-gate-evidence
+          path: soup-evidence/
+          retention-days: ${{ vars.EVIDENCE_RETENTION_DAYS || 90 }}

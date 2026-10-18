@@ -1,0 +1,160 @@
+# {{doc_id_discovery}} Tool discovery checklist
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_discovery}} |
+| Title | AI tool discovery and inventory reconciliation checklist |
+| Version | 0.1 (draft) |
+| Owner (role) | {{role_executor}} |
+| Approver (role) | {{role_approver}} |
+| Date | {{today}} |
+| Organisation | {{org_name}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}. This is a checklist template: copy it for each execution, record who did each check and when, and file the completed copy as a record. Approval of each completed execution is given in the eQMS.
+
+## 1. Purpose and scope
+
+AI coding tools spread faster than inventories are updated: IDE extensions, review bots, CI actions, cloud agents and personal accounts appear without a formal request. This checklist finds AI tools that are in use at {{org_name}} and reconciles them with the software inventory, so that every QMS-relevant tool is registered, validated or stopped.
+
+When to run it:
+
+- before the validation plan of a tool is approved (initial validation{{#already_in_use}}, and as part of the interim-use justification{{/already_in_use}});
+- at every periodic review, every {{periodic_review_months}} months;
+- when a trigger occurs: a new AI vendor invoice, a new GitHub / GitLab app or bot, a report under the work instruction {{doc_id_wi}}.
+
+## 2. References
+
+{{#reg_iso13485}}
+- ISO 13485:2016 §4.1.6 (software used in the QMS is validated before use), §7.4 (purchased products and suppliers are controlled).
+{{/reg_iso13485}}
+{{#reg_fda_qmsr}}
+- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7).
+{{/reg_fda_qmsr}}
+{{#reg_gxp}}
+- EU GMP Annex 11 (2011) clause 4 (validation) and clause 11 (periodic evaluation).
+{{/reg_gxp}}
+{{#reg_iso27001}}
+- ISO/IEC 27001 (cross-reference): inventory of information and associated assets, cloud services: [fill in].
+{{/reg_iso27001}}
+{{#reg_iso42001}}
+- ISO/IEC 42001 (cross-reference): inventory of AI systems: [fill in].
+{{/reg_iso42001}}
+- Internal: {{doc_id_wi}} AI-assisted development work instruction; [fill in: software validation procedure; software inventory].
+
+## 3. Execution record
+
+| Item | Value |
+|---|---|
+| Execution date(s) | [fill in] |
+| Executed by | [fill in] |
+| Reason | [initial validation / periodic review / trigger: fill in] |
+| Repositories in scope | [fill in: all active repositories, or the rule used to select them] |
+| Previous execution | [fill in: reference] |
+
+## 4. Registered tools (compare against these)
+
+| Tool | Vendor | Tool ID | Surfaces | Inventory record |
+|---|---|---|---|---|
+{{#tools_list}}
+| {{tool_name}} | {{vendor}} | {{tool_id}} | {{#surfaces}}`{{.}}` {{/surfaces}} | {{doc_id_01}} |
+{{/tools_list}}
+| [other registered AI tools] | [fill in] | [fill in] | [fill in] | [fill in] |
+
+## 5. Checks
+
+Mark each check done with date and initials; record every finding in section 6.
+
+### 5.1 Code hosting
+
+| # | Check | How | Done | Findings |
+|---|---|---|---|---|
+{{#code_github}}
+| C1 | Installed GitHub Apps and OAuth apps with AI functions | Organisation settings: installed GitHub Apps, authorised OAuth apps; list review bots and coding agents | [ ] | |
+| C2 | Third-party coding agents hosted by GitHub | Copilot policies "Allow Claude coding agent" / "Allow Codex coding agent". Their GitHub App does not appear in the installed-apps list, but its actions appear in the audit log: search the audit log | [ ] | |
+| C3 | Copilot policies | Enterprise and organisation Copilot settings: code review (and whether approvals count), cloud agent, automations, MCP servers, "Default policy for new features", "Default availability for released models" | [ ] | |
+| C4 | AI actions in workflows | Search `.github/workflows/*` in every repository for AI actions (for example `anthropics/claude-code-action`, `openai/codex-action`) and for AI CLI invocations | [ ] | |
+| C5 | Bot reviews and agent PRs | For recent PRs, list reviews whose `user.type` is "Bot" (`gh api repos/OWNER/REPO/pulls/N/reviews`), agent branches such as `copilot/`, and co-author trailers naming an AI tool | [ ] | |
+| C6 | Tokens used by automation | Fine-grained tokens and deploy keys used by bots or agents; who owns each | [ ] | |
+{{/code_github}}
+{{#code_gitlab}}
+| C1 | GitLab Duo settings | Group and project settings: Duo Code Review, automatic reviews, "GitLab Duo can approve and request changes", Duo Agent Platform | [ ] | |
+| C2 | Audit events for AI features | Audit events such as `auto_duo_code_review_enabled_updated`, `duo_code_review_approval_counts_enabled_updated`, `duo_agent_platform_enabled_updated`, `ai_agent_session_started` | [ ] | |
+| C3 | AI jobs in pipelines | Search `.gitlab-ci.yml` and included files for AI CLIs or AI review jobs | [ ] | |
+| C4 | Bot users and tokens | Project and group access tokens, service accounts and bot users used by AI tools; who owns each | [ ] | |
+{{/code_gitlab}}
+{{#code_other}}
+| C1 | Integrations and apps with AI functions | [fill in: where the hosting platform lists integrations, apps and bot users] | [ ] | |
+| C2 | AI jobs in CI | Search CI definitions for AI CLIs or AI review jobs | [ ] | |
+| C3 | Bot users and tokens | Service accounts and tokens used by AI tools; who owns each | [ ] | |
+{{/code_other}}
+
+### 5.2 Repositories
+
+Run for every repository in scope and attach the output:
+
+```
+python3 checks/find_ai_footprint.py --path REPO_DIR
+```
+
+| # | Check | How | Done | Findings |
+|---|---|---|---|---|
+| R1 | Agent configuration and instruction files | Look for `.claude/`, `CLAUDE.md`, `CLAUDE.local.md`, `.mcp.json`, `REVIEW.md`, `AGENTS.md`, `AGENTS.override.md`, `.codex/`, `.cursor/` (including `.cursor/rules/`, `.cursor/BUGBOT.md`), `.github/copilot-instructions.md`, `.github/instructions/`, `.github/hooks/`, `.aider.conf.yml`, `.gemini/`, `GEMINI.md` | [ ] | |
+| R2 | AI-related CI workflows | `.github/workflows/*` or other CI definitions invoking AI actions or CLIs | [ ] | |
+| R3 | AI attribution in history | Commit trailers and co-authors naming AI tools, bot authors, agent branch names | [ ] | |
+| R4 | CODEOWNERS coverage | The files from R1 and R2 are covered by CODEOWNERS with required code-owner review | [ ] | |
+
+### 5.3 Identity, purchasing and billing
+
+| # | Check | How | Done | Findings |
+|---|---|---|---|---|
+| B1 | SSO application catalogue | AI applications connected to the identity provider | [ ] | |
+| B2 | Vendor admin consoles | Seat and member lists of each registered tool, compared with the identity provider (leavers, external accounts) | [ ] | |
+| B3 | Expenses and invoices | Expense reports, corporate card statements, invoices and subscriptions from AI vendors, including individual subscriptions | [ ] | |
+| B4 | Supplier list | AI vendors on the approved supplier list versus vendors found in B1 to B3 | [ ] | |
+
+### 5.4 Endpoints and CI images
+
+| # | Check | How | Done | Findings |
+|---|---|---|---|---|
+| E1 | IDE extensions | Extension inventory of VS Code, JetBrains and other IDEs via endpoint management, or a script run by each developer | [ ] | |
+| E2 | AI CLIs and desktop apps | AI command-line tools on developer machines (for example `claude --version`, `codex --version`) and AI desktop apps | [ ] | |
+| E3 | CI runner images | AI CLIs installed in CI images; AI vendor credentials stored as CI secrets (names only, never values) | [ ] | |
+| E4 | Network signals | With the ISMS: proxy or DNS logs for AI vendor API domains [fill in: domains] | [ ] | |
+
+### 5.5 People
+
+| # | Check | How | Done | Findings |
+|---|---|---|---|---|
+| P1 | Short survey | Ask every team, including non-engineering teams that draft documents, which AI tools, surfaces, models and accounts they use and for what | [ ] | |
+| P2 | Agents and schedules | Ask who runs scheduled or autonomous agents, under which account, and what they write to | [ ] | |
+
+## 6. Reconciliation
+
+| # | Found item (tool, surface, account) | Source (check #) | Users / team | On inventory? | QMS-relevant? | Action | Owner | Due | Record ref |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | [fill in] | [fill in] | [fill in] | [yes/no] | [yes/no] | [fill in] | [fill in] | [fill in] | [fill in] |
+
+Decision rules:
+
+- **QMS-relevant tool not on the inventory:** register it (inventory and intended use document), stop QMS-relevant use or document an interim-use justification with interim controls, raise a deviation per [fill in: procedure], and plan its validation.
+- **Tool found but not QMS-relevant:** record the determination in the inventory and re-check it at the next execution.
+- **Registered tool used through a new surface, model or context:** treat as a re-baseline or admission trigger of that tool's validation plan.
+- **Personal or foreign account used for QMS-relevant work:** stop that use and move it to the organisation account; assess the records produced.
+- **Instruction or configuration files not protected by CODEOWNERS:** raise a change to protect them.
+
+## 7. Conclusion
+
+| Item | Value |
+|---|---|
+| Unregistered QMS-relevant tools found | [fill in: number and references] |
+| Actions raised | [fill in] |
+| Inventory updated | [yes/no, reference] |
+| Conclusion | [fill in: inventory complete / complete after actions / not complete] |
+
+Written by: [fill in: name]. Reviewed and approved in the eQMS by the {{role_approver}}.
+
+## Revision history
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft generated with the kit ({{kit_version}}) |
