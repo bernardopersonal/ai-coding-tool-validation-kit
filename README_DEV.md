@@ -180,13 +180,14 @@ Rules enforced by `kit/render.py` (all failures raise `RenderError` with
   default config, each lite per-tool package at most 5,000 words in total and
   each lite shared document at most 1,200 words (whitespace-separated tokens of
   the rendered Markdown).
-- `tests/test_style.py` enforces the owner's style rules: no section sign in
+- `tests/test_style.py` enforces the kit's style rules: no section sign in
   any tracked text file or rendered default package (write "ISO 13485:2016
   clause 4.1.6", "21 CFR 820.10", "MDR Article 10(8)", "section 3 of this
   plan"); no times or durations in README.md; no effort or speed claims in
   GUIDE.md and `docs/`; the "No shadow AI" message in README and GUIDE and
   the rule in both work instructions; GUIDE.md at most 1,250 words; no
-  collision between lite and full document IDs.
+  collision between lite and full document IDs; and no em dash in any
+  tracked text file or rendered default package.
 - The repository-wide de-identification test in `tests/test_templates.py` is
   skipped unless a pattern file exists (`tests/deid-local.txt`, git-ignored, or
   `$KIT_DEID_PATTERNS`; a `$KIT_DEID_PATTERNS` naming a missing file fails);
@@ -203,7 +204,7 @@ Rules enforced by `kit/render.py` (all failures raise `RenderError` with
 - `examples/acme-medsoft-lite/` is the same for the LITE profile
   (`"profile": "lite"`, `today` 2026-10-19, no trigger for full); maintain it
   the same way (`--out /tmp/acme-lite`). Illustrative SHA-256 values in both
-  examples are the SHA-256 of the evidence path, not of any content.
+  examples are the SHA-256 of the evidence path.
 - `tests/test_examples.py` checks both examples: valid frozen config and its
   profile, the rendered file set with the same first heading (document ID and
   title) as the kit renders, the banner on every Markdown file, no

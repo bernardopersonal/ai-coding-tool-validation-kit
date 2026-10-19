@@ -486,7 +486,7 @@ def check_pinned_model(value: Any, approved: List[str]) -> Optional[str]:
     if err:
         return err
     if is_pattern(value):
-        return "pinned_model must be an exact model id, not a pattern"
+        return "pinned_model must be an exact model id (patterns belong in approved_models)"
     if not model_in_envelope(value, approved):
         return "pinned_model '%s' does not match any approved_models entry" % value
     return None

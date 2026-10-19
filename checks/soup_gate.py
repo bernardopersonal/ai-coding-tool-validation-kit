@@ -17,7 +17,7 @@ Approved list (JSON):
 "versions" are glob patterns matched against the version or specifier text as it
 appears in the manifest (for example "2.32.3", "^1.3.0" or ">=2"); "*" accepts any.
 
-It is a reference gate, not a full SOUP process: lockfiles, transitive
+It is a reference gate for direct dependencies: lockfiles, transitive
 dependencies and other ecosystems need your own tooling. Run it as a required
 check pinned to its app (examples/github-workflow-soup-gate.yml).
 

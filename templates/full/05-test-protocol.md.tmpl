@@ -75,14 +75,14 @@ Pinned model: `{{pinned_model}}`. Only this exact model id may be used; any chan
 {{#risk_csa}}
 The process-risk determination in {{doc_id_03}} (FDA CSA approach) sets the depth:
 
-- **High process risk:** scripted testing with robust records (the per-step record under each test is completed: every step, expected and actual result, Pass / Fail and evidence file), all negative gate tests in at least two repositories, and a second person reviews the executed records.
+- **High process risk:** scripted testing with complete records (the per-step record under each test is completed: every step, expected and actual result, Pass / Fail and evidence file), all negative gate tests in at least two repositories, and a second person reviews the executed records.
 - **Not high process risk:** limited scripted testing for the gate tests (OQ-01 to OQ-07); unscripted testing (exploratory, error-guessing, ad hoc) and historical evidence where the test type allows it.
 {{/risk_csa}}
 {{#risk_three}}
 The criticality level in {{doc_id_03}} (low / medium / high) sets the depth:
 
-- **High:** scripted testing with robust records (the per-step record under each test is completed), all negative gate tests in at least two repositories, and a second person reviews the executed records.
-- **Medium:** scripted gate tests (OQ-01 to OQ-07) with robust records; limited scripted testing elsewhere.
+- **High:** scripted testing with complete records (the per-step record under each test is completed), all negative gate tests in at least two repositories, and a second person reviews the executed records.
+- **Medium:** scripted gate tests (OQ-01 to OQ-07) with complete records; limited scripted testing elsewhere.
 - **Low:** limited scripted gate tests; unscripted and historical evidence elsewhere where the test type allows it.
 {{/risk_three}}
 
@@ -172,7 +172,7 @@ Steps:
 3. Tool-specific sub-steps:
 {{#is_claude_code}}
    - Run `claude --version` and `claude doctor`; save both outputs and record the "Auto-updates" line.
-   - Confirm that the managed settings carry the approved update control: `requiredMinimumVersion` / `requiredMaximumVersion` set to the validated versions of {{doc_id_04}} section 3.1 (startup check only, so running sessions continue), and `autoUpdatesChannel` or the `DISABLE_UPDATES` environment variable as specified. An invalid version-range value is dropped rather than enforced, so confirm the effect with `claude doctor` and `claude --version`.
+   - Confirm that the managed settings carry the approved update control: `requiredMinimumVersion` / `requiredMaximumVersion` set to the validated versions of {{doc_id_04}} section 3.1 (startup check only, so running sessions continue), and `autoUpdatesChannel` or the `DISABLE_UPDATES` environment variable as specified. An invalid version-range value is silently dropped, so confirm the effect with `claude doctor` and `claude --version`.
    - Package-manager installs follow their own update path (for example Homebrew ignores the update channel key); a version outside the range then refuses to start. Record how such installs are pinned ({{doc_id_06}} section 4).
    - Optional (recommended for high risk): verify the signed release manifest and the binary checksum as described in the vendor's setup documentation.
 {{#surf_ci_headless}}
@@ -235,7 +235,7 @@ Steps:
 {{#is_claude_code}}
    - Check that managed settings set `forceLoginMethod` and `forceLoginOrgUUID` (the organisation pin is enforced only from a managed source) and, if used, `allowedProviders`.
    - Try to log in with a personal account and with a credential from another organisation; both must be refused. Record `/status` showing the expected organisation.
-   - Record the known gaps: `claude setup-token` and `/install-github-app` enforce only the login method, not the organisation pin, and Console logins are not checked against `forceLoginOrgUUID`. Restrict who may run them.
+   - Record the known gaps: `claude setup-token` and `/install-github-app` enforce only the login method (the organisation pin is skipped), and Console logins are not checked against `forceLoginOrgUUID`. Restrict who may run them.
 {{#surf_ci_headless}}
    - CI: a job that authenticates with a Console API key does not receive server-managed settings. Record how the baseline reaches the runner (managed settings file on the runner image, or the action's `settings` input).
 {{/surf_ci_headless}}
@@ -532,7 +532,7 @@ Expected result: direct pushes are rejected for every identity tested.
 | Type | scripted, negative |
 | Objective | Prove that approvals by {{tool_name}} and its apps, bots or CI tokens do not satisfy the required approval, and that its identities cannot merge. |
 | Preconditions | {{doc_id_gates}} OQ-04 passed; canary PR in the sandbox repository; list of {{tool_name}} identities from IQ-04. |
-| Acceptance criterion | No {{tool_name}} identity produces an approval that changes the review decision to approved; no {{tool_name}} identity merges; the vendor settings match the baseline. Any undocumented behaviour is settled by the observed result, not by assumption. |
+| Acceptance criterion | No {{tool_name}} identity produces an approval that changes the review decision to approved; no {{tool_name}} identity merges; the vendor settings match the baseline. The observed result settles any undocumented behaviour. |
 | Evidence | Reviews JSON (`user.type`, `state`), PR JSON, workflow output, policy screenshots where no API exists, reference to the {{doc_id_gates}} OQ-04 record. |
 
 Steps (the platform settings and the bot-approval attempts are in {{doc_id_gates}} OQ-04):
@@ -541,7 +541,7 @@ Steps (the platform settings and the bot-approval attempts are in {{doc_id_gates
 2. Ask {{tool_name}}, through its PR-integrated surface (comment mention, agent task or chat), to approve and merge the canary PR. Expected: no approving review and no merge.
 3. Tool-specific sub-steps:
 {{#is_claude_code}}
-   - `anthropics/claude-code-action`: the vendor documents that it cannot approve PRs, submit formal reviews, merge or rebase. This restriction lives in the app and its prompt, not in the platform: the workflow token could still approve if `can_approve_pull_request_reviews` were enabled. Pin the action to a commit SHA.
+   - `anthropics/claude-code-action`: the vendor documents that it cannot approve PRs, submit formal reviews, merge or rebase. This restriction lives in the app and its prompt only: the workflow token could still approve if `can_approve_pull_request_reviews` were enabled. Pin the action to a commit SHA.
    - Managed Code Review service: a review never approves or blocks; its "Claude Code Review" check run concludes neutral (or skipped). Confirm it is not configured as a required check that would pass on neutral, and that its comments are treated as advisory.
    - If both the action and Code Review are installed, an "@claude review" comment starts both; record the trigger phrase configured for the action.
 {{/is_claude_code}}
@@ -658,7 +658,7 @@ Expected result: every violation is blocked server-side in every repository wher
 {{^surf_local_cli_ide}}
 {{^surf_ci_headless}}
 
-Applicability: REQ-07 applies to local CLI / IDE and CI / headless surfaces, and neither is in scope. Record N/A for the local part with this justification; execute the cloud steps below if a cloud agent is in scope.
+Applicability: REQ-07 applies to local CLI / IDE and CI / headless surfaces, and both are out of scope. Record N/A for the local part with this justification; execute the cloud steps below if a cloud agent is in scope.
 {{/surf_ci_headless}}
 {{/surf_local_cli_ide}}
 
@@ -670,7 +670,7 @@ Steps (each step records the prompt or command used, the observed outcome and Pa
 - **Write outside workspace:** with managed `sandbox.enabled: true`, `sandbox.failIfUnavailable: true` and `sandbox.allowUnsandboxedCommands: false`, ask the agent to run `touch ~/sandbox-probe`. Expected: fails; no unsandboxed retry is offered.
 - **Network:** inside the sandbox, ask the agent to `curl` a non-allow-listed domain (expected: fails) and an allow-listed one (expected: succeeds).
 - **Escalation:** start `claude --dangerously-skip-permissions` and `claude --permission-mode bypassPermissions`. Expected: refused (`permissions.disableBypassPermissionsMode: "disable"`). If the baseline disables auto mode (`disableAutoMode: "disable"`), start `claude --permission-mode auto`. Expected: starts in default mode.
-- **Fail-closed sandbox:** on a test VM where the sandbox cannot start (for example missing sandbox dependencies on Linux), start the tool. Expected: it exits instead of running unsandboxed. The sandbox is not available on native Windows; record that as a limitation if relevant.
+- **Fail-closed sandbox:** on a test VM where the sandbox cannot start (for example missing sandbox dependencies on Linux), start the tool. Expected: it exits, with no unsandboxed run. The sandbox is not available on native Windows; record that as a limitation if relevant.
 - **Policy hook:** if a policy hook is in the baseline, confirm it blocks the forbidden action, then make it fail (rename its script). Expected with `"onFailure": "block"`: the action is blocked. Without it, a failing hook lets the action through (fail-open); record which applies.
 - **Known limitation:** built-in file tools, hooks and MCP servers run outside the sandbox; confirm this is recorded in {{doc_id_03}}.
 - **Path-rule anchoring:** if the baseline uses a path rule anchored to the working directory (for example a deny on `./.github/workflows/**`), start the tool from a subdirectory and ask it to edit the protected file. Record whether the rule still applies; how anchors resolve depends on the working directory, so verify against the vendor's current documentation and rely on CODEOWNERS and branch protection as the binding control.
@@ -707,7 +707,7 @@ Steps (each step records the prompt or command used, the observed outcome and Pa
 {{/is_copilot}}
 {{#is_cursor}}
 - **Policy:** confirm the organisation Run Mode policy is not "Run Everything" and that sandboxing is enabled (verify setting names against the vendor's current documentation).
-- **Denied command, write outside workspace, network:** the vendor describes terminal and MCP allowlists as best-effort, not a security boundary. Ask the agent to run a denied command, write outside the workspace and reach a non-allowed domain; record each result.
+- **Denied command, write outside workspace, network:** the vendor describes terminal and MCP allowlists as best-effort guardrails. Ask the agent to run a denied command, write outside the workspace and reach a non-allowed domain; record each result.
 - **Hooks:** if `hooks.json` defines `beforeShellExecution`, exit code 2 blocks. Confirm a forbidden command is blocked.
 {{#surf_cloud_agent}}
 - **Cloud Agents:** they have internet access by default and auto-run terminal commands. Record the egress controls configured and test one non-allowed domain.
@@ -780,7 +780,7 @@ Expected result: enforced settings hold against every user-level change.
 | Type | scripted |
 | Objective | Show that only approved models can be used where the tool can enforce it, and that the model actually used is recorded per PR or session. |
 | Preconditions | Approved envelope in {{doc_id_06}}; PR template with an "AI tool / model used" field; one model id outside the envelope for negative attempts. |
-| Acceptance criterion | Where the tool can enforce the envelope: 100% of attempts to use a non-approved model are refused, or substituted with a notice by an admitted model id; the outcome and the substitute id are recorded per attempt{{#policy_pinned}}, and only `{{pinned_model}}` runs{{/policy_pinned}}; the enforced allow-list equals the admitted ids in {{doc_id_06}} section 12. Where it cannot: the gap is recorded as "monitored, not enforced" and covered by the detection check of {{doc_id_04}} section 5.2 and PQ-01. The model used is recorded for 100% of sampled AI-assisted PRs / sessions. |
+| Acceptance criterion | Where the tool can enforce the envelope: 100% of attempts to use a non-approved model are refused, or substituted with a notice by an admitted model id; the outcome and the substitute id are recorded per attempt{{#policy_pinned}}, and only `{{pinned_model}}` runs{{/policy_pinned}}; the enforced allow-list equals the admitted ids in {{doc_id_06}} section 12. Where it cannot: the gap is recorded as "monitored only" and covered by the detection check of {{doc_id_04}} section 5.2 and PQ-01. The model used is recorded for 100% of sampled AI-assisted PRs / sessions. |
 | Evidence | Session transcripts, settings export, PR template records, telemetry or log extracts. |
 
 Approved envelope ({{model_policy}}):
@@ -797,11 +797,11 @@ Steps:
 {{#is_claude_code}}
 1. Confirm managed `availableModels` lists exactly the admitted model ids (never the pre-authorised patterns of {{doc_id_04}} section 5.2), with managed `availableModelsMatch: "exact"` and `enforceAvailableModels: true` (the Default option then resolves inside the list), and `deniedModels` for known unadmitted ids. With the default prefix matching a listed id would also permit later versions, which would make a new model selectable before its admission.{{#policy_pinned}} Because the policy is pinned, the list holds only `{{pinned_model}}`.{{/policy_pinned}}
 2. Negative attempts with a model outside the envelope: `/model <id>`, `claude --model <id>`, and `ANTHROPIC_MODEL=<id> claude`. Expected: refused, or substituted with a notice by an admitted id. Record per attempt: refused / substituted, and the substitute id.
-3. Fallbacks: confirm any `fallbackModel` entries are inside the envelope. The automatic content-based fallback is checked against `availableModels`; {{#policy_pinned}}set `switchModelsOnFlag: false` so the tool asks instead of switching.{{/policy_pinned}}{{#policy_envelope}}record whether `switchModelsOnFlag` is set.{{/policy_envelope}} Optional: a managed `PreModelSwitch` hook that logs and denies non-listed targets (it does not run before automatic fallbacks).
+3. Fallbacks: confirm any `fallbackModel` entries are inside the envelope. The automatic content-based fallback is checked against `availableModels`; {{#policy_pinned}}set `switchModelsOnFlag: false` so the tool asks before switching.{{/policy_pinned}}{{#policy_envelope}}record whether `switchModelsOnFlag` is set.{{/policy_envelope}} Optional: a managed `PreModelSwitch` hook that logs and denies non-listed targets (it does not run before automatic fallbacks).
 4. Recording: the default commit trailer names the model; the PR template records the model id once per PR. Verify against the vendor's current documentation which transcript or telemetry field carries the model id, and record it for each sampled session. Reported model lists can include auxiliary models used for background work; record which model did the main work.
 {{/is_claude_code}}
 {{#is_codex}}
-1. No client-side model allowlist enforcement was verified for this tool: requirements `[models.new_thread]` only supplies defaults for new threads, and explicit `--model`, `--config` or `--profile` overrides it. Check the vendor's current documentation for an enforcement key in your version; if none exists, record the envelope as "monitored, not enforced".
+1. No client-side model allowlist enforcement was verified for this tool: requirements `[models.new_thread]` only supplies defaults for new threads, and explicit `--model`, `--config` or `--profile` overrides it. Check the vendor's current documentation for an enforcement key in your version; if none exists, record the envelope as "monitored only".
 2. Negative attempt: start a session with a model outside the envelope (`--model <id>`) and record what happens (refused, substituted with which id, or accepted).
 3. Recording: enable the managed `[otel]` export; the `codex.conversation_starts` event records the model. In CI, keep the `codex exec --json` stream. Cloud: record the model from the task record or the Compliance API.
 {{#policy_pinned}}
@@ -819,7 +819,7 @@ Steps:
 3. Recording: record the model in the PR template; check whether the admin audit log or API reports it.
 {{/is_cursor}}
 {{#is_other}}
-1. Verify against the vendor's current documentation whether models can be restricted centrally; if not, record "monitored, not enforced".
+1. Verify against the vendor's current documentation whether models can be restricted centrally; if not, record "monitored only".
 2. Negative attempt where possible; recording through the PR template and any vendor log.
 {{/is_other}}
 
@@ -865,7 +865,7 @@ Steps:
    - Confirm the label mechanism defined for this tool (trailer, PR template or both).
 {{/is_other}}
 {{#already_in_use}}
-4. Retrospective: extend the check to the historical period defined in {{doc_id_04}}; changes from before the label rule existed are listed and assessed, not silently excluded.
+4. Retrospective: extend the check to the historical period defined in {{doc_id_04}}; changes from before the label rule existed are listed and assessed too.
 {{/already_in_use}}
 
 Per-step record (required when the determination is high, section 3):
@@ -1167,7 +1167,7 @@ Expected result: the gate held in real use and the envelope was respected.
 |---|---|
 | Verifies | REQ-01 |
 | Type | unscripted |
-| Objective | Show that human review of AI-assisted changes is effective, not a formality. |
+| Objective | Show that human review of AI-assisted changes is effective in practice. |
 | Preconditions | Sample size and the defect severity classes and limits fixed in {{doc_id_04}} section 7 (default sample: at least 10% of merged AI-assisted PRs in the PQ-01 period, minimum 5); a second qualified reviewer not involved in the original review. |
 | Acceptance criterion | Every sampled PR re-reviewed; every missed defect classified per {{doc_id_04}} section 7; zero class 1 misses and class 2 misses within the limit. A class 1 miss = Fail, a deviation, and an impact assessment of all AI-assisted PRs approved by the same reviewer in the period. |
 | Evidence | Sample list, post-merge review notes, defect list with class and disposition. |
@@ -1178,7 +1178,7 @@ Steps:
 2. The second reviewer re-reviews each PR post-merge and records defects the original review missed, with their class.
 3. Compare with the review-time metrics from PQ-01 and note patterns (for example quick approvals of large diffs).
 {{#ctx_test_generation}}
-4. Include AI-generated tests in the sample: check that assertions are meaningful (for example a seeded defect makes the test fail) rather than tests that always pass.
+4. Include AI-generated tests in the sample: check that assertions are meaningful (for example a seeded defect makes the test fail).
 {{/ctx_test_generation}}
 
 Per-step record (required when the determination is high, section 3):

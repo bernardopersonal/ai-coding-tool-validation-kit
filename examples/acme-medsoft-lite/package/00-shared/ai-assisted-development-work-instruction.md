@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed lite package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed lite package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-GEN-L01 AI-assisted development work instruction
 
@@ -29,12 +29,12 @@ Approved contexts: Product code (`code_product`); Internal tooling (`code_toolin
 
 ## 3. Rules
 
-1. **No shadow AI:** use only the declared, organisation-approved tools of section 2, with organisation accounts; never use an AI tool on a personal account for Acme MedSoft development or QMS work. Label every AI-assisted change (section 4). Report any AI tool, extension, bot or agent you find that is not in section 2 (section 6); it needs registration and validation first. AI use the organisation does not know about cannot be validated, controlled or defended in an audit.
+1. **No shadow AI:** use only the declared, organisation-approved tools of section 2, with organisation accounts; never use an AI tool on a personal account for Acme MedSoft development or QMS work. Label every AI-assisted change (section 4). Report any AI tool, extension, bot or agent you find outside section 2 (section 6): it needs registration and validation first. AI use the organisation does not know about cannot be validated, controlled or defended in an audit.
 2. **Accounts:** only the organisation account or workspace, through single sign-on. No foreign or shared accounts or tokens. Agent and CI tokens are issued and recorded by the tool owner.
 3. **Data:** never put secrets, patient or health data or personal data into prompts, context or instruction files, or repositories the tool can read, unless the contract and the data protection impact assessment DPIA-2026-03 cover it. Use synthetic data for tests.
 4. **Untrusted content:** issues, PR comments, web pages and MCP results can carry instructions aimed at the agent (prompt injection). Do not combine such content with write access to protected systems.
 5. **You own every line you merge.** As author: keep changes reviewable; read and understand every changed line; never let the AI delete tests, weaken assertions or change expected values to make CI pass; check that every new dependency exists and is approved (AI tools invent package names).
-6. **As reviewer:** review the diff, not the AI's summary; approve only what you understood; check tests, dependencies, secrets and changes to CI, gate, tool configuration or instruction files (these need code-owner review). AI review comments are hints, and their absence proves nothing.
+6. **As reviewer:** review the diff itself (the AI's summary is a hint); approve only what you understood; check tests, dependencies, secrets and changes to CI, gate, tool configuration or instruction files (these need code-owner review). AI review comments are hints, and their absence proves nothing.
 7. **Separation of duties:** never approve your own PR or a PR whose agent you launched. Where the agent opens PRs under its own identity, the code host counts your approval, so this rule is yours to keep; such PRs need 2 approvals or code-owner approval.
 8. **Models:** only models from the approved list, and a newly released model only after its admission record (MA-01) exists. Report unexpected model switches to the tool owner.
 9. **Configuration:** managed or admin configuration changes only by the Engineering Lead, through change control. Instruction files guide the AI; they do not enforce anything.
@@ -51,7 +51,7 @@ AI-Assisted: yes
 AI-Tool: <tool name>
 ```
 
-- Claude Code: the default trailer `Co-Authored-By: <model name> <noreply@anthropic.com>` names the model; keep it or set the managed `attribution` setting. It is an instruction to the model, not a git hook: still check the label. Acme MedSoft sets the managed `attribution` to the two trailers above and records the model id in the PR template.
+- Claude Code: the default trailer `Co-Authored-By: <model name> <noreply@anthropic.com>` names the model; keep it or set the managed `attribution` setting. It works as an instruction to the model, so still check the label. Acme MedSoft sets the managed `attribution` to the two trailers above and records the model id in the PR template.
 - OpenAI Codex: no built-in commit attribution setting is documented; add the trailers yourself or through the PR template.
 
 ## 5. Context rules

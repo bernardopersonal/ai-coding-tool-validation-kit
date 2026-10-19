@@ -40,7 +40,7 @@ Contexts of use:
 - {{label}}: {{description}}
 {{/contexts_list}}
 
-Summary of results (written by the person named in section 14, not by the AI tool): ______
+Summary of results (written by the person named in section 14): ______
 
 ## 2. Regulatory basis
 
@@ -192,18 +192,18 @@ A deviation still open at release is acceptable only with a documented risk asse
 | Behaviour change without a version change (model updates, server-side changes) | | | MA-01 on every new model; monitoring routine ({{doc_id_08}}) | |
 | Prompt injection through untrusted content | | | OQ-40 re-run on surface or context changes | |
 | Vendor feature, default or terms change | | | Monitoring routine; supplier re-evaluation | |
-| Local guardrails are defence in depth, not a security boundary | | | Server-side gates remain the binding control | |
+| Local guardrails are defence in depth only | | | Server-side gates remain the binding control | |
 {{#code_github}}
 | Evidence lost to platform retention (audit log 180 days, Git events 7 days, CI checks and logs per the repository retention setting) | | | Periodic export into the QMS | |
 {{/code_github}}
 {{#is_claude_code}}
 | Bash deny rules match command text only; Read / Edit denies do not stop subprocesses; built-in file tools, hooks and MCP servers run outside the sandbox | | | OS sandbox enabled and fail-closed; OQ-08 | |
-| Server-managed settings are a client-side control (skipped with third-party providers or a custom base URL, not delivered to Console API-key sessions) | | | Endpoint-managed settings where possible; login and provider pinning | |
+| Server-managed settings are a client-side control (skipped with third-party providers, a custom base URL or Console API-key sessions) | | | Endpoint-managed settings where possible; login and provider pinning | |
 | A policy hook without `"onFailure": "block"` fails open | | | Baseline requires it on policy hooks | |
 | User-installed extensions (mods) can approve calls that an ask rule would prompt for, unless restricted from managed settings | | | Managed restriction recorded in {{doc_id_06}} | |
 {{/is_claude_code}}
 {{#is_codex}}
-| Model envelope monitored, not enforced (no verified client-side enforcement) | | | Model recorded per session; PQ-01 | |
+| Model envelope monitored only (no verified client-side enforcement) | | | Model recorded per session; PQ-01 | |
 | Hooks may not block on error or timeout; environment variables with secret-like names pass to subprocesses unless configured | | | Hooks not relied on alone; `shell_environment_policy` in baseline | |
 | Permission-profile keys are beta and may change between releases | | | Version pinning; re-test on upgrade | |
 | Cloud PR / commit identity not documented by the vendor | | | Empirical result of IQ-04 recorded; re-check on vendor changes | |

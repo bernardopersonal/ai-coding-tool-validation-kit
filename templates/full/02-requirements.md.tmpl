@@ -107,18 +107,18 @@ Risk traceability (risk to requirement to test) is in {{doc_id_03}}, section 4.
 
 ## 5. Requirement details
 
-Each requirement lists the objective, the acceptance criteria used by the tests (fixed in {{doc_id_05}} before execution), and implementation notes. Implementation notes describe known ways to meet the objective; they are not the acceptance criteria, and settings must be confirmed against the vendor's current documentation at IQ.
+Each requirement lists the objective, the acceptance criteria used by the tests (fixed in {{doc_id_05}} before execution), and implementation notes. Implementation notes describe known ways to meet the objective and carry no acceptance criteria; settings must be confirmed against the vendor's current documentation at IQ.
 
 ### REQ-01 Human approval gate
 
-- **Objective:** every change to a protected branch of an in-scope repository requires at least [fill in: N, minimum 1] approval(s) by a qualified human who is neither the author nor the person who launched the agent, given on the final commit.
+- **Objective:** every change to a protected branch of an in-scope repository requires at least [fill in: N, minimum 1] approval(s) by a qualified human other than the author and the person who launched the agent, given on the final commit.
 - **Acceptance:** the platform rule requires the approvals; approvals become stale on a new push; 100% of sampled merged AI-assisted PRs had a qualified human approval submitted before merge on the head commit; merge without approval is refused (negative test); PRs authored by a bot or agent identity need 2 approvals or code-owner approval by a human team (compensating control, because the platform counts the launcher's approval of such a PR).
 - **Qualified reviewer:** trained on {{doc_id_wi}} and authorised by [fill in: code review procedure or role list].
 {{#code_github}}
 - **GitHub:** classic branch protection `required_approving_review_count` of 1 or more, `dismiss_stale_reviews`, `require_last_push_approval` (the most recent push must be approved by someone other than the pusher; enable stale-review dismissal as well), `require_code_owner_reviews` for protected paths; or a ruleset `pull_request` rule with `required_approving_review_count`, `dismiss_stale_reviews_on_push`, `require_last_push_approval` and `require_code_owner_review`. Only approvals from reviewers with write permission count.
 {{/code_github}}
 {{#code_gitlab}}
-- **GitLab:** an approval rule with `approvals_required` of 1 or more (without a default approval rule, any user can approve); project approval settings `merge_requests_author_approval` false, `merge_requests_disable_committers_approval` true ("Prevent approvals by users who add commits", not enabled by default), `reset_approvals_on_push` true and `disable_overriding_approvers_per_merge_request` true. Lock the settings at group level where possible.
+- **GitLab:** an approval rule with `approvals_required` of 1 or more (without a default approval rule, any user can approve); project approval settings `merge_requests_author_approval` false, `merge_requests_disable_committers_approval` true ("Prevent approvals by users who add commits", off by default), `reset_approvals_on_push` true and `disable_overriding_approvers_per_merge_request` true. Lock the settings at group level where possible.
 {{/code_gitlab}}
 {{#code_other}}
 - **Git hosting:** [fill in: the server-side setting that enforces required human approval, stale-approval reset and author exclusion].
@@ -138,13 +138,13 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 - **Git hosting:** [fill in: how bot and app approvals are excluded, and how this is proven].
 {{/code_other}}
 {{#is_claude_code}}
-- **Claude Code:** the Claude Code GitHub Action documents that it cannot approve pull requests, submit formal reviews or merge. This is behaviour of the action, not a platform boundary (its GitHub App holds pull-request write permission), so the platform settings above remain the control. The managed Code Review service never approves or blocks a PR; its check run concludes neutral.
+- **Claude Code:** the Claude Code GitHub Action documents that it cannot approve pull requests, submit formal reviews or merge. This is behaviour of the action, and its GitHub App holds pull-request write permission, so the platform settings above remain the control. The managed Code Review service never approves or blocks a PR; its check run concludes neutral.
 {{/is_claude_code}}
 {{#is_codex}}
 - **Codex:** vendor documentation says Codex review rules "don't replace tests, branch protections, or required approvals". Whether Codex review can submit an approving review is not documented: establish it in OQ-04.
 {{/is_codex}}
 {{#is_copilot}}
-- **GitHub Copilot:** by default Copilot code review leaves a "Comment" review that does not count, but approving can be enabled at repository, organisation and enterprise level: keep it disabled. The Copilot cloud agent cannot approve or merge, and the requester's approval of its PR does not count.
+- **GitHub Copilot:** by default Copilot code review leaves a "Comment" review that does not count; approving can be enabled at repository, organisation and enterprise level: keep it disabled. The Copilot cloud agent cannot approve or merge, and the requester's approval of its PR does not count.
 {{/is_copilot}}
 {{#is_cursor}}
 - **Cursor:** Bugbot posts comments and a check; it does not count as an approval. See REQ-15 for its check semantics.
@@ -170,7 +170,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 
 ### REQ-04 No direct push and no silent bypass
 
-- **Objective:** nobody, including administrators and AI identities, can push directly to a protected branch; any bypass of the rules is either impossible or logged and reviewed.
+- **Objective:** direct pushes to a protected branch are refused for every identity, administrators and AI identities included; any bypass of the rules is either impossible or logged and reviewed.
 - **Acceptance:** direct push refused (OQ-03); admin bypass refused, or the bypass appears in the audit records and is reviewed (OQ-06); no bypass in the PQ-01 period without a review record.
 {{#code_github}}
 - **GitHub:** classic `enforce_admins` true ("Do not allow bypassing the above settings"), or rulesets with reviewed `bypass_actors`. Do not use `bypass_mode` "exempt" on QMS branches: exempt actors are not evaluated and no bypass audit entry is created. The organisation audit log shows 180 days and Git events only 7 days; export or stream it, and export ruleset and rule-suite (bypass) records periodically.
@@ -188,7 +188,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 - **Acceptance:** the surface to identity mapping (IQ-04) shows no shared or anonymous identities; account ownership and SSO are confirmed (IQ-02); in the OQ-01 sample every PR shows a named human requester and approver, and AI involvement is identifiable.
 - **Note:** give agents a dedicated identity, or a mandatory label (REQ-10) that the reviewer checks.
 {{#is_claude_code}}
-- **Claude Code:** in telemetry `user.id` is an anonymous identifier, not a person; user identity attributes (such as `user.email`) are present only with a claude.ai or Team / Enterprise login. For API-key fleets add an identity attribute through `OTEL_RESOURCE_ATTRIBUTES`.
+- **Claude Code:** in telemetry `user.id` is an anonymous identifier; user identity attributes (such as `user.email`) are present only with a claude.ai or Team / Enterprise login. For API-key fleets add an identity attribute through `OTEL_RESOURCE_ATTRIBUTES`.
 {{/is_claude_code}}
 {{#is_codex}}
 - **Codex:** the identity under which cloud tasks commit and open PRs is not documented; record what is observed in IQ-04.
@@ -208,7 +208,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 - **Objective:** the tool configuration that governs behaviour (managed or admin settings, permission mode, allow / deny rules, sandbox, hooks, MCP or extension allow-list, instruction files) is baselined with hashes, changed only through change control, and cannot be overridden by users.
 - **Acceptance:** baseline captured and hashed (`python3 checks/capture_baseline.py`, IQ-03) and recorded in {{doc_id_06}}; version recorded per surface (IQ-01); a user-level attempt to override a managed setting has no effect (OQ-09); instruction and configuration files in repositories require code-owner review.
 {{#is_claude_code}}
-- **Claude Code:** managed settings (system `managed-settings.json`, MDM, or server-managed from the admin console) take precedence over `--settings`, `.claude/settings.local.json`, `.claude/settings.json` and `~/.claude/settings.json`. Candidate locks: `permissions.disableBypassPermissionsMode` = `"disable"`; `disableAutoMode` = `"disable"` or an explicit managed `permissions.defaultMode`; `allowManagedPermissionRulesOnly`; `allowManagedHooksOnly` (CI and agent runners) or, on developer machines, `pluginConfigs` `cc-plugin-sec-default@builtin` option `allowManagedModsOnly` with `disableSideloadFlags`; `allowManagedMcpServersOnly`; `availableModels` with `availableModelsMatch` = `"exact"` and `enforceAvailableModels`. `CLAUDE.md` is guidance, not enforcement. Verify the effective sources with `/status` ("Setting sources") and `claude doctor`. Server-managed settings are a client-side control, not a security boundary; endpoint-managed settings give stronger guarantees.
+- **Claude Code:** managed settings (system `managed-settings.json`, MDM, or server-managed from the admin console) take precedence over `--settings`, `.claude/settings.local.json`, `.claude/settings.json` and `~/.claude/settings.json`. Candidate locks: `permissions.disableBypassPermissionsMode` = `"disable"`; `disableAutoMode` = `"disable"` or an explicit managed `permissions.defaultMode`; `allowManagedPermissionRulesOnly`; `allowManagedHooksOnly` (CI and agent runners) or, on developer machines, `pluginConfigs` `cc-plugin-sec-default@builtin` option `allowManagedModsOnly` with `disableSideloadFlags`; `allowManagedMcpServersOnly`; `availableModels` with `availableModelsMatch` = `"exact"` and `enforceAvailableModels`. `CLAUDE.md` is guidance for the model. Verify the effective sources with `/status` ("Setting sources") and `claude doctor`. Server-managed settings are a client-side control only; endpoint-managed settings give stronger guarantees.
 {{/is_claude_code}}
 {{#is_codex}}
 - **Codex:** admin-enforced `requirements.toml` (`/etc/codex/requirements.toml`, Windows `%ProgramData%\OpenAI\Codex\requirements.toml`, macOS MDM, or cloud-managed requirements); a conflicting user value falls back to an allowed value with a notice. Candidate keys: `allowed_approval_policies`, `allowed_sandbox_modes` or `allowed_permission_profiles`, `allow_managed_hooks_only`, `[mcp_servers]` identity allow-list, `[rules]` with `prompt` or `forbidden` decisions, `allowed_approvals_reviewers = ["user"]`. `managed_config.toml` only supplies startup defaults that users can change during a run. Project `.codex/config.toml` loads only for trusted projects.
@@ -217,7 +217,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 - **GitHub Copilot:** enterprise and organisation policies (capture dated screenshots; no REST export was verified), repository instruction files (`.github/copilot-instructions.md`, `.github/instructions/`, `AGENTS.md`) and hooks (`.github/hooks/`). Copilot code review reads instructions from the PR head branch, so protect these files with CODEOWNERS and required code-owner review. Set the "Default policy for new features" and "Default availability for released models" policies explicitly so that new features and models are not enabled outside change control.
 {{/is_copilot}}
 {{#is_cursor}}
-- **Cursor:** team or enterprise admin settings (Privacy Mode enforced, Run Mode policy, model and MCP allow / block lists), Team Rules, project `.cursor/rules`, `.cursor/BUGBOT.md`, hooks. Cursor describes terminal and MCP allow-lists as best-effort, not a security boundary.
+- **Cursor:** team or enterprise admin settings (Privacy Mode enforced, Run Mode policy, model and MCP allow / block lists), Team Rules, project `.cursor/rules`, `.cursor/BUGBOT.md`, hooks. Cursor describes terminal and MCP allow-lists as best-effort guardrails.
 {{/is_cursor}}
 {{#is_other}}
 - **{{tool_name}}:** [fill in: configuration sources, precedence, and which ones users cannot override].
@@ -237,7 +237,7 @@ Not applicable: no local CLI / IDE or CI / headless surface is in scope. Re-asse
 {{/surf_ci_headless}}
 {{/surf_local_cli_ide}}
 
-- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks rather than allows).
+- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks).
 - **Acceptance:** OQ-08 negative cases (denied command, write outside workspace, non-approved network destination) are all refused; the failure-mode case blocks; OQ-40 shows that instructions planted in untrusted content do not lead to a denied action.
 {{#is_claude_code}}
 - **Claude Code:** Bash deny rules match the command text and are not a security boundary (for example `Bash(curl *)` does not stop `/usr/bin/curl`); use the OS sandbox with `sandbox.enabled`, `sandbox.failIfUnavailable` and `sandbox.allowUnsandboxedCommands` = false (the sandbox is not available on native Windows; built-in file tools, hooks and MCP servers run outside it). Hooks fail open on errors and timeouts unless the hook sets `"onFailure": "block"`. In CI always pass `--permission-mode` explicitly.
@@ -311,7 +311,7 @@ Not applicable: no local CLI / IDE or CI / headless surface is in scope. Re-asse
 - **Objective:** every AI-assisted change is declared using the labels defined in {{doc_id_wi}} (commit trailer and / or PR template field; the model used is recorded once per PR or from telemetry).
 - **Acceptance:** OQ-11: 100% of sampled AI-assisted PRs carry the label; [fill in: optional CI check that rejects AI-assisted PRs without the label, for example `examples/github-workflow-label-check.yml`].
 {{#is_claude_code}}
-- **Claude Code:** the default commit trailer is `Co-Authored-By: <model name> <noreply@anthropic.com>`; the `attribution` setting customises commit and PR text. Attribution is an instruction to the model, not a git hook, so it is not proof that every AI-assisted commit is labelled.
+- **Claude Code:** the default commit trailer is `Co-Authored-By: <model name> <noreply@anthropic.com>`; the `attribution` setting customises commit and PR text. Attribution works as an instruction to the model, so it is no proof that every AI-assisted commit is labelled.
 {{/is_claude_code}}
 {{#is_codex}}
 - **Codex:** the current configuration has no built-in commit attribution setting; enforce the label with the PR template, a commit-msg hook or a CI check.
@@ -343,7 +343,7 @@ Not applicable: no local CLI / IDE or CI / headless surface is in scope. Re-asse
 - **Acceptance:** OQ-20: source-citation probes during normal drafting work; a statement without a supporting source fails; for sampled writes, a preview record precedes the write and the write is attributed to the human who approved the preview.
 {{/ctx_doc_drafting}}
 {{^ctx_doc_drafting}}
-Not applicable: the `doc_drafting` context is not selected. Selecting it later is a new context of use (re-baseline trigger).
+Not applicable, because the `doc_drafting` context is not selected; selecting it later is a new context of use (re-baseline trigger).
 {{/ctx_doc_drafting}}
 
 ### REQ-14 Bounded write scope and oracle-based verification
@@ -353,7 +353,7 @@ Not applicable: the `doc_drafting` context is not selected. Selecting it later i
 - **Acceptance:** OQ-30 on a frozen snapshot: expected results computed independently first; at least one expected positive and one expected negative case; false negatives = 0 for [fill in: critical categories] and false positives at most [fill in]; declared writes match the actual write history.
 {{/ctx_agents_qms}}
 {{^ctx_agents_qms}}
-Not applicable: the `agents_qms` context is not selected. Selecting it later is a new context of use (re-baseline trigger).
+Not applicable, because the `agents_qms` context is not selected; selecting it later is a new context of use (re-baseline trigger).
 {{/ctx_agents_qms}}
 
 ### REQ-15 AI review is advisory only

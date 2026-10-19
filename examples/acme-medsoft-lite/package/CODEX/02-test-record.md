@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed lite package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed lite package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-L02 Test record: OpenAI Codex
 
@@ -35,7 +35,7 @@ Environment before execution (repositories, sandbox; tool version, configuration
 2. Compare with the approved configuration; managed files owned by root / Administrators (`ls -l`, `icacls`); record local admins.
 3. Drift: change one managed and one user setting, re-run with `--compare <approved baseline JSON>`: both reported; restore.
 
-Observed: captures on ACME-MBP-017 (macOS, MDM payload) and ACME-WS-004 (Linux, `/etc/codex/requirements.toml`) for the three repositories: `requirements.toml`, `config.toml`, `AGENTS.md` and the absence of a repository `.codex/` layer equal the approved values; `allowed_login_methods` and `allowed_chatgpt_workspaces` restrict login to the organisation workspace (REQ-16). `codex --strict-config doctor` reports no unknown fields; `codex features list` matches the approved list; no retired constructs for 0.163.0. Requirements file owned by root, not writable by developers; local admins: IT only. Drift check on ACME-WS-004 with `--compare <approved JSON> --approved-version 0.163.0`: a changed line in `/etc/codex/requirements.toml` reported as a failure (exit 1), a changed user `config.toml` as a warning; both restored.
+Observed: captures on ACME-MBP-017 (macOS, MDM payload) and ACME-WS-004 (Linux, `/etc/codex/requirements.toml`) for the three repositories: `requirements.toml`, `config.toml`, `AGENTS.md` and the absence of a repository `.codex/` layer equal the approved values; `allowed_login_methods` and `allowed_chatgpt_workspaces` restrict login to the organisation workspace (REQ-16). `codex --strict-config doctor` reports no unknown fields; `codex features list` matches the approved list; no retired constructs for 0.163.0. Requirements file owned by root and read-only for developers; local admins: IT only. Drift check on ACME-WS-004 with `--compare <approved JSON> --approved-version 0.163.0`: a changed line in `/etc/codex/requirements.toml` reported as a failure (exit 1), a changed user `config.toml` as a warning; both restored.
 
 **Result:** Pass, Alex Example, 2026-10-21, none
 
@@ -138,16 +138,16 @@ Observed: OQ-08: `codex sandbox -- sh -c 'touch ~/outside.txt'` failed with a pe
 
 ### OQ-10 Model allow-list refuses other models; model recorded (REQ-08)
 
-**Criterion:** where the tool can enforce the list: 100% of attempts with a non-approved model are refused, or substituted with a notice by an admitted id, recorded per attempt, and the enforced list equals the admitted ids; where it cannot: recorded as "monitored, not enforced" and covered by the detection check (ACME-VAL-CODEX-L01 section 8) and PQ-01. The model id is recorded for 100% of at least 5 sampled AI-assisted PRs or sessions.
+**Criterion:** where the tool can enforce the list: 100% of attempts with a non-approved model are refused, or substituted with a notice by an admitted id, recorded per attempt, and the enforced list equals the admitted ids; where it cannot: recorded as "monitored only" and covered by the detection check (ACME-VAL-CODEX-L01 section 8) and PQ-01. The model id is recorded for 100% of at least 5 sampled AI-assisted PRs or sessions.
 
 **Evidence:** transcripts, settings export, model records.
 
 1. `codex --model <id>` with an id outside the list; record refused, substituted or accepted.
 2. Model id of each OQ-01 sample PR or session, from telemetry, session logs or vendor exports.
 
-Observed: `codex --model openai-model-b` (outside the list) started without a notice: no client-side enforcement, as expected (KL-04); recorded as "monitored, not enforced", covered by the weekly detection check of ACME-VAL-CODEX-L01 section 8 and PQ-01. Model id of the 9 OQ-01 sample PRs: 9 of 9 from the PR template, 6 of them also from `codex.conversation_starts` telemetry (enabled 2026-08-01), all `openai-model-a`.
+Observed: `codex --model openai-model-b` (outside the list) started without a notice: no client-side enforcement, as expected (KL-04); recorded as "monitored only", covered by the weekly detection check of ACME-VAL-CODEX-L01 section 8 and PQ-01. Model id of the 9 OQ-01 sample PRs: 9 of 9 from the PR template, 6 of them also from `codex.conversation_starts` telemetry (enabled 2026-08-01), all `openai-model-a`.
 
-**Result:** Pass, Alex Example, 2026-10-22, none (monitored, not enforced)
+**Result:** Pass, Alex Example, 2026-10-22, none (monitored only)
 
 ### MA-01 Model admission suite (REQ-08)
 

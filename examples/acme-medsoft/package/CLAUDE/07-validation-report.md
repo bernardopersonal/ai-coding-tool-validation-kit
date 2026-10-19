@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CLAUDE-07 Validation report: Claude Code
 
@@ -43,7 +43,7 @@ Contexts of use:
 - Advisory AI PR review: AI review comments on pull requests; advisory only, never counted as the required human approval.
 - Document drafting: Drafting of controlled documents and records, previewed and approved by a human before they are written or released.
 
-Summary of results (written by the person named in section 14, not by the AI tool): all 22 tests passed. The server-side gate held in every negative test on two repositories, including attempts by the agent itself; managed settings could not be overridden; both models in the envelope passed MA-01; 4 weeks of in-use data showed qualified human approval on every merged PR and no model outside the envelope. One minor deviation (an undeclared AI-assisted PR found by the provenance cross-check) was corrected and re-tested. Known guardrail limitations (text-matching deny rules) are compensated by the server-side gate.
+Summary of results (written by the person named in section 14): all 22 tests passed. The server-side gate held in every negative test on two repositories, including attempts by the agent itself; managed settings could not be overridden; both models in the envelope passed MA-01; 4 weeks of in-use data showed qualified human approval on every merged PR and no model outside the envelope. One minor deviation (an undeclared AI-assisted PR found by the provenance cross-check) was corrected and re-tested. Known guardrail limitations (text-matching deny rules) are compensated by the server-side gate.
 
 ## 2. Regulatory basis
 
@@ -140,10 +140,10 @@ A deviation still open at release is acceptable only with a documented risk asse
 | Behaviour change without a version change (model updates, server-side changes) | Low: models change without notice, but admission and monitoring detect it | yes | MA-01 on every new model; monitoring routine (ACME-VAL-CLAUDE-08) | Jordan Demo (Engineering Lead) |
 | Prompt injection through untrusted content | Low: OQ-40 showed no guardrail break; server-side gates bind | yes | OQ-40 re-run on surface or context changes | Jordan Demo (Engineering Lead) |
 | Vendor feature, default or terms change | Medium: frequent releases; mitigated by weekly monitoring and version pinning | yes | Monitoring routine; supplier re-evaluation | Jordan Demo (Engineering Lead) |
-| Local guardrails are defence in depth, not a security boundary | Accepted by design | yes | Server-side gates remain the binding control | Jordan Demo (Engineering Lead) |
+| Local guardrails are defence in depth only | Accepted by design | yes | Server-side gates remain the binding control | Jordan Demo (Engineering Lead) |
 | Evidence lost to platform retention (audit log 180 days, Git events 7 days, CI checks and logs per the repository retention setting) | Low with weekly and on-merge export | yes | Periodic export into the QMS | Jordan Demo (Engineering Lead) |
 | Bash deny rules match command text only; Read / Edit denies do not stop subprocesses; built-in file tools, hooks and MCP servers run outside the sandbox | Reproduced in OQ-08 (`sh -c`); compensated | yes | OS sandbox enabled and fail-closed; OQ-08 | Jordan Demo (Engineering Lead) |
-| Server-managed settings are a client-side control (skipped with third-party providers or a custom base URL, not delivered to Console API-key sessions) | Not used: endpoint-managed files only | yes | Endpoint-managed settings where possible; login and provider pinning | Jordan Demo (Engineering Lead) |
+| Server-managed settings are a client-side control (skipped with third-party providers, a custom base URL or Console API-key sessions) | Not used: endpoint-managed files only | yes | Endpoint-managed settings where possible; login and provider pinning | Jordan Demo (Engineering Lead) |
 | A policy hook without `"onFailure": "block"` fails open | None: the only policy hook sets `"onFailure": "block"` (OQ-08) | yes | Baseline requires it on policy hooks | Jordan Demo (Engineering Lead) |
 | User-installed extensions (mods) can approve calls that an ask rule would prompt for, unless restricted from managed settings | Low: mods restricted by managed `allowManagedModsOnly` and `disableSideloadFlags` (OQ-09) | yes | Managed restriction recorded in ACME-VAL-CLAUDE-06 section 9 | Jordan Demo (Engineering Lead) |
 | Undeclared AI-assisted change when an author rewrites the commit message (DEV-CLAUDE-01) | Low: the change still passes the human gate and CI; provenance gap only | yes, with compensating control | Weekly reconciliation until CR-2026-047; OQ-11 re-test after deployment | Jordan Demo (Engineering Lead) |

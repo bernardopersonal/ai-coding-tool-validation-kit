@@ -77,7 +77,7 @@ An exclusion is accepted only with a reference to the record that covers the top
 | Supplier evaluation and monitoring | Purchasing process{{#reg_iso13485}} (ISO 13485 clause 7.4){{/reg_iso13485}}; this plan only checks the contracted data terms (IQ-05) | [fill in] |
 | AI governance and AI impact | {{#reg_iso42001}}AI management system{{/reg_iso42001}}{{^reg_iso42001}}Organisation AI policy{{/reg_iso42001}} | [fill in] |
 | Qualification of the language model itself | Not performed: the validation covers intended use, guardrails and output verification | This plan, section 3.2 |
-| AI functions inside the medical device | Design and development controls of the product, not this plan | [fill in] |
+| AI functions inside the medical device | Design and development controls of the product (outside this plan) | [fill in] |
 | [fill in] | [fill in] | [fill in] |
 
 ## 4. Approach
@@ -88,8 +88,8 @@ An exclusion is accepted only with a reference to the record that covers the top
 4. The tool never executes, writes the conclusion of, or approves its own validation. The executor is never the approver. People sign for themselves in the eQMS or with an electronic signature.
 5. Configuration (versioned, baselined, change-controlled in {{doc_id_06}}) is separated from behaviour (variable: models change without a version bump), which is monitored and re-tested on events and on a calendar.
 6. Every gate is proven with negative tests, on more than one repository when available. The code-host part of the gate tests is executed once per code host in {{doc_id_gates}} and referenced here; the tool-specific part is executed per tool in {{doc_id_05}}.
-7. Evidence comes from exports (API JSON, logs, hashes), not only screenshots.
-8. The binding controls live server-side (Git hosting and CI), not in the agent's local configuration.
+7. Evidence comes from exports (API JSON, logs, hashes), with screenshots as a supplement.
+8. The binding controls live server-side (Git hosting and CI); the agent's local configuration is a second layer.
 {{#already_in_use}}
 9. The tool is already in use: this is a retrospective validation with a documented interim-use justification and nonconformity (section 12). The historical in-use data are reviewed as RV-01 Retrospective review; PQ starts after release.
 {{/already_in_use}}
@@ -99,17 +99,17 @@ Test depth by determination (from {{doc_id_03}}, section 6):
 | Tests | Determination{{#risk_csa}}: high process risk{{/risk_csa}}{{#risk_three}}: high{{/risk_three}} | Lower determinations |
 |---|---|---|
 | IQ-01 to IQ-05 | Scripted | Scripted |
-| OQ-02 to OQ-07 (negative gate tests) | Scripted (robust) | Scripted (limited); never omitted |
+| OQ-02 to OQ-07 (negative gate tests) | Scripted (rigorous) | Scripted (limited); never omitted |
 | OQ-01, OQ-11 (historical samples) | Scripted sampling with predefined criteria | Historical sample with predefined criteria |
-| OQ-08 to OQ-10, OQ-12, OQ-40 | Scripted (robust) plus error-guessing | Limited scripted or unscripted with the same criteria |
+| OQ-08 to OQ-10, OQ-12, OQ-40 | Scripted (rigorous) plus error-guessing | Limited scripted or unscripted with the same criteria |
 | OQ-13 (vendor monitoring routine) | Scripted record review | Scripted record review |
-| Context tests (OQ-20, OQ-30) | Scripted (robust) | Limited scripted |
+| Context tests (OQ-20, OQ-30) | Scripted (rigorous) | Limited scripted |
 | MA-01 | Automated, every model in the envelope | Automated, every model in the envelope |
 | PQ-01, PQ-02 | Required | PQ-01 required; PQ-02 [fill in: required / sample size reduced] |
 
 ## 5. Predetermined change protocol for models (three tiers)
 
-This protocol applies under [fill in: software validation procedure ID and clause] (section 2). Models change every few weeks and teams switch between them. This section is set **before** execution and is approved with this plan. It is an internal change-control mechanism, analogous in spirit to a predetermined change control plan; it is not a regulatory submission.
+This protocol applies under [fill in: software validation procedure ID and clause] (section 2). Models change every few weeks and teams switch between them. This section is set **before** execution and is approved with this plan. It is an internal change-control mechanism, analogous in spirit to a predetermined change control plan, and it stays inside the QMS (no regulatory submission).
 
 ### 5.1 Tier 1: initial validation (once per tool and vendor)
 
@@ -322,7 +322,7 @@ Detailed steps, expected results and acceptance criteria are in {{doc_id_05}} an
 | PQ-01 in-use monitoring | at least 4 weeks or 20 AI-assisted PRs, starting on the deployment date of the approved {{doc_id_06}} revision | [fill in] |
 | PQ-02 reviewer effectiveness | [fill in: e.g. 10% of AI-assisted PRs merged in the PQ-01 period, at least 5], reviewed by someone who did not review the PR | [fill in] |
 
-Samples are selected by a rule written here before execution, not chosen after looking at results: [fill in: e.g. the most recent N merged PRs labelled AI-assisted per repository, or a random selection with the seed recorded].
+Samples are selected by a rule written here before execution, ahead of any results: [fill in: e.g. the most recent N merged PRs labelled AI-assisted per repository, or a random selection with the seed recorded].
 
 **PQ-01 outlier rule** (required): an approval less than [fill in: x] minutes after ready-for-review on a diff of more than [fill in: y] changed lines, or an approval without any review comment on a diff of more than [fill in: y] lines, is an outlier; each outlier is reviewed by the {{role_approver}} and the result recorded.
 
@@ -381,7 +381,7 @@ Rules:
 
 - Executor and approver are different people; at least [fill in: 2] named people take part, so that no one designs, executes and effectively approves alone.
 - If the AI tool assisted in drafting any validation document, this is declared in that document, and a human author reviews and owns every line. The conclusion of {{doc_id_07}} is written by a human.
-- Approvals and signatures are made by the people themselves in the eQMS or with an electronic signature; nobody records an approval on behalf of someone else, and the AI tool never does.
+- Approvals and signatures are made by the people themselves in the eQMS or with an electronic signature; each person records only their own approval, and the AI tool records none.
 
 ## 11. Deviation handling
 
@@ -417,7 +417,7 @@ If the interim controls cannot be shown to be in place, QMS-relevant use stops u
 {{^already_in_use}}
 ## 12. Use before release
 
-{{tool_name}} is not yet in use. It is not used in any QMS-relevant context before the release decision in {{doc_id_07}}. Use in a sandbox repository solely to execute this validation is permitted.
+{{tool_name}} is not yet in use, and it stays out of every QMS-relevant context until the release decision in {{doc_id_07}}. Use in a sandbox repository solely to execute this validation is permitted.
 {{/already_in_use}}
 
 ## 13. Schedule

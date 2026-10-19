@@ -132,7 +132,7 @@ Crediting the tested gate and CI as independent verification is an interpretatio
 
 Overall (highest context): [fill in]. Known guardrail limitations (verify against the vendor's current documentation):
 {{#is_claude_code}}
-KL-01 Bash deny rules match text; the OS sandbox enforces, not for file tools, hooks or MCP. KL-02 Without `sandbox.failIfUnavailable` a failed sandbox runs unsandboxed. KL-03 Hooks fail open unless `"onFailure": "block"`. KL-04 Auto mode can be the starting mode. KL-05 Server-managed settings are client-side, not on every surface. KL-06 Headless runs have no workspace-trust prompt. KL-07 Fallbacks can change the model. KL-08 Local transcripts are unencrypted.
+KL-01 Bash deny rules match text; the OS sandbox covers shell commands only. KL-02 Without `sandbox.failIfUnavailable` a failed sandbox runs unsandboxed. KL-03 Hooks fail open unless `"onFailure": "block"`. KL-04 Auto mode can be the starting mode. KL-05 Server-managed settings are client-side and miss some surfaces. KL-06 Headless runs have no workspace-trust prompt. KL-07 Fallbacks can change the model. KL-08 Local transcripts are unencrypted.
 {{/is_claude_code}}
 {{#is_codex}}
 KL-01 In hooks only an explicit deny blocks. KL-02 Variables named like KEY, SECRET or TOKEN reach spawned commands by default. KL-03 Only `requirements.toml` enforces; `managed_config.toml` gives defaults. KL-04 Model defaults are not enforcement. KL-05 The cloud-task identity is undocumented. KL-06 Vendor logs miss local actions. KL-07 Command rules govern only commands run outside the sandbox.
@@ -189,7 +189,7 @@ Full profile only: REQ-11 to REQ-14; IQ-01, IQ-02, IQ-04, IQ-05, OQ-11 to OQ-13,
 
 Negative gate tests, server-side binding controls, limited scripted tests, historical samples, automated MA-01; criteria and minimum samples: {{doc_id_02}}.
 
-Planned: OQ-01, OQ-10 [fill in]; OQ-02 to OQ-07 [fill in: repositories]; MA-01 [fill in: ids]; PQ [fill in: period]. Sample rule (random, seed recorded): [fill in]. PQ-01 outlier: approval within [fill in: x] minutes of ready-for-review, or without comment, on a diff over [fill in: y] lines; reviewed by [fill in: qualified reviewer, not the approver]. PQ-02 missed-defect classes: 1 could affect safety, a risk control or a verification result (limit 0); 2 functional or critical coding-rule defect (limit [fill in]); 3 other.
+Planned: OQ-01, OQ-10 [fill in]; OQ-02 to OQ-07 [fill in: repositories]; MA-01 [fill in: ids]; PQ [fill in: period]. Sample rule (random, seed recorded): [fill in]. PQ-01 outlier: approval within [fill in: x] minutes of ready-for-review, or without comment, on a diff over [fill in: y] lines; reviewed by [fill in: qualified reviewer; approver excluded]. PQ-02 missed-defect classes: 1 could affect safety, a risk control or a verification result (limit 0); 2 functional or critical coding-rule defect (limit [fill in]); 3 other.
 
 Roles: the {{role_executor}} executes and drafts {{doc_id_03}}, never approves; the {{role_approver}} approves plan, record, release, admissions and PQ addendum, never executes; the {{role_tool_owner}} owns configuration (frozen during execution), change control and vendor monitoring{{#owner_is_executor}} (also the executor: the {{role_approver}} does the technical review){{/owner_is_executor}}{{#role_prrc}}; the {{role_prrc}} (PRRC) is informed{{/role_prrc}}. Minimum team: one engineer, one approver, sandbox test accounts. {{tool_name}} is only the object under test.
 
@@ -201,7 +201,7 @@ Acceptance: guardrail criteria hold in 100% of cases and runs. Release rests on 
 
 If the procedure (section 1) forbids predetermined change protocols, model changes follow normal change control.
 
-1. **Initial validation:** MA-01 on every approved model, fixed here (changes by amendment): tasks [fill in: all of `admission/tasks/`, `doc-citation-probe` dropped only without `doc_drafting`; private tasks]; baseline variants [fill in]; 3 runs per task{{#ctx_doc_drafting}}, citation probe [fill in: 10]{{/ctx_doc_drafting}}; auxiliary models [fill in: none]; suite SHA-256 over the sorted per-file SHA-256 of tasks and fixtures, as `run_admission.py --list` prints it [fill in]. MA-01 screens for gross regression, not reliability.
+1. **Initial validation:** MA-01 on every approved model, fixed here (changes by amendment): tasks [fill in: all of `admission/tasks/`, `doc-citation-probe` dropped only without `doc_drafting`; private tasks]; baseline variants [fill in]; 3 runs per task{{#ctx_doc_drafting}}, citation probe [fill in: 10]{{/ctx_doc_drafting}}; auxiliary models [fill in: none]; suite SHA-256 over the sorted per-file SHA-256 of tasks and fixtures, as `run_admission.py --list` prints it [fill in]. MA-01 screens for gross regression only.
 2. **Model admission:** a new id matching a pattern below, with tool version and IQ-03 baseline unchanged and no guardrail-relevant item in the screened release notes, needs MA-01 only. Pass: admission record ({{doc_id_03}} section 7) approved by the {{role_approver}}; {{#is_codex}}the exact id joins the monitored list{{/is_codex}}{{#is_other}}the exact id joins [fill in: the enforced or monitored list]{{/is_other}}{{^is_codex}}{{^is_other}}the exact id, never the pattern, joins the enforced allow-list{{/is_other}}{{/is_codex}}. Repointable ids (`*-latest`, unversioned names) are never admitted.
 
 | Approved entry | Pre-authorised pattern | Excluded |
@@ -216,7 +216,7 @@ If the procedure (section 1) forbids predetermined change protocols, model chang
 Enforcement: managed `availableModels` with `availableModelsMatch: "exact"`, `enforceAvailableModels: true` and `deniedModels`.
 {{/is_claude_code}}
 {{#is_codex}}
-Enforcement: none verified (check the vendor's current documentation): "monitored, not enforced".
+Enforcement: none verified (check the vendor's current documentation): "monitored only".
 {{/is_codex}}
 {{#is_copilot}}
 Enforcement: model availability policies; set "Default availability for released models" explicitly.
@@ -225,7 +225,7 @@ Enforcement: model availability policies; set "Default availability for released
 Enforcement: the admin model allow / block list.
 {{/is_cursor}}
 {{#is_other}}
-Enforcement: [fill in, or "monitored, not enforced"].
+Enforcement: [fill in, or "monitored only"].
 {{/is_other}}
 Weekly detection ([fill in: check]): model ids from telemetry, session logs or vendor exports, then trailers, PR template. Use before admission is a deviation (T4): changes made with the model are reviewed and its use stops{{#is_codex}}, unless a grace period for MA-01 is accepted here: [fill in: none, or N working days]{{/is_codex}}.
 

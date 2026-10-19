@@ -4,34 +4,40 @@ Where each clause is answered in the rendered package, and how firm the link is.
 
 **Basis column**
 
-- **R: requirement.** The clause requires it. Wording is paraphrased. ISO and IEC texts are paywalled, so check your licensed copy before quoting verbatim.
-- **G: guidance.** Non-binding guidance or a technical report. It describes an accepted way to meet a requirement.
-- **I: interpretation.** The kit's reading, or a practice the kit recommends. Defend it in your own words, or adapt it.
+- R: requirement. The clause requires it. The wording is paraphrased: ISO and IEC texts are paywalled, so check your licensed copy before quoting verbatim.
+- G: guidance. Non-binding guidance or a technical report that describes an accepted way to meet a requirement.
+- I: interpretation. The kit's reading, or a practice the kit recommends. Defend it in your own words, or adapt it.
 
-**Document key** (rendered package): `00-WI` work instruction, `00-TD` tool discovery checklist, `01` inventory and intended use, `02` requirements, `03` risk assessment, `04` validation plan, `05` test protocol, `06` configuration baseline, `07` validation report, `08` change and revalidation. Section names follow the template headings.
+Document key (rendered package): `00-WI` work instruction, `00-TD` tool discovery checklist, `01` inventory and intended use, `02` requirements, `03` risk assessment, `04` validation plan, `05` test protocol, `06` configuration baseline, `07` validation report, `08` change and revalidation. Section names follow the template headings.
 
-The keys are those of the full profile. The lite profile condenses the same content, with the same REQ, IQ, OQ, MA and PQ IDs, into three documents per tool (document IDs `...-L01` to `...-L03`; shared documents `...-GEN-L01`, `...-GEN-L02`): `01` validation plan (full 01 to 04, applicable requirement subset, known guardrail limitations, model change protocol), `02` test record (the lite tests of full 05, including the IQ-03 baseline of 06 and the code-host part of the gate qualification) and `03` validation report (full 07, a subset of the triggers of 08 and the admission record). Tests and requirements that lite leaves out are answered only by the full profile.
+The keys follow the full profile. The lite profile condenses the same content, with the same REQ, IQ, OQ, MA and PQ IDs, into 3 documents per tool (document IDs `...-L01` to `...-L03`; shared documents `...-GEN-L01`, `...-GEN-L02`):
 
-Facts were checked on 2026-10-18 against public sources. Regulator and standards sites could not always be fetched directly, so several points rest on reputable secondary summaries. These are flagged in [Verify before citing](#verify-before-citing).
+- `01` validation plan: full 01 to 04, the applicable requirement subset, known guardrail limitations, model change protocol;
+- `02` test record: the lite tests of full 05, including the IQ-03 baseline of 06 and the code-host part of the gate qualification;
+- `03` validation report: full 07, a subset of the triggers of 08 and the admission record.
+
+Tests and requirements that lite leaves out are answered by the full profile only.
+
+Facts were checked on 2026-10-18 against public sources. Regulator and standards sites couldn't always be fetched directly, so several points rest on reputable secondary summaries (flagged in [Verify before citing](#verify-before-citing)).
 
 ## ISO 13485:2016
 
-ISO 13485:2016 is the current edition. It was reconfirmed, and no public revision project was found as of 2026.
+ISO 13485:2016 is the current edition. It was reconfirmed, and a search in 2026 found no public revision project.
 
 | Clause | Obligation (paraphrase) | Where in the kit | Basis |
 |---|---|---|---|
 | 4.1.6 | Documented procedures for validating the application of computer software used in the QMS | Your software-validation SOP governs. The kit supplies the per-tool validation content (01-08), the shared code-host record (00-gates) and the rules of use (00-WI). 04 References names the SOP clause that permits risk-based assurance, predetermined change protocols and retrospective validation; adaptable clause text in [model-change-protocol.md](model-change-protocol.md) | R |
 | 4.1.6 | Validate before initial use | 04 Schedule; 07 Release decision; 05 execution rules (plan and protocol approved before execution) | R |
 | 4.1.6 | Use before validation is a nonconformity: record it, and correct the root cause of why the tool entered use without validation | 04 Interim-use justification (mandatory NC and CAPA references); 07 Interim use before release; RV-01 Retrospective review | R |
-| 4.1.6 | When the tool is already in use: retrospective validation plus a documented interim-use justification and interim controls | 04 Interim-use justification; 07 Interim use before release | I (an honest way to handle a gap; it does not replace validation before use) |
+| 4.1.6 | When the tool is already in use: retrospective validation plus a documented interim-use justification and interim controls | 04 Interim-use justification; 07 Interim use before release | I (an honest way to handle a gap; validation before use remains the requirement) |
 | 8.3, 8.5.2 | Nonconforming product or process handled; corrective action on the root cause, proportionate to its effects | 04 Interim-use justification (NC, CAPA); 04 Deviation handling; 05 Deviation log | R |
 | 4.1.6 | Validate after changes to the software or its application, as appropriate | 08 Triggers and required actions; 08 Confirmatory subsets; 04 Predetermined change protocol for models | R |
 | 4.1.6 | A new model, or a new model version, is a change to the software or its application | 04 Predetermined change protocol for models; MA-01; [model-change-protocol.md](model-change-protocol.md) | I |
 | 4.1.6 | Approach and activities proportionate to the risk of using the software | 03 Criticality determination and resulting test depth; 04 Approach; 05 Test depth by risk | R |
 | 4.1.6, 4.2.5 | Keep records of validation activities | 05 execution fields; 06; 07; `evidence/` exports with SHA-256 | R |
-| 4.1.6 vs 7.3 | Development use of a coding assistant falls mainly under clause 4.1.6, with design and development controls (clause 7.3) applying to the product code it produces | 01 QMS-relevance determination; 07 Regulatory basis | I (public guidance has not settled this) |
+| 4.1.6 vs 7.3 | Development use of a coding assistant falls mainly under clause 4.1.6, with design and development controls (clause 7.3) applying to the product code it produces | 01 QMS-relevance determination; 07 Regulatory basis | I (public guidance leaves this open) |
 | 7.5.6, 7.6 | Same validation pattern for software used in production and service provision (clause 7.5.6) or in monitoring and measurement (clause 7.6) | State in 01 which clause each use falls under. Consider clause 7.6 when AI-built checks are used as measuring software | R (when applicable); I (which uses are in scope) |
-| 4.1.5 | Control outsourced processes that affect product conformity, proportionate to risk, including quality agreements | 01 Supplier and contractual terms; 04 Exclusions and cross-references: record a terms review, or a rationale for why cloud-executed agent runs are not an outsourced process | I |
+| 4.1.5 | Control outsourced processes that affect product conformity, proportionate to risk, including quality agreements | 01 Supplier and contractual terms; 04 Exclusions and cross-references: record a terms review, or a rationale for why cloud-executed agent runs aren't an outsourced process | I |
 | 4.2.4 | Documents reviewed and approved before issue; changes and revision status identified; current versions at the point of use | 06 Instruction files and hashes; 06 Who may change the configuration; 00-WI Configuration: where it lives and who may change it; REQ-06 (code-owner review of instruction files) | R (for documents) |
 | 4.2.4 | Agent instruction files and managed settings are controlled documents or configuration items | 06; REQ-06; OQ-09 | I |
 | 4.2.5 | Records legible, identifiable and retrievable; changes identifiable; kept at least for the device lifetime and not less than 2 years from release | 04 Evidence rules; 00-WI Records | R |
@@ -49,47 +55,49 @@ In force since 2 February 2026 (final rule published 2 February 2024).
 | Reference | Obligation (paraphrase) | Where in the kit | Basis |
 |---|---|---|---|
 | 21 CFR 820.7, 820.10(a) | Document a QMS that complies with ISO 13485:2016, which is incorporated by reference | All ISO 13485 rows above. Cite "ISO 13485:2016 clause 4.1.6, as incorporated by 21 CFR 820.10" | R |
-| Former 21 CFR 820.70(i) | No longer exists. Software validation for production and QMS software now comes from ISO 13485 clauses 4.1.6, 7.5.6 and 7.6 | 07 Regulatory basis: do not cite 21 CFR 820.70(i) | R |
+| Former 21 CFR 820.70(i) | Removed. Software validation for production and QMS software now comes from ISO 13485 clauses 4.1.6, 7.5.6 and 7.6 | 07 Regulatory basis: don't cite 21 CFR 820.70(i) | R |
 | 21 CFR 820.10(c) | ISO 13485 clause 7.3 design and development applies to class II and class III devices, and to listed class I devices, including those automated with computer software | Context `code_product`; 01 Contexts of use | R |
 | 21 CFR 820.35 | Adds record content for complaints, servicing and UDI on top of ISO 13485 clause 4.2.5. Nothing specific to software validation | Validation record content comes from ISO 13485 clause 4.2.5 and the CSA guidance (05, 07) | R |
 | Inspection scope | The old 21 CFR 820.180(c) exemption is gone. Investigators may review management review, internal audit and supplier audit reports, including records created before 2 February 2026 | Write the supplier assessment and 08 periodic review as inspectable records | R |
 | Pre-QMSR records | FDA suggests a comparative analysis showing that earlier records meet the QMSR | If you adopt the kit mid-stream, add a short comparison note for earlier AI-tool records | G |
-| CP 7382.850 | Replaced QSIT on 2 February 2026. Six QMS areas, including Change Control, Design and Development, and Outsourcing and Purchasing | AI-tool evidence is typically sampled under these areas: 05, 08, IQ-05 | I |
+| CP 7382.850 | Replaced QSIT on 2 February 2026. 6 QMS areas, including Change Control, Design and Development, and Outsourcing and Purchasing | AI-tool evidence is typically sampled under these areas: 05, 08, IQ-05 | I |
 | 21 CFR 11.1(b) | Part 11 applies to records required by predicate rules (Part 820, including the records of ISO 13485 clauses 4.1.6 and 4.2.5 it incorporates) that are kept, signed or submitted electronically | Every package record kept in an eQMS; 04 References; 05 Execution rules ("Electronic records and signatures") | R |
 | 21 CFR 11.10(a) | Validation of the system that holds the records (accuracy, reliability, consistent intended performance, detection of invalid or altered records) | The eQMS and evidence store are validated under your Part 11 program; evidence files carry SHA-256 hashes (04 Evidence rules) | R |
 | 21 CFR 11.10(d), (g) | Access limited to authorised individuals; authority checks | eQMS roles; 04 Roles and responsibilities; 06 Who may change the configuration | R |
 | 21 CFR 11.10(e) | Secure, computer-generated, time-stamped audit trails | eQMS audit trail; kit evidence with UTC timestamps, `executed_by` and SHA-256 (04 Evidence rules) | R |
 | 21 CFR 11.50 | Signature manifestation: printed name, date and time, meaning | 05, 06, 07, 08 and 00-gates signature tables ("Date and time (UTC)", meaning of the signature) | R |
-| 21 CFR 11.70 | Signatures linked to their records so they cannot be removed, copied or transferred | eQMS signature function; 07 Signatures | R |
-| 21 CFR 11.100(c) | Certification to FDA that electronic signatures are the legally binding equivalent of handwritten signatures | Your organisation's Part 11 program (not in the kit) | R |
-| 21 CFR 11.200, 11.300 | Components and controls of non-biometric signatures; controls for identification codes and passwords | eQMS e-signature configuration (not in the kit) | R |
+| 21 CFR 11.70 | Signatures linked to their records so they can't be removed, copied or transferred | eQMS signature function; 07 Signatures | R |
+| 21 CFR 11.100(c) | Certification to FDA that electronic signatures are the legally binding equivalent of handwritten signatures | Your organisation's Part 11 program (outside the kit) | R |
+| 21 CFR 11.200, 11.300 | Components and controls of non-biometric signatures; controls for identification codes and passwords | eQMS e-signature configuration (outside the kit) | R |
 
 ## FDA Computer Software Assurance guidance
 
-"Computer Software Assurance for Production and Quality Management System Software". Final guidance issued 24 September 2025, then revised and retitled 3 February 2026 to align with the QMSR (docket FDA-2022-D-0795). It is non-binding. It covers software used as part of production or the quality management system, not device software functions, and it supersedes Section 6 of the 2002 General Principles of Software Validation. Cite the February 2026 version.
+"Computer Software Assurance for Production and Quality Management System Software". Final guidance issued 24 September 2025, then revised and retitled 3 February 2026 to align with the QMSR (docket FDA-2022-D-0795). It's non-binding.
+
+Its scope is software used as part of production or the quality management system (device software functions fall outside it), and it supersedes Section 6 of the 2002 General Principles of Software Validation. Cite the February 2026 version.
 
 | Element | What it describes | Where in the kit | Basis |
 |---|---|---|---|
 | Step 1: intended use | Identify the intended use of each feature, function or operation | 01 Contexts of use; 01 Uses outside the intended use | G |
-| Step 2: risk-based approach | Binary call: "high process risk" when a failure may cause a quality problem that foreseeably compromises safety; otherwise "not high". Judge by foreseeable failure, not by feature name | 03 Criticality determination (`csa` risk model) | G |
+| Step 2: risk-based approach | Binary call: "high process risk" when a failure may cause a quality problem that foreseeably compromises safety; otherwise "not high". Judge by the foreseeable failure, whatever the feature is called | 03 Criticality determination (`csa` risk model) | G |
 | Step 2: finer tiers | Manufacturers may use more granular internal tiers | 03 (`three_level` risk model: low / medium / high) | I |
-| Step 3: assurance activities | Scripted testing (robust, or limited/hybrid) and unscripted testing (ad-hoc, error-guessing, exploratory), scaled to risk | 04 Approach; 05 test types (scripted, negative, historical, exploratory) | G |
-| Step 3: other controls | Leverage supplier evidence under purchasing controls, downstream controls such as human review and CI, and automated records such as logs and audit trails | 03 controls credited per failure mode; IQ-05; PQ-01 | G |
+| Step 3: assurance activities | Scripted testing (the most rigorous level, or limited/hybrid) and unscripted testing (ad-hoc, error-guessing, exploratory), scaled to risk | 04 Approach; 05 test types (scripted, negative, historical, exploratory) | G |
+| Step 3: other controls | Use supplier evidence under purchasing controls, downstream controls such as human review and CI, and automated records such as logs and audit trails | 03 controls credited per failure mode; IQ-05; PQ-01 | G |
 | Step 4: record | Intended use, risk determination, activities performed, issues and their disposition, conclusion, date and name of the person, approval where appropriate. Digital records favoured over screenshots | 05 execution fields; 07; 04 Evidence rules (exports, hashes) | G |
-| Applying CSA to AI coding assistants | The kit treats a coding assistant as QMS or development software within CSA's reasoning. It does not assume a lower "supporting software" assurance level | 03, 04 | I |
+| Applying CSA to AI coding assistants | The kit treats a coding assistant as QMS or development software within CSA's reasoning, at the assurance level of other QMS software (no "supporting software" discount) | 03, 04 | I |
 
 ## ISO/TR 80002-2:2017
 
-A technical report (guidance) on validating software for medical device quality systems. Cite it instead of the withdrawn AAMI TIR36:2007.
+A technical report (guidance) on validating software for medical device quality systems. It replaces the withdrawn AAMI TIR36:2007 as the reference to cite.
 
 | Element | What it says | Where in the kit | Basis |
 |---|---|---|---|
-| Scope | Software used in device design, testing, component acceptance, manufacturing, labelling, packaging, distribution and complaint handling, or to automate other parts of an ISO 13485 QMS. It excludes software that is part of a device or is itself a device | 01 QMS-relevance determination. Coding assistants used to design and test device software are in scope | G (scope); I (applying it to coding assistants) |
+| Scope | Software used in device design, testing, component acceptance, manufacturing, labelling, packaging, distribution and complaint handling, or to automate other parts of an ISO 13485 QMS. It excludes software that's part of a device or is itself a device | 01 QMS-relevance determination. Coding assistants used to design and test device software are in scope | G (scope); I (applying it to coding assistants) |
 | Approach | Risk-based critical thinking and a toolbox of confidence-building activities, chosen by complexity, risk of harm and vendor pedigree | 03; 04 Approach | G |
 | Develop: Define, Implement, Test, Deploy | Define covers process and use requirements, scope and intended use, risk analysis and the validation plan. Testing is its own sub-phase | 01, 02, 03, 04 (Define); 05 (Test); 07 (Deploy) | G |
 | Maintain | Keep the validated state. Monitoring of use or of configuration may be appropriate, because use and configuration drift. A change in intended use that raises risk can trigger more validation even without a software change | 08 Triggers; 08 Periodic review; PQ-01 | G |
 | Retire | Remove from use and preserve data | No separate template. Use your SOP, and keep the records per ISO 13485 clause 4.2.5 | G |
-| IQ/OQ/PQ | Not mandated by the TR | The kit uses IQ/OQ/MA/PQ labels as a convenient structure | I |
+| IQ/OQ/PQ | Optional under the TR | The kit uses IQ/OQ/MA/PQ labels as a convenient structure | I |
 
 ## GAMP 5 Second Edition and the ISPE GAMP AI Guide
 
@@ -99,7 +107,7 @@ GAMP 5 2nd ed. (ISPE, July 2022) added Appendix M12 Critical Thinking, D8 Agile,
 |---|---|---|
 | Software category (1, 3, 4, 5). The kit recommends Category 4 for configurable agentic tools and asks for a justification if you choose 3 | 01 GAMP 5 category | G (categories); I (the recommendation) |
 | M12 critical thinking, risk-based effort | 03; 04 Approach | G |
-| D9 Software Tools: life-cycle tools assured through good practice plus a risk assessment of their use, rather than full computerised system validation | 03; 04 | I (the D9 wording could not be verified; it is paraphrased from summaries) |
+| D9 Software Tools: life-cycle tools assured through good practice plus a risk assessment of their use (a lighter route than full computerised system validation) | 03; 04 | I (D9 wording unverified, paraphrased from summaries) |
 | M11 IT infrastructure and SaaS suppliers; supplier involvement throughout | IQ-05; 01 Supplier and contractual terms | G |
 | AI guide: define the context of use, treat prompts and instructions as controlled items, set performance criteria, qualify AI vendors | 01 Contexts of use; 06 Instruction files and hashes; MA-01 criteria; IQ-05 | I (from secondary summaries of the guide) |
 
@@ -116,11 +124,15 @@ GAMP 5 2nd ed. (ISPE, July 2022) added Appendix M12 Critical Thinking, D8 Agile,
 | 8.1.1 to 8.1.3 (A, B, C) | Uniquely identify configuration items and versions, SOUP and system configuration documentation | 06 Baseline identification; REQ-03 dependency and SOUP gate (also catches hallucinated dependencies) | R |
 | 8.2 (A, B, C) | Approve, implement and verify changes, with traceability | 08 Change record minimum content; REQ-05, REQ-11 | R |
 
-A second edition of IEC 62304 is in development. Its publication was not confirmed as of October 2026, so cite 2006+A1:2015 and keep a slot for the new numbering. Check the EU harmonisation status of EN 62304 on EUR-Lex before you claim it.
+A second edition of IEC 62304 is in development. Its publication was still unconfirmed in October 2026, so cite 2006+A1:2015 and keep a slot for the new numbering.
+
+Check the EU harmonisation status of EN 62304 on EUR-Lex before you claim it.
 
 ## GxP option (`reg_gxp`)
 
-Added when the wizard's GxP option is selected. EU GMP Annex 11 is medicinal-product GMP, not a device requirement. 21 CFR Part 11 is mapped under FDA QMSR above, because it applies to Part 820 records too; the templates render the Part 11 text when either option is selected.
+Added when you select the wizard's GxP option. EU GMP Annex 11 belongs to medicinal-product GMP (devices fall outside it).
+
+21 CFR Part 11 is mapped under FDA QMSR above, because it applies to Part 820 records too. The templates render the Part 11 text when either option is selected.
 
 | Clause | Topic | Where in the kit | Basis |
 |---|---|---|---|
@@ -133,7 +145,7 @@ Added when the wizard's GxP option is selected. EU GMP Annex 11 is medicinal-pro
 | Annex 11 clause 12 | Security | REQ-16, REQ-09; IQ-02 | R (GxP) |
 | Annex 11 clause 13 | Incident management | 00-WI Reporting problems; 05 Deviation log | R (GxP) |
 | Annex 11 clause 17 | Archiving | 04 Evidence rules | R (GxP) |
-| Annex 11 revision and new Annex 22 (drafts, July 2025) | Not final as of October 2026. Draft Annex 22 excludes generative AI and LLMs from critical GMP applications. Non-critical use is allowed when qualified people confirm the output is fit for its intended use | Human approval gate (REQ-01, REQ-02); keep AI out of critical GMP decisions | G (draft); may change |
+| Annex 11 revision and new Annex 22 (drafts, July 2025) | Still drafts in October 2026. Draft Annex 22 excludes generative AI and LLMs from critical GMP applications. Non-critical use is allowed when qualified people confirm the output is fit for its intended use | Human approval gate (REQ-01, REQ-02); keep AI out of critical GMP decisions | G (draft); may change |
 | 21 CFR Part 11 | For GMP predicate records, as above under FDA QMSR (the 21 CFR Part 11 rows apply in the same way) | See the FDA QMSR section | R |
 | 21 CFR Part 11 and logs | If agent session logs, hook output or CI logs serve as validation or review evidence, state whether they are QMS records and how their integrity and attribution are ensured | 04 Evidence rules; 06 Logging, telemetry and retention | I |
 
@@ -145,27 +157,29 @@ Added when the wizard's GxP option is selected. EU GMP Annex 11 is medicinal-pro
 | EU AI Act Article 4 (AI literacy) | Reportedly softened by Regulation (EU) 2026/1744, so that deployers take measures to support AI literacy. Check the Official Journal text before quoting | 00-WI Training and competence, alongside ISO 13485 clause 6.2 | I |
 | ISO/IEC 27001, ISO/IEC 42001 (options) | Cross-references for information security and AI management systems | Added by the wizard options; 04 Exclusions and cross-references | I |
 
-## Signals, not requirements
+## Regulatory signals
 
-- No regulator or notified body had published guidance specifically on validating AI coding assistants as of October 2026.
-- An FDA warning letter dated 2 April 2026 cited a drug manufacturer whose AI agents generated specifications, procedures and master production and control records without quality-unit review. FDA rejected the defence that the AI had not flagged the gap, and it did not prohibit AI. The lesson is a mandatory qualified human review gate plus validation for intended use (REQ-01, REQ-13, OQ-20).
-- FDA and EMA published 10 guiding principles of Good AI Practice in drug development (January 2026). These are high-level policy principles, not guidance.
-- FDA's discussion paper on generative AI-enabled medical devices (August 2026) is about AI inside devices, not coding tools.
+Non-binding signals that show where regulators are looking:
+
+- As of October 2026, no regulator or notified body had published guidance specifically on validating AI coding assistants.
+- An FDA warning letter dated 2 April 2026 cited a drug manufacturer whose AI agents generated specifications, procedures and master production and control records without quality-unit review. FDA rejected the defence that the AI hadn't flagged the gap, and it left the use of AI itself alone. The lesson: a mandatory qualified human review gate plus validation for intended use (REQ-01, REQ-13, OQ-20).
+- FDA and EMA published 10 guiding principles of Good AI Practice in drug development (January 2026). They're high-level policy principles, softer than guidance.
+- FDA's discussion paper on generative AI-enabled medical devices (August 2026) covers AI inside devices only.
 - Team-NB/IG-NB's AI questionnaire (November 2024) and MDCG 2025-6 (June 2025) concern AI in devices and the interplay of the MDR/IVDR with the AI Act. MDCG 2025-6 allows AI Act controls to be integrated into the existing QMS.
 
 ## Supplier evidence (input to IQ-05)
 
-Record the certificate scope text and expiry from the vendor's trust portal, and check that the scope covers the product and surface you actually use.
+Record the certificate scope text and expiry from the vendor's trust portal. Then check that the scope covers the product and surface you actually use.
 
-- **Anthropic** announced ISO/IEC 42001:2023 certification in January 2025. Its support article lists ISO/IEC 27001:2022, ISO/IEC 42001:2023 and SOC 2 Type I and Type II for its commercial products. No public statement names Claude Code within these scopes. Source: trust.anthropic.com.
-- **OpenAI**'s trust portal lists a SOC 2 Type 2 report and ISO/IEC 27001, 27017, 27018 and 27701 certifications. The API is covered and ISO/IEC 42001 is claimed. Coverage of Codex was not verified. Source: trust.openai.com.
+- Anthropic announced ISO/IEC 42001:2023 certification in January 2025. Its support article lists ISO/IEC 27001:2022, ISO/IEC 42001:2023 and SOC 2 Type I and Type II for its commercial products. No public statement names Claude Code within these scopes. Source: trust.anthropic.com.
+- OpenAI's trust portal lists a SOC 2 Type 2 report and ISO/IEC 27001, 27017, 27018 and 27701 certifications. The API is covered and ISO/IEC 42001 is claimed. Coverage of Codex wasn't verified. Source: trust.openai.com.
 
 ## Verify before citing
 
-- The exact February 2026 CSA text. Some summaries say it names AI/ML tools and adds a Part 11 section and a software-changes subsection. Check the FDA PDF before quoting.
+- The exact February 2026 CSA text. Some summaries say it names AI/ML tools and adds a Part 11 section and a software-changes subsection, so check the FDA PDF before quoting.
 - Whether the final CSA text keeps the draft's examples of "supporting" software, such as development tools that automate testing.
 - The wording of GAMP 5 Appendix D9 and of the GAMP AI guide (paywalled).
 - The final text of Annex 11 and Annex 22, and the status of IEC 62304 Edition 2.
 - The exact subsection cited in the April 2026 warning letter (21 CFR 211.22(c) according to commentators; one record lists (d)).
 
-Not legal advice. Adapt the mapping to your QMS and to your notified body's or investigator's expectations.
+Adapt the mapping to your QMS and to your notified body's or investigator's expectations, and take legal questions to a lawyer.

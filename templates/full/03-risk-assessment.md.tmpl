@@ -39,7 +39,7 @@ Process risk is not device risk. Where an AI-assisted change could affect a risk
 
 ## 3. Method
 
-1. For each context of use, identify reasonably foreseeable failures of the tool to perform as intended. Assess the failure, not the feature name or how often it is used.
+1. For each context of use, identify reasonably foreseeable failures of the tool to perform as intended. Assess the foreseeable failure itself, whatever the feature is called and however often it is used.
 2. Determine the process risk with the model selected for {{org_name}} (section 5).
 3. Credit the other controls that limit the effect of a failure (server-side human approval gate, required CI checks, downstream verification, supplier evidence) only when those controls are themselves tested in this validation.
 4. Select assurance activities, test depth and review cadence from the determination (section 6).
@@ -51,7 +51,7 @@ Rules applied regardless of the determination: negative tests of every gate (OQ-
 
 | ID | Failure mode | Typical cause | Effect on product / QMS | Controls (REQ) | Verified by |
 |---|---|---|---|---|---|
-| R-01 | Incorrect or hallucinated code accepted | Plausible but wrong output; reviewer trusts the AI explanation instead of reading the diff | Defect in released software; nonconforming product | REQ-01, REQ-03, REQ-10, REQ-17 | OQ-01, OQ-07, PQ-02 |
+| R-01 | Incorrect or hallucinated code accepted | Plausible but wrong output; reviewer trusts the AI explanation and skips the diff | Defect in released software; nonconforming product | REQ-01, REQ-03, REQ-10, REQ-17 | OQ-01, OQ-07, PQ-02 |
 | R-02 | Silent omission or false negative | The AI misses a defect in review, omits a required step or edge case, writes a test that does not exercise the requirement, or an agent misses an item it should report | False assurance; defects go undetected | REQ-01, REQ-03{{#ctx_pr_review}}, REQ-15{{/ctx_pr_review}}{{^ctx_pr_review}}{{#surf_pr_review_bot}}, REQ-15{{/surf_pr_review_bot}}{{/ctx_pr_review}}{{#ctx_agents_qms}}, REQ-14{{/ctx_agents_qms}} | PQ-02, OQ-04{{#ctx_agents_qms}}, OQ-30{{/ctx_agents_qms}} |
 | R-03 | Wrong-target write | Wrong branch, file, repository or record selected | Corrupted controlled record or unintended component changed | REQ-01, REQ-11{{#ctx_doc_drafting}}, REQ-13{{/ctx_doc_drafting}}{{#ctx_agents_qms}}, REQ-14{{/ctx_agents_qms}} | OQ-12{{#ctx_doc_drafting}}, OQ-20{{/ctx_doc_drafting}}{{#ctx_agents_qms}}, OQ-30{{/ctx_agents_qms}} |
 | R-04 | Behaviour drift without a version change | Vendor changes the model behind an unchanged id or alias, default modes or fallbacks without a tool version bump | Validated state no longer represents actual behaviour | REQ-06, REQ-08, REQ-12 | MA-01 and its scheduled re-run on the current envelope ({{doc_id_08}} T19), OQ-10, OQ-13, PQ-01 |
@@ -143,7 +143,7 @@ Risk model: **three levels**. Criteria:
 {{#risk_csa}}
 | Determination | Assurance activities | Test depth | Samples | Review cadence |
 |---|---|---|---|---|
-| High process risk | Scripted testing of all gates and guardrails with positive and negative cases; MA-01 on every model in the envelope; PQ-01 and PQ-02; supplier evidence as supplement only | Robust scripted for OQ-01 to OQ-12 and for the context tests (OQ-20, OQ-30) in scope; error-guessing and exploratory sessions in addition | Minimums in {{doc_id_04}}, increased by [fill in] | Recommended 6 months (configured: {{periodic_review_months}}), plus every trigger in {{doc_id_08}} |
+| High process risk | Scripted testing of all gates and guardrails with positive and negative cases; MA-01 on every model in the envelope; PQ-01 and PQ-02; supplier evidence as supplement only | Rigorous scripted for OQ-01 to OQ-12 and for the context tests (OQ-20, OQ-30) in scope; error-guessing and exploratory sessions in addition | Minimums in {{doc_id_04}}, increased by [fill in] | Recommended 6 months (configured: {{periodic_review_months}}), plus every trigger in {{doc_id_08}} |
 | Not high process risk | Scripted negative tests of the gates and MA-01 on every model in the envelope (always); unscripted (ad hoc, error-guessing, exploratory) and historical evidence for the rest; supplier evidence may be credited | Limited scripted or unscripted with the same acceptance criteria | Minimums in {{doc_id_04}} | Typically 12 months (configured: {{periodic_review_months}}), plus every trigger in {{doc_id_08}} |
 {{/risk_csa}}
 {{#risk_three}}
@@ -151,7 +151,7 @@ Risk model: **three levels**. Criteria:
 |---|---|---|---|---|
 | Low | Scripted negative tests of the gates and MA-01 on every model in the envelope (always); unscripted and historical evidence for the rest; supplier evidence may be credited | Unscripted with predefined acceptance criteria | Minimums in {{doc_id_04}} | Typically 12 months (configured: {{periodic_review_months}}), plus triggers |
 | Medium | Scripted tests of gates and guardrails; MA-01 on every model in the envelope; unscripted for functional behaviour; PQ-01 | Limited scripted | Minimums in {{doc_id_04}} | Typically 12 months (configured: {{periodic_review_months}}), plus triggers |
-| High | Robust scripted tests of all gates, guardrails and context tests; MA-01 on every model; PQ-01 and PQ-02; error-guessing and exploratory sessions in addition | Robust scripted | Minimums in {{doc_id_04}}, increased by [fill in] | Recommended 6 months (configured: {{periodic_review_months}}), plus triggers |
+| High | Rigorous scripted tests of all gates, guardrails and context tests; MA-01 on every model; PQ-01 and PQ-02; error-guessing and exploratory sessions in addition | Rigorous scripted | Minimums in {{doc_id_04}}, increased by [fill in] | Recommended 6 months (configured: {{periodic_review_months}}), plus triggers |
 {{/risk_three}}
 
 Configured periodic review interval: every {{periodic_review_months}} months. If the overall determination is the highest level and the configured interval is longer than 6 months, justify it here: [fill in].
@@ -186,14 +186,14 @@ Justification: [fill in: which use relies on the AI output as a control or as ev
 
 ## 8. Known guardrail limitations of {{tool_name}}
 
-These limitations are inputs to the residual risk. Confirm each against the vendor's current documentation at IQ. Each has an ID (KL-nn) so that the test protocol can list, before execution, the limitations that are accepted and reproduced rather than failed.
+These limitations are inputs to the residual risk. Confirm each against the vendor's current documentation at IQ. Each has an ID (KL-nn) so that the test protocol can list, before execution, the limitations that are accepted, so a test that reproduces one records it as expected.
 
 {{#is_claude_code}}
 - KL-01: Bash deny rules match command text and are not a security boundary; only the OS sandbox enforces at OS level, and it does not cover the built-in file tools, hooks or MCP servers (R-05, R-06, R-12).
 - KL-02: Without `sandbox.failIfUnavailable`, a sandbox that cannot start silently falls back to unsandboxed execution (R-12).
 - KL-03: Hooks fail open on errors and timeouts unless `"onFailure": "block"` is set (R-12).
-- KL-04: Auto mode, in which a classifier approves actions instead of a person, can be the starting mode for interactive sessions; set the starting mode explicitly or disable it in managed settings (R-08, R-12).
-- KL-05: Server-managed settings are a client-side control, not a security boundary, and do not reach every surface (R-12).
+- KL-04: Auto mode, in which a classifier approves actions on the person's behalf, can be the starting mode for interactive sessions; set the starting mode explicitly or disable it in managed settings (R-08, R-12).
+- KL-05: Server-managed settings are a client-side control only and miss some surfaces (R-12).
 - KL-06: In headless runs there is no workspace-trust prompt, so repository-provided hooks and MCP servers can run unless restricted (R-05, R-09).
 - KL-07: Automatic model fallbacks can change the model during a session (R-13).
 - KL-08: Local transcripts are stored unencrypted (R-06).
@@ -214,7 +214,7 @@ These limitations are inputs to the residual risk. Confirm each against the vend
 - KL-04: Copilot code review reads instructions from the PR head branch, so a PR can change its own review instructions (R-05, R-09).
 {{/is_copilot}}
 {{#is_cursor}}
-- KL-01: Terminal and MCP allow-lists are best-effort, not a security boundary (R-05, R-12).
+- KL-01: Terminal and MCP allow-lists are best-effort guardrails (R-05, R-12).
 - KL-02: The Bugbot check concludes neutral on findings by default and does not block merge (R-02, R-08).
 - KL-03: Cloud Agents have internet access by default and run terminal commands automatically (R-05, R-06).
 {{/is_cursor}}
@@ -228,7 +228,7 @@ These limitations are inputs to the residual risk. Confirm each against the vend
 |---|---|---|---|
 | [fill in] | [fill in] | [yes/no] | [fill in] |
 
-Overall conclusion: [fill in: residual risk acceptable for the intended use / acceptable with restrictions / not acceptable]. The conclusion is written by a named human author, not by the AI tool. Accepted in the eQMS by the {{role_approver}}{{#role_prrc}}, with {{role_prrc}} informed{{/role_prrc}}.
+Overall conclusion: [fill in: residual risk acceptable for the intended use / acceptable with restrictions / not acceptable]. A named human author writes the conclusion; the AI tool never does. Accepted in the eQMS by the {{role_approver}}{{#role_prrc}}, with {{role_prrc}} informed{{/role_prrc}}.
 
 ## Revision history
 

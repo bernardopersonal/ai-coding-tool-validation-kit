@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-02 Requirements: OpenAI Codex
 
@@ -63,11 +63,11 @@ Risk traceability (risk to requirement to test) is in ACME-VAL-CODEX-03, section
 
 ## 5. Requirement details
 
-Each requirement lists the objective, the acceptance criteria used by the tests (fixed in ACME-VAL-CODEX-05 before execution), and implementation notes. Implementation notes describe known ways to meet the objective; they are not the acceptance criteria, and settings must be confirmed against the vendor's current documentation at IQ.
+Each requirement lists the objective, the acceptance criteria used by the tests (fixed in ACME-VAL-CODEX-05 before execution), and implementation notes. Implementation notes describe known ways to meet the objective and carry no acceptance criteria; settings must be confirmed against the vendor's current documentation at IQ.
 
 ### REQ-01 Human approval gate
 
-- **Objective:** every change to a protected branch of an in-scope repository requires at least 1 approval by a qualified human who is neither the author nor the person who launched the agent, given on the final commit.
+- **Objective:** every change to a protected branch of an in-scope repository requires at least 1 approval by a qualified human other than the author and the person who launched the agent, given on the final commit.
 - **Acceptance:** the platform rule requires the approvals; approvals become stale on a new push; 100% of sampled merged AI-assisted PRs had a qualified human approval submitted before merge on the head commit; merge without approval is refused (negative test); PRs authored by a bot or agent identity need 2 approvals or code-owner approval by a human team (compensating control, because the platform counts the launcher's approval of such a PR).
 - **Qualified reviewer:** trained on ACME-VAL-GEN-01 and authorised by ACME-QP-12 Code review and merge, Annex A (qualified-reviewer list).
 - **GitHub:** classic branch protection `required_approving_review_count` of 1 or more, `dismiss_stale_reviews`, `require_last_push_approval` (the most recent push must be approved by someone other than the pusher; enable stale-review dismissal as well), `require_code_owner_reviews` for protected paths; or a ruleset `pull_request` rule with `required_approving_review_count`, `dismiss_stale_reviews_on_push`, `require_last_push_approval` and `require_code_owner_review`. Only approvals from reviewers with write permission count.
@@ -88,7 +88,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 
 ### REQ-04 No direct push and no silent bypass
 
-- **Objective:** nobody, including administrators and AI identities, can push directly to a protected branch; any bypass of the rules is either impossible or logged and reviewed.
+- **Objective:** direct pushes to a protected branch are refused for every identity, administrators and AI identities included; any bypass of the rules is either impossible or logged and reviewed.
 - **Acceptance:** direct push refused (OQ-03); admin bypass refused, or the bypass appears in the audit records and is reviewed (OQ-06); no bypass in the PQ-01 period without a review record.
 - **GitHub:** classic `enforce_admins` true ("Do not allow bypassing the above settings"), or rulesets with reviewed `bypass_actors`. Do not use `bypass_mode` "exempt" on QMS branches: exempt actors are not evaluated and no bypass audit entry is created. The organisation audit log shows 180 days and Git events only 7 days; export or stream it, and export ruleset and rule-suite (bypass) records periodically.
 
@@ -109,7 +109,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 
 Applies: the local CLI / IDE surface is in scope.
 
-- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks rather than allows).
+- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks).
 - **Acceptance:** OQ-08 negative cases (denied command, write outside workspace, non-approved network destination) are all refused; the failure-mode case blocks; OQ-40 shows that instructions planted in untrusted content do not lead to a denied action.
 - **Codex:** `sandbox_mode = "workspace-write"` with `[sandbox_workspace_write] network_access = false` (the default), or the `:workspace` permission profile; `.git`, `.codex` and `.agents` stay read-only inside writable roots. `shell_environment_policy.ignore_default_excludes` defaults to true, so variables named like KEY, SECRET or TOKEN reach spawned commands unless it is set to false. Only an explicit deny in a PreToolUse hook blocks; hook errors and timeouts let the call continue. `codex exec` runs read-only by default.
 
@@ -152,7 +152,7 @@ Applies: the local CLI / IDE surface is in scope.
 
 ### REQ-14 Bounded write scope and oracle-based verification
 
-Not applicable: the `agents_qms` context is not selected. Selecting it later is a new context of use (re-baseline trigger).
+Not applicable, because the `agents_qms` context is not selected; selecting it later is a new context of use (re-baseline trigger).
 
 ### REQ-15 AI review is advisory only
 

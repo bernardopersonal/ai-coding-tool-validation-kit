@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CLAUDE-03 Risk assessment: Claude Code
 
@@ -29,7 +29,7 @@ Process risk is not device risk. Where an AI-assisted change could affect a risk
 
 ## 3. Method
 
-1. For each context of use, identify reasonably foreseeable failures of the tool to perform as intended. Assess the failure, not the feature name or how often it is used.
+1. For each context of use, identify reasonably foreseeable failures of the tool to perform as intended. Assess the foreseeable failure itself, whatever the feature is called and however often it is used.
 2. Determine the process risk with the model selected for Acme MedSoft (section 5).
 3. Credit the other controls that limit the effect of a failure (server-side human approval gate, required CI checks, downstream verification, supplier evidence) only when those controls are themselves tested in this validation.
 4. Select assurance activities, test depth and review cadence from the determination (section 6).
@@ -41,7 +41,7 @@ Rules applied regardless of the determination: negative tests of every gate (OQ-
 
 | ID | Failure mode | Typical cause | Effect on product / QMS | Controls (REQ) | Verified by |
 |---|---|---|---|---|---|
-| R-01 | Incorrect or hallucinated code accepted | Plausible but wrong output; reviewer trusts the AI explanation instead of reading the diff | Defect in released software; nonconforming product | REQ-01, REQ-03, REQ-10, REQ-17 | OQ-01, OQ-07, PQ-02 |
+| R-01 | Incorrect or hallucinated code accepted | Plausible but wrong output; reviewer trusts the AI explanation and skips the diff | Defect in released software; nonconforming product | REQ-01, REQ-03, REQ-10, REQ-17 | OQ-01, OQ-07, PQ-02 |
 | R-02 | Silent omission or false negative | The AI misses a defect in review, omits a required step or edge case, writes a test that does not exercise the requirement, or an agent misses an item it should report | False assurance; defects go undetected | REQ-01, REQ-03, REQ-15 | PQ-02, OQ-04 |
 | R-03 | Wrong-target write | Wrong branch, file, repository or record selected | Corrupted controlled record or unintended component changed | REQ-01, REQ-11, REQ-13 | OQ-12, OQ-20 |
 | R-04 | Behaviour drift without a version change | Vendor changes the model behind an unchanged id or alias, default modes or fallbacks without a tool version bump | Validated state no longer represents actual behaviour | REQ-06, REQ-08, REQ-12 | MA-01 and its scheduled re-run on the current envelope (ACME-VAL-CLAUDE-08 T19), OQ-10, OQ-13, PQ-01 |
@@ -79,7 +79,7 @@ Risk model: **FDA CSA (binary)**. A context is **high process risk** when failur
 
 | Determination | Assurance activities | Test depth | Samples | Review cadence |
 |---|---|---|---|---|
-| High process risk | Scripted testing of all gates and guardrails with positive and negative cases; MA-01 on every model in the envelope; PQ-01 and PQ-02; supplier evidence as supplement only | Robust scripted for OQ-01 to OQ-12 and for the context tests (OQ-20, OQ-30) in scope; error-guessing and exploratory sessions in addition | Minimums in ACME-VAL-CLAUDE-04, increased by four repositories in OQ-01 and two in every negative gate test | Recommended 6 months (configured: 6), plus every trigger in ACME-VAL-CLAUDE-08 |
+| High process risk | Scripted testing of all gates and guardrails with positive and negative cases; MA-01 on every model in the envelope; PQ-01 and PQ-02; supplier evidence as supplement only | Rigorous scripted for OQ-01 to OQ-12 and for the context tests (OQ-20, OQ-30) in scope; error-guessing and exploratory sessions in addition | Minimums in ACME-VAL-CLAUDE-04, increased by four repositories in OQ-01 and two in every negative gate test | Recommended 6 months (configured: 6), plus every trigger in ACME-VAL-CLAUDE-08 |
 | Not high process risk | Scripted negative tests of the gates and MA-01 on every model in the envelope (always); unscripted (ad hoc, error-guessing, exploratory) and historical evidence for the rest; supplier evidence may be credited | Limited scripted or unscripted with the same acceptance criteria | Minimums in ACME-VAL-CLAUDE-04 | Typically 12 months (configured: 6), plus every trigger in ACME-VAL-CLAUDE-08 |
 
 Configured periodic review interval: every 6 months. If the overall determination is the highest level and the configured interval is longer than 6 months, justify it here: not needed (6 months configured).
@@ -103,13 +103,13 @@ Justification: AI output in every context is verified by qualified human review 
 
 ## 8. Known guardrail limitations of Claude Code
 
-These limitations are inputs to the residual risk. Confirm each against the vendor's current documentation at IQ. Each has an ID (KL-nn) so that the test protocol can list, before execution, the limitations that are accepted and reproduced rather than failed.
+These limitations are inputs to the residual risk. Confirm each against the vendor's current documentation at IQ. Each has an ID (KL-nn) so that the test protocol can list, before execution, the limitations that are accepted, so a test that reproduces one records it as expected.
 
 - KL-01: Bash deny rules match command text and are not a security boundary; only the OS sandbox enforces at OS level, and it does not cover the built-in file tools, hooks or MCP servers (R-05, R-06, R-12).
 - KL-02: Without `sandbox.failIfUnavailable`, a sandbox that cannot start silently falls back to unsandboxed execution (R-12).
 - KL-03: Hooks fail open on errors and timeouts unless `"onFailure": "block"` is set (R-12).
-- KL-04: Auto mode, in which a classifier approves actions instead of a person, can be the starting mode for interactive sessions; set the starting mode explicitly or disable it in managed settings (R-08, R-12).
-- KL-05: Server-managed settings are a client-side control, not a security boundary, and do not reach every surface (R-12).
+- KL-04: Auto mode, in which a classifier approves actions on the person's behalf, can be the starting mode for interactive sessions; set the starting mode explicitly or disable it in managed settings (R-08, R-12).
+- KL-05: Server-managed settings are a client-side control only and miss some surfaces (R-12).
 - KL-06: In headless runs there is no workspace-trust prompt, so repository-provided hooks and MCP servers can run unless restricted (R-05, R-09).
 - KL-07: Automatic model fallbacks can change the model during a session (R-13).
 - KL-08: Local transcripts are stored unencrypted (R-06).
@@ -124,7 +124,7 @@ These limitations are inputs to the residual risk. Confirm each against the vend
 | R-15 | Provenance label lost when an author rewrites a commit message (DEV-CLAUDE-01, major, open) | yes, with compensating control: the change still passes the human gate and CI | Weekly reconciliation of telemetry sessions against PR declarations by the Engineering Lead until CR-2026-047 is deployed (target 2026-11-20); OQ-11 re-test after deployment and at each periodic review |
 | R-11 | Certificate scope does not name the coding tool | yes | Supplier action ACME-VEN-2026-011-A |
 
-Overall conclusion: residual risk acceptable for the intended use, with the compensating control for R-15 until CR-2026-047 is deployed. Written by Alex Example (Validation Engineer) on 2026-10-23 after the test results; accepted by Sam Sample on 2026-10-23 [signed in eQMS]; Robin Specimen informed on 2026-10-23. The conclusion is written by a named human author, not by the AI tool. Accepted in the eQMS by the Head of QA, with Regulatory Affairs Manager informed.
+Overall conclusion: residual risk acceptable for the intended use, with the compensating control for R-15 until CR-2026-047 is deployed. Written by Alex Example (Validation Engineer) on 2026-10-23 after the test results; accepted by Sam Sample on 2026-10-23 [signed in eQMS]; Robin Specimen informed on 2026-10-23. A named human author writes the conclusion; the AI tool never does. Accepted in the eQMS by the Head of QA, with Regulatory Affairs Manager informed.
 
 ## Revision history
 

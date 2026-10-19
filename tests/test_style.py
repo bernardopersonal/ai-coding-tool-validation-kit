@@ -1,4 +1,4 @@
-"""Style rules of the kit owner, enforced on the repository and on rendered packages.
+"""Style rules of the kit, enforced on the repository and on rendered packages.
 
 * no section sign in any tracked text file, nor in the rendered default packages:
   clauses are cited as "ISO 13485:2016 clause 4.1.6", "21 CFR 820.10",
@@ -10,7 +10,8 @@
   its word budget;
 * the work instruction of both profiles has an explicit "No shadow AI" rule;
 * lite and full document IDs never collide for the default config, so an ID always
-  names one document when a team upgrades from lite to full.
+  names one document when a team upgrades from lite to full;
+* no em dash in any tracked text file (a hyphen, comma, colon or parentheses do the job).
 """
 
 import os
@@ -51,6 +52,8 @@ README_TIME_PHRASES = [
 EFFORT_PHRASES = ["minutes of reading", "in about a week", "1-2 days", "1–2 days",
                   "hours, not weeks", "in a week", "one week, not", "total effort",
                   "of people's time", "quick start in"]
+
+EM_DASH = chr(0x2014)   # written as a code point: this file follows its own rule
 
 
 def tracked_files():
@@ -230,6 +233,26 @@ class DocumentIdTest(unittest.TestCase):
         self.assertIn("ACME-VAL-GEN-L01", lite)
         self.assertIn("ACME-VAL-CLAUDE-01", full)
         self.assertIn("ACME-VAL-GEN-01", full)
+
+
+class EmDashTest(unittest.TestCase):
+    def test_no_em_dash_in_tracked_files(self):
+        offenders = []
+        for rel in tracked_files():
+            text = read_text_file(rel)
+            if text is None:
+                continue
+            for number, line in enumerate(text.splitlines(), 1):
+                if EM_DASH in line:
+                    offenders.append("%s:%d: %s" % (rel, number, line.strip()[:100]))
+        self.assertEqual(offenders, [], "use a hyphen, comma, colon or parentheses instead "
+                                        "of the em dash:\n" + "\n".join(offenders))
+
+    def test_no_em_dash_in_rendered_packages(self):
+        for profile in ("lite", "full"):
+            for rel, text in render_default(profile).items():
+                with self.subTest(profile=profile, document=rel):
+                    self.assertNotIn(EM_DASH, text)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 # checks/ - evidence scripts
 
 Scripts that produce objective evidence for the validation package: API exports,
-hashes and timestamps instead of screenshots. Python 3.9+ standard library only;
-`run_canary.sh` needs bash, the GitHub CLI (`gh`) and python3.
+hashes and timestamps. Python 3.9+ standard library only; `run_canary.sh` needs
+bash, the GitHub CLI (`gh`) and python3.
 
 | Script | Produces evidence for | Requirements |
 |---|---|---|
@@ -23,28 +23,29 @@ The model admission suite (MA-01) lives in `../admission/`.
 - `--help` on every script; `--out DIR` (default `evidence/`).
 - `--operator "<name>"` (or `$KIT_OPERATOR`) is required for every run that
   produces evidence. The evidence records who ran the script: the operator, the
-  operating-system user, the host name, the SHA-256 of the machine id, and, for
-  the GitHub scripts, the authenticated login (`GET /user`). Exploratory runs
-  belong in `evidence/<TOOL_ID>/_exploratory/`, not in a test folder.
+  operating-system user, the host name, the SHA-256 of the machine id and, for
+  the GitHub scripts, the authenticated login (`GET /user`).
+- Exploratory runs go to `evidence/<TOOL_ID>/_exploratory/`, away from the test
+  folders.
 - Each run writes `<name>_<target>_<UTC timestamp>.json`, the same name with
   `.md`, and `<name>.json.sha256` (`sha256sum -c` compatible). The Markdown
   repeats the SHA-256 of the JSON, the UTC timestamp, the script name and version.
-- Findings carry a severity (`fail`, `inconclusive`, `warn`, `info`), the
+- Findings carry a severity (`fail`, `inconclusive`, `warn`, `info`), plus the
   requirement and the test they relate to.
 - Exit codes: `0` pass (warnings allowed), `1` a check failed (or was
   inconclusive), `2` usage, authentication or network error. In the Python
   scripts, `--fail-on-warn` turns warnings into exit `1`.
-- Secrets are never written to the evidence: `capture_baseline.py` redacts
-  token-like values, header and key values and environment values that are not
-  known non-secret toggles; the canary and admission runs replace their canary
-  value before saving output.
-- The scripts write evidence; they do not decide. Conclusions and approvals are
-  recorded by the responsible people in the QMS (executor and approver are
-  different people, and neither is the AI tool).
+- Secrets stay out of the evidence. `capture_baseline.py` redacts token-like
+  values, header and key values, and environment values that aren't known
+  non-secret toggles; the canary and admission runs replace their canary value
+  before saving output.
+- The scripts write evidence, and people decide. The responsible people record
+  conclusions and approvals in the QMS: executor and approver are 2 different
+  people, and the AI tool is never one of them.
 
 Name the output folder after the test and attach the `.json`, `.json.sha256`
-and `.md` to the test record: `evidence/GEN/<TEST-ID>/` for the code-host gate
-tests that are qualified once for all tools (OQ-01 to OQ-07, OQ-12), and
+and `.md` to the test record. Use `evidence/GEN/<TEST-ID>/` for the code-host
+gate tests that are qualified once for all tools (OQ-01 to OQ-07, OQ-12), and
 `evidence/<TOOL_ID>/<TEST-ID>/` for tool tests, e.g. `--out evidence/CLAUDE/IQ-03/`.
 
 ## check_github_gates.py
@@ -60,13 +61,14 @@ python3 checks/check_github_gates.py --repo OWNER/REPO --prs 300 --commits-since
 `--commits-since YYYY-MM-DD` (interim use, RV-01, lite plan section 9) lists
 every commit on the branch since that date (`GET /repos/{o}/{r}/commits`) and
 matches each to a merged PR into the branch: the checked PRs by merge commit,
-others through `GET /repos/{o}/{r}/commits/{sha}/pulls`. A commit in no merged
-PR (direct push, admin push, push before the protection existed) fails; a commit
-in a merged PR outside the checked sample is a warning (raise `--prs`). Bypass
-insights (`rule-suites`) cover only the last month: export older bypasses from
-the organisation audit log, or record the gap.
+the others through `GET /repos/{o}/{r}/commits/{sha}/pulls`.
 
-Reads, for the branch: classic branch protection
+A commit in no merged PR (direct push, admin push, push before the protection
+existed) fails. A commit in a merged PR outside the checked sample is a warning
+(raise `--prs`). Bypass insights (`rule-suites`) cover only the last month, so
+export older bypasses from the organisation audit log, or record the gap.
+
+What it reads, for the branch: classic branch protection
 (`GET /repos/{o}/{r}/branches/{b}/protection`), the effective ruleset rules
 (`GET /repos/{o}/{r}/rules/branches/{b}`) and the details and bypass lists of the
 rulesets behind them, ruleset bypass events of the last month
@@ -75,53 +77,57 @@ rulesets behind them, ruleset bypass events of the last month
 organisation (`GET .../actions/permissions/workflow`), the secret scanning push
 protection status, and the last N merged PRs with their reviews.
 
-A merged PR passes when it has at least one (or the configured number of)
-**qualifying approval**: state `APPROVED`, by a user of type `User` (not a
-`[bot]` login and not listed with `--non-human`), not the PR author, submitted
-before the merge, still the reviewer's latest decision at merge time, and on the
-head commit when last-push approval is required (`--require-head-approval auto`,
-the default), and, unless `--no-checks`, every required check passed on the
-merged head commit (check runs and commit statuses). Approvals by bots or apps,
-PRs merged by non-human identities and approvals given only on an earlier
-commit are flagged as warnings. Check results that are no longer readable
-(expired under the retention setting) are `inconclusive`, not a pass.
+A merged PR passes when it has at least 1 (or the configured number of)
+**qualifying approval**: state `APPROVED`, by a user of type `User` (no `[bot]`
+login, and none listed with `--non-human`), by someone other than the PR author,
+submitted before the merge, still the reviewer's latest decision at merge time,
+and on the head commit when last-push approval is required
+(`--require-head-approval auto`, the default). Unless you pass `--no-checks`,
+every required check must also have passed on the merged head commit (check runs
+and commit statuses).
+
+Approvals by bots or apps, PRs merged by non-human identities and approvals
+given only on an earlier commit are flagged as warnings. Check results that are
+no longer readable (expired under the retention setting) count as `inconclusive`.
 
 Agent-authored PRs (OQ-05): the approval of the person who launched the agent
-does not count. Give the launcher with `--launcher PR=LOGIN` (for example from a
-cloud task record); otherwise the script scans PR and issue comments for the
+doesn't count. Give the launcher with `--launcher PR=LOGIN` (for example from a
+cloud task record). Otherwise the script scans PR and issue comments for the
 trigger mentions (`--trigger`, default `@claude`, `@codex`, `@copilot`) and
-treats the commenter as the launcher. When the launcher is unknown, an
-agent-authored PR needs `--agent-pr-min-approvals` qualifying approvals
-(default 2, the compensating control in the work instruction), and fewer is
-flagged.
+treats the commenter as the launcher.
+
+When the launcher is unknown, an agent-authored PR needs
+`--agent-pr-min-approvals` qualifying approvals (default 2, the compensating
+control in the work instruction), and fewer is flagged.
 
 Configuration findings include: no required approving review (fail); GitHub
 Actions allowed to approve PRs (fail); a ruleset bypass actor in `exempt` mode,
 which runs no rules and creates no bypass audit entry (fail); no required status
-check or required workflow (fail); administrators not included in classic
-protection, bypass lists, app / integration bypass actors, recent bypass events,
-force pushes allowed, required checks not pinned to an app (any writer can set a
-status), final-commit approval not enforced (warnings).
+check or required workflow (fail); administrators outside classic protection,
+bypass lists, app / integration bypass actors, recent bypass events, force
+pushes allowed, required checks without a pinned app (any writer can set a
+status), final-commit approval unenforced (warnings).
 
 Authentication: `GITHUB_TOKEN` or `GH_TOKEN` (sent with urllib), otherwise the
 login of the GitHub CLI through `gh api`. Active rulesets are readable with read
 access. Classic protection, the Actions workflow permissions and the organisation
-setting may need repository or organisation admin rights; verify the required
+setting may need repository or organisation admin rights, so verify the required
 token scopes or fine-grained permissions against GitHub's current documentation.
-Items that cannot be read are reported as `inconclusive`
-(repository settings) or `info` (organisation settings, rule insights). For
-GitHub Enterprise Server pass `--api-url https://HOST/api/v3`. Requests pin
-`X-GitHub-Api-Version: 2022-11-28`; the version is recorded in the evidence.
+
+Items the script can't read are reported as `inconclusive` (repository
+settings) or `info` (organisation settings, rule insights). For GitHub
+Enterprise Server pass `--api-url https://HOST/api/v3`. Requests pin
+`X-GitHub-Api-Version: 2022-11-28`, and the evidence records the version.
 
 Limitations to record in the test report:
 
-- The API does not show who launched an agent. The comment scan finds only
+- The API doesn't show who launched an agent, and the comment scan finds only
   launches by mention. For agent tasks started elsewhere (IDE, cloud console),
   pass `--launcher` from the task record or rely on the compensating control
   (OQ-05).
-- Whether approvals by apps or machine users count toward required reviews is
-  not documented consistently; demonstrate it with a negative test (OQ-04) and
-  list machine users used by agents with `--non-human`.
+- GitHub documents inconsistently whether approvals by apps or machine users
+  count toward required reviews. Demonstrate it with a negative test (OQ-04),
+  and list machine users used by agents with `--non-human`.
 - Copilot code review can be configured to approve PRs, and such approvals can
   count toward merge requirements when enabled at repository, organisation and
   enterprise level. The script flags them as non-human approvals; record the
@@ -132,11 +138,12 @@ Limitations to record in the test report:
   (`GET /repos/{o}/{r}/actions/permissions/artifact-and-log-retention`, in days;
   default 90, at most 400 for private repositories; from 2026-10-01 it also
   covers checks and statuses). The script records the setting and flags a
-  sample older than it. Export the check evidence of every merged PR with
+  sample older than it.
+- So export the check evidence of every merged PR with
   `../examples/github-workflow-evidence-export.yml` and archive it in the QMS
   within the retention period.
-- GitLab and other code hosts are not covered: use the manual alternative in
-  the test protocol.
+- GitLab and other code hosts aren't covered: use the manual alternative in the
+  test protocol.
 
 ## capture_baseline.py
 
@@ -149,7 +156,7 @@ python3 checks/capture_baseline.py --tool other --name "Tool X" --version-cmd "t
 
 Run it on each machine image or runner in scope (developer laptop, CI runner),
 as the user who runs the tool. It records the CLI version (`claude --version`,
-`codex --version` or `--version-cmd`), and hashes and parses the configuration
+`codex --version` or `--version-cmd`), then hashes and parses the configuration
 files at these locations:
 
 | Tool | Scope | Locations |
@@ -181,32 +188,37 @@ the `allowed_*` lists of `requirements.toml`.
 Claude Code managed sources are evaluated in the client's own order:
 server-managed (from the local cache) > MDM (Windows registry) > managed file
 and drop-ins (`managed-settings.json`, then `managed-settings.d/*.json`
-alphabetically) > `HKCU`. With `managedSourcesBehavior: "first-wins"` (the
-default) only the highest-ranked source counts; with `"merge"` the admin
-sources are combined. Each finding names the source that sets the key, and the
-Markdown shows the effective policy. Confirm it with `/status`.
+alphabetically) > `HKCU`.
 
-Findings: unparseable configuration files and a configured
-`bypassPermissions` default mode fail; missing managed settings, a managed
+With `managedSourcesBehavior: "first-wins"` (the default) only the
+highest-ranked source counts; with `"merge"` the admin sources are combined.
+Each finding names the source that sets the key, and the Markdown shows the
+effective policy. Confirm it with `/status`.
+
+Findings: unparseable configuration files and a configured `bypassPermissions`
+default mode fail. These are warnings: missing managed settings; a managed
 policy without `disableBypassPermissionsMode = "disable"`, without
-`disableAutoMode` or without `availableModels`, `availableModels` without
-`availableModelsMatch: "exact"`, a missing `requirements.toml`,
-`danger-full-access` or an `approval_policy` of `never` are warnings.
+`disableAutoMode` or without `availableModels`; `availableModels` without
+`availableModelsMatch: "exact"`; a missing `requirements.toml`;
+`danger-full-access`; an `approval_policy` of `never`.
 
 With `--compare` (drift against the approved baseline, REQ-06), an added,
 removed or changed file in the managed, MDM, requirements, managed-defaults,
 system, project or declared scope fails. Changes in user-scope files and caches
-are warnings, and server-managed settings are compared by their selected values,
-not bytes. A changed CLI version is `info` when it is one of the
-`--approved-version` values and a failure otherwise. Only tools present in both
-captures are compared.
+are warnings, and server-managed settings are compared value by value on the
+selected keys.
 
-Not read by the script (listed as manual fields in the Markdown): macOS MDM
-profiles (`com.anthropic.claudecode`, `com.openai.codex`), the server-managed /
-cloud-managed policy consoles, and the `/status`, `claude doctor`,
-`codex --strict-config doctor` and `codex features list` output. Attach those
-separately. On Python 3.9 / 3.10 TOML is parsed by a small built-in parser for
-the subset used in configuration files; the parser used is recorded per file.
+A changed CLI version is `info` when it's one of the `--approved-version` values
+and a failure otherwise. Only tools present in both captures are compared.
+
+Manual fields (the script can't read them, so the Markdown lists them): macOS
+MDM profiles (`com.anthropic.claudecode`, `com.openai.codex`), the
+server-managed / cloud-managed policy consoles, and the `/status`,
+`claude doctor`, `codex --strict-config doctor` and `codex features list`
+output. Attach those separately.
+
+On Python 3.9 / 3.10 a small built-in parser reads TOML, for the subset used in
+configuration files, and the evidence records the parser used per file.
 
 ## find_ai_footprint.py
 
@@ -221,21 +233,25 @@ Lists agent configuration and instruction files (`.claude/`, `CLAUDE.md`,
 `GEMINI.md`, `.gemini/`, `.aider.conf.yml`, ...), CI workflows that use AI actions
 or agent CLIs, AI SDK dependencies in package manifests, and AI attribution in
 the last `--git-log` commit messages (counts and commit SHAs only, no names or
-e-mails). Instruction files not covered by CODEOWNERS are flagged: some review
-bots read instructions from the PR head branch, so a PR can change its own
-review instructions unless those files need code-owner review.
+e-mails).
+
+Instruction files outside CODEOWNERS are flagged. Some review bots read
+instructions from the PR head branch, so a PR can change its own review
+instructions unless those files need code-owner review.
 
 Workflow risks: `--dangerously-skip-permissions`, Codex approval and sandbox
 bypass flags, `bypassPermissions`, `allowed_non_write_users` and
-`safety-strategy: unsafe` fail; AI workflows on `pull_request_target` or
-`workflow_run`, bots allowed to trigger, `write-all` permissions, action refs that
-are not a commit SHA, and `openai/codex-action` without `codex-version` are
-warnings. With `--known-tools`, any detected tool outside the validated
-inventory fails (tool discovery reconciliation). With `--org`, the organisation's
-GitHub App installations are listed (`GET /orgs/{org}/installations`, needs an
-organisation owner token) and AI-related apps are flagged. The apps installed by
-GitHub's "Allow Claude / Codex coding agent" policies are not listed among
-installations; review the audit log for them.
+`safety-strategy: unsafe` fail. AI workflows on `pull_request_target` or
+`workflow_run`, bots allowed to trigger, `write-all` permissions, action refs
+other than a commit SHA, and `openai/codex-action` without `codex-version` are
+warnings.
+
+With `--known-tools`, any detected tool outside the validated inventory fails
+(tool discovery reconciliation). With `--org`, the script lists the
+organisation's GitHub App installations (`GET /orgs/{org}/installations`, needs
+an organisation owner token) and flags AI-related apps. The apps installed by
+GitHub's "Allow Claude / Codex coding agent" policies don't show up among
+installations, so review the audit log for them.
 
 The scan is heuristic text matching. Review every hit and record the
 reconciliation in the tool-discovery checklist.
@@ -253,13 +269,15 @@ python3 checks/mirror_protection.py --from OWNER/PROD --to OWNER/SANDBOX --apply
 ```
 
 Exports classic branch protection, repository rulesets and the Actions approval
-setting of the production repository, and copies them to a sandbox repository
-(plan only unless `--apply`), then compares the two. Bypass actors, dismissal
-and push allowances are copied only with `--copy-actors`, because their ids
-differ between repositories. Run the canary against the sandbox when you may
-not open test PRs in production, and attach the comparison to the test record:
-the canary result is valid for production only where the comparison matches.
-Writing protection needs admin rights on the sandbox.
+setting of the production repository, copies them to a sandbox repository
+(plan only unless `--apply`), then compares the 2. Bypass actors, dismissal and
+push allowances are copied only with `--copy-actors`, because their ids differ
+between repositories.
+
+Run the canary against the sandbox when you may not open test PRs in
+production, and attach the comparison to the test record: the canary result is
+valid for production only where the comparison matches. Writing protection
+needs admin rights on the sandbox.
 
 ## soup_gate.py
 
@@ -268,15 +286,16 @@ python3 checks/soup_gate.py --approved approved-components.json --base origin/ma
 ```
 
 Compares the direct dependencies in `requirements*.txt` and `package.json`
-between the base and head revisions and fails when a new or changed dependency
-is not on the approved component (SOUP) list, or, with `--check-registry`, does
-not exist in PyPI or npm (an invented package name). Versions in the list may
-use glob patterns. Example list:
-`../examples/github/approved-components.example.json`; example workflow:
-`../examples/github-workflow-soup-gate.yml`. Make the job a required check on
-the protected branch and demonstrate it in OQ-07 b with the canary. Other
-ecosystems need their own parser; the gate fails closed only for the files it
-knows.
+between the base and head revisions. It fails when a new or changed dependency
+is missing from the approved component (SOUP) list or, with `--check-registry`,
+from PyPI or npm (an invented package name). Versions in the list may use glob
+patterns.
+
+Example list: `../examples/github/approved-components.example.json`; example
+workflow: `../examples/github-workflow-soup-gate.yml`. Make the job a required
+check on the protected branch and demonstrate it in OQ-07 b with the canary.
+Other ecosystems need their own parser, because the gate fails closed only for
+the files it knows.
 
 ## client_regression.py
 
@@ -287,14 +306,16 @@ python3 checks/client_regression.py --probes <approved probe file> --candidate-v
 
 Runs a fixed list of probes (command, expected exit code, output patterns,
 files that must or must not exist) on a candidate client version and records
-each outcome. The probe file is approved with the validation plan; the example
-files in `../tools/` are a starting point and every expectation in them must be
-confirmed once on the validated version. `--skip-credentials` skips probes that
-need a vendor login and records them as skipped. A pass is the gate for the
-batched version raise (T7a in document 08); a skipped probe must be covered by
-the manual CS-3.
+each outcome. The probe file is approved with the validation plan.
+
+The example files in `../tools/` are a starting point, and every expectation in
+them must be confirmed once on the validated version. `--skip-credentials`
+skips probes that need a vendor login and records them as skipped.
+
+A pass is the gate for the batched version raise (T7a in document 08); the
+manual CS-3 covers any skipped probe.
 
 ## Tests
 
 `python3 -m unittest discover -s tests` runs the unit tests of these scripts with
-mocked HTTP and mocked subprocess calls; no network access and no agent calls.
+mocked HTTP and mocked subprocess calls: no network access, no agent calls.

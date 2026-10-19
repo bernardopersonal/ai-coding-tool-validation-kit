@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-05 Test protocol: OpenAI Codex
 
@@ -61,7 +61,7 @@ Approved model envelope (envelope policy):
 
 The process-risk determination in ACME-VAL-CODEX-03 (FDA CSA approach) sets the depth:
 
-- **High process risk:** scripted testing with robust records (the per-step record under each test is completed: every step, expected and actual result, Pass / Fail and evidence file), all negative gate tests in at least two repositories, and a second person reviews the executed records.
+- **High process risk:** scripted testing with complete records (the per-step record under each test is completed: every step, expected and actual result, Pass / Fail and evidence file), all negative gate tests in at least two repositories, and a second person reviews the executed records.
 - **Not high process risk:** limited scripted testing for the gate tests (OQ-01 to OQ-07); unscripted testing (exploratory, error-guessing, ad hoc) and historical evidence where the test type allows it.
 
 Minimum samples for every criticality: at least 3 AI-assisted PRs per repository, at least 2 repositories when available, and at least 1 negative test per gate. Gate tests are never reduced below these minimums.
@@ -243,7 +243,7 @@ Per-step record (required when the determination is high, section 3):
 |---|---|---|---|---|
 | 1 | Capture on each reference machine; strict-config doctor clean; cloud requirements captured | 3 captures; no unknown fields; cloud requirements exported | Pass | baseline JSON files (3), `20261020-strict-config-doctor-and-features.txt`, `20261020-cloud-managed-requirements.pdf` |
 | 2 | Every value matches ACME-VAL-CODEX-06 | every row Match | Pass | same |
-| 3 | Requirements file not writable by developers | owner root, not writable by developers | Pass | same |
+| 3 | Requirements file not writable by developers | owner root, read-only for developers | Pass | same |
 | 4 | Requirements drift fails, user drift warns | as expected | Pass | `baseline_codex_20261020T121540Z.json` |
 
 Expected result: the effective configuration equals the approved baseline and is reproducible from hashed evidence.
@@ -254,7 +254,7 @@ Expected result: the effective configuration equals the approved baseline and is
 |---|---|---|
 | Alex Example, 2026-10-20 | Pass | none |
 
-Observed: `capture_baseline.py --tool codex` on ACME-MBP-017, ACME-WS-004 and the test VM: `requirements.toml`, `config.toml`, managed hooks, `AGENTS.md` and repository `.codex/` hashes equal ACME-VAL-CODEX-06 rev 1; every row Match. `codex --strict-config doctor` reports no unknown fields; `codex features list` saved; no retired constructs. Cloud-managed requirements and environment settings exported separately. Requirements file owned by root, not writable by developers. Drift check on the test VM with `--compare <approved JSON> --approved-version 0.163.0`: a changed line in `/etc/codex/requirements.toml` was reported as a failure (exit 1) and a changed user `config.toml` as a warning, as expected; both restored and re-captured.
+Observed: `capture_baseline.py --tool codex` on ACME-MBP-017, ACME-WS-004 and the test VM: `requirements.toml`, `config.toml`, managed hooks, `AGENTS.md` and repository `.codex/` hashes equal ACME-VAL-CODEX-06 rev 1; every row Match. `codex --strict-config doctor` reports no unknown fields; `codex features list` saved; no retired constructs. Cloud-managed requirements and environment settings exported separately. Requirements file owned by root and read-only for developers. Drift check on the test VM with `--compare <approved JSON> --approved-version 0.163.0`: a changed line in `/etc/codex/requirements.toml` was reported as a failure (exit 1) and a changed user `config.toml` as a warning, as expected; both restored and re-captured.
 
 Evidence: `evidence/CODEX/IQ-03/baseline_codex_20261020T102030Z.json`, `evidence/CODEX/IQ-03/baseline_codex_20261020T110910Z.json`, `evidence/CODEX/IQ-03/baseline_codex_20261020T121540Z.json`, `evidence/CODEX/IQ-03/20261020-strict-config-doctor-and-features.txt`, `evidence/CODEX/IQ-03/20261020-cloud-managed-requirements.pdf` (SHA-256 in the evidence index, section 10).
 
@@ -332,7 +332,7 @@ Per-step record (required when the determination is high, section 3):
 | 1 | Data terms recorded with source and access date | enterprise workspace ACME-PUR-2026-019, DPA of 2026-06-01; retention per workspace setting; no training by default | Pass | `20261020-vendor-data-terms-and-trust-portal.pdf` |
 | 2a | Training and retention match the contract | match | Pass | same |
 | 2b | Compliance API retention recorded | 30 days, exported weekly | Pass | same |
-| 2c | Residency decision recorded | not required, not set | Pass | same |
+| 2c | Residency decision recorded | not required; unset | Pass | same |
 | 2d | Certificate scope recorded | coding product not named: supplier action ACME-VEN-2026-015-A | Pass | same |
 | 3 | Cloud execution covered by a terms review (ISO 13485 clause 4.1.5) or restricted | review ACME-VEN-2026-015-B open (due 2026-11-30); cloud agent restricted to non-product repositories | Pass (restriction) | `20261020-contract-and-dpa-clause-references.md` |
 
@@ -471,7 +471,7 @@ Evidence: ACME-VAL-GEN-03 evidence `evidence/GEN/OQ-03/`; `evidence/CODEX/OQ-03/
 | Type | scripted, negative |
 | Objective | Prove that approvals by OpenAI Codex and its apps, bots or CI tokens do not satisfy the required approval, and that its identities cannot merge. |
 | Preconditions | ACME-VAL-GEN-03 OQ-04 passed; canary PR in the sandbox repository; list of OpenAI Codex identities from IQ-04. |
-| Acceptance criterion | No OpenAI Codex identity produces an approval that changes the review decision to approved; no OpenAI Codex identity merges; the vendor settings match the baseline. Any undocumented behaviour is settled by the observed result, not by assumption. |
+| Acceptance criterion | No OpenAI Codex identity produces an approval that changes the review decision to approved; no OpenAI Codex identity merges; the vendor settings match the baseline. The observed result settles any undocumented behaviour. |
 | Evidence | Reviews JSON (`user.type`, `state`), PR JSON, workflow output, policy screenshots where no API exists, reference to the ACME-VAL-GEN-03 OQ-04 record. |
 
 Steps (the platform settings and the bot-approval attempts are in ACME-VAL-GEN-03 OQ-04):
@@ -704,7 +704,7 @@ Evidence: `evidence/CODEX/OQ-09/20261022-oq09-codex-override-attempts.txt` (SHA-
 | Type | scripted |
 | Objective | Show that only approved models can be used where the tool can enforce it, and that the model actually used is recorded per PR or session. |
 | Preconditions | Approved envelope in ACME-VAL-CODEX-06; PR template with an "AI tool / model used" field; one model id outside the envelope for negative attempts. |
-| Acceptance criterion | Where the tool can enforce the envelope: 100% of attempts to use a non-approved model are refused, or substituted with a notice by an admitted model id; the outcome and the substitute id are recorded per attempt; the enforced allow-list equals the admitted ids in ACME-VAL-CODEX-06 section 12. Where it cannot: the gap is recorded as "monitored, not enforced" and covered by the detection check of ACME-VAL-CODEX-04 section 5.2 and PQ-01. The model used is recorded for 100% of sampled AI-assisted PRs / sessions. |
+| Acceptance criterion | Where the tool can enforce the envelope: 100% of attempts to use a non-approved model are refused, or substituted with a notice by an admitted model id; the outcome and the substitute id are recorded per attempt; the enforced allow-list equals the admitted ids in ACME-VAL-CODEX-06 section 12. Where it cannot: the gap is recorded as "monitored only" and covered by the detection check of ACME-VAL-CODEX-04 section 5.2 and PQ-01. The model used is recorded for 100% of sampled AI-assisted PRs / sessions. |
 | Evidence | Session transcripts, settings export, PR template records, telemetry or log extracts. |
 
 Approved envelope (envelope):
@@ -714,7 +714,7 @@ Approved envelope (envelope):
 
 Steps:
 
-1. No client-side model allowlist enforcement was verified for this tool: requirements `[models.new_thread]` only supplies defaults for new threads, and explicit `--model`, `--config` or `--profile` overrides it. Check the vendor's current documentation for an enforcement key in your version; if none exists, record the envelope as "monitored, not enforced".
+1. No client-side model allowlist enforcement was verified for this tool: requirements `[models.new_thread]` only supplies defaults for new threads, and explicit `--model`, `--config` or `--profile` overrides it. Check the vendor's current documentation for an enforcement key in your version; if none exists, record the envelope as "monitored only".
 2. Negative attempt: start a session with a model outside the envelope (`--model <id>`) and record what happens (refused, substituted with which id, or accepted).
 3. Recording: enable the managed `[otel]` export; the `codex.conversation_starts` event records the model. In CI, keep the `codex exec --json` stream. Cloud: record the model from the task record or the Compliance API.
 
@@ -724,7 +724,7 @@ Per-step record (required when the determination is high, section 3):
 
 | Step | Expected | Actual | Pass / Fail | Evidence file |
 |---|---|---|---|---|
-| 1 | Enforcement key checked; envelope recorded as monitored | no client-side enforcement for 0.163.0: monitored, not enforced | Pass | `20261022-oq10-codex-model-attempts-and-telemetry.txt` |
+| 1 | Enforcement key checked; envelope recorded as monitored | no client-side enforcement for 0.163.0: monitored only | Pass | `20261022-oq10-codex-model-attempts-and-telemetry.txt` |
 | 2 | Out-of-envelope model outcome recorded | accepted by the client; detected by the model-use check | Pass | same |
 | 3 | Model recorded from telemetry and task records | `codex.conversation_starts` carries the model; cloud from the task record | Pass | same |
 | 4 | At least 5 PRs or sessions with a recorded model inside the envelope | 10 of 10 | Pass | same |
@@ -737,7 +737,7 @@ Expected result: the envelope is enforced where possible, and the model used is 
 |---|---|---|
 | Alex Example, 2026-10-22 | Pass | none |
 
-Observed: No client-side model enforcement for 0.163.0 (checked against the vendor's current documentation on 2026-10-22): envelope recorded as "monitored, not enforced". Negative attempt `codex --model openai-model-x` started a session; the `codex.conversation_starts` event recorded the model and the weekly model-use check flagged it within the test (detection shown; in production such a sighting is a T4 deviation with admission within 5 working days, ACME-VAL-CODEX-04 section 5.2). Sample of 5 Codex-assisted PRs and 5 sessions: model recorded for 10 of 10 (PR template, telemetry), all inside the envelope.
+Observed: No client-side model enforcement for 0.163.0 (checked against the vendor's current documentation on 2026-10-22): envelope recorded as "monitored only". Negative attempt `codex --model openai-model-x` started a session; the `codex.conversation_starts` event recorded the model and the weekly model-use check flagged it within the test (detection shown; in production such a sighting is a T4 deviation with admission within 5 working days, ACME-VAL-CODEX-04 section 5.2). Sample of 5 Codex-assisted PRs and 5 sessions: model recorded for 10 of 10 (PR template, telemetry), all inside the envelope.
 
 Evidence: `evidence/CODEX/OQ-10/20261022-oq10-codex-model-attempts-and-telemetry.txt` (SHA-256 in the evidence index, section 10).
 
@@ -758,7 +758,7 @@ Steps:
 2. Cross-check: take at least 5 PRs not labelled as AI-assisted and compare with tool-side evidence (telemetry, session records, agent task lists, bot identities). Record any undeclared AI use.
 3. Tool-specific sub-steps:
    - No documented built-in commit-attribution control was found; confirm the repository-side commit-msg hook or PR template enforces the label.
-4. Retrospective: extend the check to the historical period defined in ACME-VAL-CODEX-04; changes from before the label rule existed are listed and assessed, not silently excluded.
+4. Retrospective: extend the check to the historical period defined in ACME-VAL-CODEX-04; changes from before the label rule existed are listed and assessed too.
 
 Per-step record (required when the determination is high, section 3):
 
@@ -1079,7 +1079,7 @@ Evidence: planned in `evidence/CODEX/PQ-01/`.
 |---|---|
 | Verifies | REQ-01 |
 | Type | unscripted |
-| Objective | Show that human review of AI-assisted changes is effective, not a formality. |
+| Objective | Show that human review of AI-assisted changes is effective in practice. |
 | Preconditions | Sample size and the defect severity classes and limits fixed in ACME-VAL-CODEX-04 section 7 (default sample: at least 10% of merged AI-assisted PRs in the PQ-01 period, minimum 5); a second qualified reviewer not involved in the original review. |
 | Acceptance criterion | Every sampled PR re-reviewed; every missed defect classified per ACME-VAL-CODEX-04 section 7; zero class 1 misses and class 2 misses within the limit. A class 1 miss = Fail, a deviation, and an impact assessment of all AI-assisted PRs approved by the same reviewer in the period. |
 | Evidence | Sample list, post-merge review notes, defect list with class and disposition. |
@@ -1126,7 +1126,7 @@ Evidence: planned in `evidence/CODEX/PQ-02/`.
 | OQ-07 | REQ-03, REQ-09 | Pass (ACME-VAL-GEN-03) | Alex Example / 2026-10-21 | none |
 | OQ-08 | REQ-07 | Pass (known limitation KL-01 reproduced as listed in section 4) | Alex Example / 2026-10-22 | none |
 | OQ-09 | REQ-06 | Pass | Alex Example / 2026-10-22 | none |
-| OQ-10 | REQ-08 | Pass (envelope monitored, not enforced) | Alex Example / 2026-10-22 | none |
+| OQ-10 | REQ-08 | Pass (envelope monitored only) | Alex Example / 2026-10-22 | none |
 | OQ-11 | REQ-10 | Pass | Alex Example / 2026-10-22 | none |
 | OQ-12 | REQ-11 | Pass (ACME-VAL-GEN-03) | Alex Example / 2026-10-22 | none |
 | OQ-13 | REQ-12 | Pass for 2026-10-02 to 2026-10-23 (earlier period: NC-2026-032) | Alex Example / 2026-10-22 | none |

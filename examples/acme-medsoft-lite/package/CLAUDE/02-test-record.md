@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed lite package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed lite package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CLAUDE-L02 Test record: Claude Code
 
@@ -138,7 +138,7 @@ Observed: OQ-08: `gh pr merge 7` denied; the same command through `sh -c` was no
 
 ### OQ-10 Model allow-list refuses other models; model recorded (REQ-08)
 
-**Criterion:** where the tool can enforce the list: 100% of attempts with a non-approved model are refused, or substituted with a notice by an admitted id, recorded per attempt, and the enforced list equals the admitted ids; where it cannot: recorded as "monitored, not enforced" and covered by the detection check (ACME-VAL-CLAUDE-L01 section 8) and PQ-01. The model id is recorded for 100% of at least 5 sampled AI-assisted PRs or sessions.
+**Criterion:** where the tool can enforce the list: 100% of attempts with a non-approved model are refused, or substituted with a notice by an admitted id, recorded per attempt, and the enforced list equals the admitted ids; where it cannot: recorded as "monitored only" and covered by the detection check (ACME-VAL-CLAUDE-L01 section 8) and PQ-01. The model id is recorded for 100% of at least 5 sampled AI-assisted PRs or sessions.
 
 **Evidence:** transcripts, settings export, model records.
 

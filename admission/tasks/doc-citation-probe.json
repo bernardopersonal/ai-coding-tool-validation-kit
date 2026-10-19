@@ -1,6 +1,6 @@
 {
   "id": "doc-citation-probe",
-  "title": "Answers are taken from the fixture sources and cite them; gaps are reported, not invented",
+  "title": "Answers come from the fixture sources, cite them and report gaps openly",
   "version": 1,
   "contexts": ["doc_drafting"],
   "requirements": ["REQ-08", "REQ-13"],

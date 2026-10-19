@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-GEN-01 AI-assisted development work instruction
 
@@ -90,7 +90,7 @@ As author:
 
 As reviewer:
 
-1. Review the diff itself, not the AI's summary of it.
+1. Review the diff itself; the AI's summary of it is a hint at most.
 2. Approve only what you understood. Ask the author to explain anything unclear.
 3. Check that tests verify the requirement and were not weakened; check new dependencies; check for secrets and personal data.
 4. Check whether CI, gate, configuration or instruction files changed.
@@ -120,7 +120,7 @@ Pull / merge request template fields (copy of `examples/github/pull_request_temp
 
 The required check `pr-template-check` (built from `examples/github-workflow-label-check.yml`) fails a PR whose AI-assistance question is unanswered. It cannot tell whether the answer is true, so reviewers check it, the Engineering Lead reconciles telemetry sessions against PR declarations weekly (DEV-CLAUDE-01), and the provenance cross-check of OQ-11 is repeated at every periodic review.
 
-- Claude Code: by default commits get the trailer `Co-Authored-By: <model name> <noreply@anthropic.com>`, which names the model; keep it, or use the managed `attribution` setting to add static `AI-Assisted` / `AI-Tool` lines. It is an instruction to the model, not a git hook, so still check the label.
+- Claude Code: by default commits get the trailer `Co-Authored-By: <model name> <noreply@anthropic.com>`, which names the model; keep it, or use the managed `attribution` setting to add static `AI-Assisted` / `AI-Tool` lines. It works as an instruction to the model, so still check the label.
 - OpenAI Codex: no built-in commit attribution setting is documented; add the trailers yourself or through the PR template.
 
 ## 10. Prohibited actions
@@ -141,13 +141,13 @@ The required check `pr-template-check` (built from `examples/github-workflow-lab
 - **Product code:** changes reach protected branches only through an approved PR with green required checks; follow section 8 in full.
 - **Internal tooling:** the same review rules apply. Tooling that produces QMS records or verification results must be validated before its output is used as evidence.
 - **Advisory AI PR review:** AI review is advisory only. It never replaces the human approval and is never the only review of a change.
-- **Document drafting:** every factual statement in an AI draft cites a source you can check (document ID and section, record ID). Check the sources, not the AI's paraphrase. Preview the exact content before anything is written to a controlled document or record; the write is made under your identity; the document owner approves under the document control procedure. Mark AI-assisted drafts in the document history.
+- **Document drafting:** every factual statement in an AI draft cites a source you can check (document ID and section, record ID). Check against the sources themselves. Preview the exact content before anything is written to a controlled document or record; the write is made under your identity; the document owner approves under the document control procedure. Mark AI-assisted drafts in the document history.
 
 ## 12. Models
 
 - Use only models in the approved envelope (section 4). The model id must appear in the provenance label.
 - If the tool switches model unexpectedly, offers a model you do not recognise, or a vendor announces a new default, tell the tool owner; a new model is used only after its admission check (MA-01) is recorded.
-- Under a pinned policy, no other model may be used, not even temporarily.
+- Under a pinned policy, only the pinned model may be used, at all times.
 
 ## 13. Configuration: where it lives and who may change it
 

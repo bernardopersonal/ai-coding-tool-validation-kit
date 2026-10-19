@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed lite package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed lite package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-L03 Validation report: OpenAI Codex
 
@@ -22,7 +22,7 @@
 | Execution period (UTC); repositories | 2026-10-21 08:15 to 2026-10-22 16:45; lumen-core, lumen-app, qa-tooling, val-sandbox |
 | Tests executed / passed / failed / N/A | 10 records (12 test IDs) before release / 10 / 0 / 0 (OQ-04 steps 2 and 3 and OQ-05 step 3 N/A with justification); PQ-01 and PQ-02 pending |
 
-Summary of results (author named in section 5): all ten pre-release test records met their acceptance criteria. The code-host gates, executed once for both tools, refused every unapproved, direct and admin merge or push; OpenAI Codex's own merge and push attempts failed in the sandbox or were stopped by command rules and the server. No Codex identity exists on the code host that could approve. The sandbox, network restriction and admin-enforced requirements held, with the accepted limitation KL-01 reproduced. A model outside the list was accepted by the client (no enforcement), so the list is monitored, not enforced. `openai-model-a` passed MA-01, with the denied-command check recorded N/A (KL-07). No deviation.
+Summary of results (author named in section 5): all ten pre-release test records met their acceptance criteria. The code-host gates, executed once for both tools, refused every unapproved, direct and admin merge or push; OpenAI Codex's own merge and push attempts failed in the sandbox or were stopped by command rules and the server. No Codex identity exists on the code host that could approve. The sandbox, network restriction and admin-enforced requirements held, with the accepted limitation KL-01 reproduced. A model outside the list was accepted by the client (no enforcement), so the list is monitored only. `openai-model-a` passed MA-01, with the denied-command check recorded N/A (KL-07). No deviation.
 
 Basis: ISO 13485:2016 clause 4.1.6, records under clause 4.2.5; 21 CFR 820.10 (QMSR, incorporating ISO 13485) and the record content of the FDA CSA guidance; ISO/TR 80002-2:2017. IEC 62304 (clauses 5.1.4, 5.1.10, 8.1): tool, configuration and model ids are configuration items, named in the software development plan where required.
 
@@ -37,7 +37,7 @@ Result per requirement of ACME-VAL-CODEX-L01 section 6 (met / restricted / not m
 - REQ-05: met
 - REQ-06: met
 - REQ-07: met; KL-01 as accepted
-- REQ-08: restricted: monitored, not enforced (OQ-10; weekly detection, grace period of ACME-VAL-CODEX-L01 section 8); PQ-01 pending
+- REQ-08: restricted: monitored only (OQ-10; weekly detection, grace period of ACME-VAL-CODEX-L01 section 8); PQ-01 pending
 - REQ-09: met
 - REQ-10: met (9 of 9 declared); PQ-01 pending
 - REQ-15: met: no Codex review identity exists
@@ -46,7 +46,7 @@ Result per requirement of ACME-VAL-CODEX-L01 section 6 (met / restricted / not m
 
 Per-test results: ACME-VAL-CODEX-L02; PQ-01 and PQ-02 "pending" until the signed addendum. Deviations (ID, class, resolution, status): none; an open one needs a risk assessment, restriction and target date.
 
-Residual risk: automation bias (PQ-01 outliers, PQ-02), silent model changes (MA-01), vendor changes (section 6), local guardrails as defence in depth, GitHub evidence retention (export); accepted limitations KL-01, KL-04, KL-06, KL-07 (ACME-VAL-CODEX-L01 section 5); the model list is monitored, not enforced. Acceptable: yes, because the binding controls are the server-side gate and the required checks, both shown to refuse violations, the sandbox has no network access, and a model outside the list is detected weekly and is a deviation with review of its changes.
+Residual risk: automation bias (PQ-01 outliers, PQ-02), silent model changes (MA-01), vendor changes (section 6), local guardrails as defence in depth, GitHub evidence retention (export); accepted limitations KL-01, KL-04, KL-06, KL-07 (ACME-VAL-CODEX-L01 section 5); the model list is monitored only. Acceptable: yes, because the binding controls are the server-side gate and the required checks, both shown to refuse violations, the sandbox has no network access, and a model outside the list is detected weekly and is a deviation with review of its changes.
 
 ## 3. Approved model list at release
 

@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-01 Inventory and intended use: OpenAI Codex
 
@@ -64,7 +64,7 @@ Approved models (ids or family patterns, as entered in the kit configuration):
 - `openai-model-a`
 - `openai-model-b`
 
-Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route, not the model itself.
+Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route only; each model still needs its own admission.
 
 The rationale for the policy is in ACME-VAL-CODEX-03. The approved envelope at release is restated in ACME-VAL-CODEX-07.
 
@@ -96,7 +96,7 @@ Decision: **QMS-relevant** (Q1, Q2, Q4, Q6). If QMS-relevant, it is validated un
 
 ## 7. GAMP 5 category
 
-Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is not categorised; it is managed through the envelope.
+Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is managed through the envelope, outside the categories.
 
 Selected category: **Category 4**. Category 3 was not selected, so no justification is needed. A configurable tool classified as non-configured, with its configuration never baselined, is a common audit finding.
 

@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-07 Validation report: OpenAI Codex
 
@@ -42,7 +42,7 @@ Contexts of use:
 - Advisory AI PR review: AI review comments on pull requests; advisory only, never counted as the required human approval.
 - Document drafting: Drafting of controlled documents and records, previewed and approved by a human before they are written or released.
 
-Summary of results (written by the person named in section 14, not by the AI tool): all 22 tests passed. The server-side gate held in every negative test, including attempts driven through Codex; admin requirements could not be overridden; both models in the envelope passed MA-01; 4 weeks of in-use data showed qualified human approval on every merged PR. The model envelope is monitored, not enforced, because no client-side enforcement was found. The ISO 13485 clause 4.1.5 terms review of cloud execution is still open, so the cloud agent is restricted to non-product repositories until it is approved.
+Summary of results (written by the person named in section 14): all 22 tests passed. The server-side gate held in every negative test, including attempts driven through Codex; admin requirements could not be overridden; both models in the envelope passed MA-01; 4 weeks of in-use data showed qualified human approval on every merged PR. The model envelope is monitored only, because no client-side enforcement was found. The ISO 13485 clause 4.1.5 terms review of cloud execution is still open, so the cloud agent is restricted to non-product repositories until it is approved.
 
 ## 2. Regulatory basis
 
@@ -73,7 +73,7 @@ Summary of results (written by the person named in section 14, not by the AI too
 | REQ-05 | Every change traceable to a named human; agent activity distinguishable | IQ-02, IQ-04, OQ-01 | met with restriction (cloud agent, section 9) | none |
 | REQ-06 | Configuration under control; users cannot override managed settings | IQ-01, IQ-03, OQ-09 | met | none |
 | REQ-07 | Local guardrails behave as configured (denied commands, workspace writes, network) | OQ-08, OQ-40 | met (known limitation KL-01 reproduced and compensated) | none |
-| REQ-08 | Model envelope enforced where possible, model recorded, new models admitted via MA-01 | OQ-10, MA-01, PQ-01 | met (monitored, not enforced; time-boxed admission after detection); PQ-01 pending | none |
+| REQ-08 | Model envelope enforced where possible, model recorded, new models admitted via MA-01 | OQ-10, MA-01, PQ-01 | met (monitored only; time-boxed admission after detection); PQ-01 pending | none |
 | REQ-09 | Data handling and vendor data terms as contracted | IQ-05, OQ-07 | met with restriction (cloud agent, section 9) | none |
 | REQ-10 | AI-assisted changes are declared (trailer / PR template) | OQ-11 | met | none |
 | REQ-11 | AI-assisted changes can be reverted with traceability | OQ-12 | met | none |
@@ -139,9 +139,9 @@ A deviation still open at release is acceptable only with a documented risk asse
 | Behaviour change without a version change (model updates, server-side changes) | Low: models change without notice, but admission and monitoring detect it | yes | MA-01 on every new model; monitoring routine (ACME-VAL-CODEX-08) | Jordan Demo (Engineering Lead) |
 | Prompt injection through untrusted content | Low: OQ-40 showed no guardrail break; server-side gates bind | yes | OQ-40 re-run on surface or context changes | Jordan Demo (Engineering Lead) |
 | Vendor feature, default or terms change | Medium: frequent releases; mitigated by weekly monitoring and version pinning | yes | Monitoring routine; supplier re-evaluation | Jordan Demo (Engineering Lead) |
-| Local guardrails are defence in depth, not a security boundary | Accepted by design | yes | Server-side gates remain the binding control | Jordan Demo (Engineering Lead) |
+| Local guardrails are defence in depth only | Accepted by design | yes | Server-side gates remain the binding control | Jordan Demo (Engineering Lead) |
 | Evidence lost to platform retention (audit log 180 days, Git events 7 days, CI checks and logs per the repository retention setting) | Low with weekly and on-merge export | yes | Periodic export into the QMS | Jordan Demo (Engineering Lead) |
-| Model envelope monitored, not enforced (no verified client-side enforcement) | Medium: a developer can start an unapproved model; detected within a week and admitted with MA-01 within 5 working days, or use stops (T4) | yes | Model recorded per session; weekly detection check; PQ-01 | Jordan Demo (Engineering Lead) |
+| Model envelope monitored only (no verified client-side enforcement) | Medium: a developer can start an unapproved model; detected within a week and admitted with MA-01 within 5 working days, or use stops (T4) | yes | Model recorded per session; weekly detection check; PQ-01 | Jordan Demo (Engineering Lead) |
 | Hooks may not block on error or timeout; environment variables with secret-like names pass to subprocesses unless configured | Low: hooks not relied on alone; environment filtered (OQ-08) | yes | Hooks not relied on alone; `shell_environment_policy` in baseline | Jordan Demo (Engineering Lead) |
 | Permission-profile keys are beta and may change between releases | Low: legacy sandbox settings used; re-test on upgrade | yes | Version pinning; re-test on upgrade | Jordan Demo (Engineering Lead) |
 | Cloud PR / commit identity not documented by the vendor | Medium: identity observed but undocumented by the vendor | yes, with the restriction in section 9 | Empirical result of IQ-04 recorded; repository ruleset `agent-prs` (2 approvals) where the cloud agent opens PRs; re-check on vendor changes | Jordan Demo (Engineering Lead) |

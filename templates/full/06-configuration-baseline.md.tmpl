@@ -189,7 +189,7 @@ Only managed MCP servers may run: yes / no (key and value): ______
 | PR template (AI-assistance and model fields) | repository | | | | |
 | `CODEOWNERS` | repository | | | n/a | |
 
-Agent instruction files are guidance to the model, not enforcement. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of {{doc_id_08}}: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
+Agent instruction files are guidance to the model only. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of {{doc_id_08}}: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
 
 ## 12. Approved models and model policy
 
@@ -218,10 +218,10 @@ The enforced allow-list holds admitted model ids only, never the pre-authorised 
 | How the model used is recorded (trailer, PR template, log, telemetry) | | | |
 
 {{#is_claude_code}}
-Keys: `availableModels` (the admitted exact ids), `enforceAvailableModels` true, `availableModelsMatch` `"exact"` (managed-only), `deniedModels` (managed-only, for known unadmitted ids), `model` (starting default only, not a lock), `fallbackModel`, `switchModelsOnFlag`. With the default prefix matching a listed id would also permit later versions, which would make a new model selectable before admission; the kit's glob patterns are notation for {{doc_id_04}} and {{doc_id_08}} only.
+Keys: `availableModels` (the admitted exact ids), `enforceAvailableModels` true, `availableModelsMatch` `"exact"` (managed-only), `deniedModels` (managed-only, for known unadmitted ids), `model` (starting default only), `fallbackModel`, `switchModelsOnFlag`. With the default prefix matching a listed id would also permit later versions, which would make a new model selectable before admission; the kit's glob patterns are notation for {{doc_id_04}} and {{doc_id_08}} only.
 {{/is_claude_code}}
 {{#is_codex}}
-No client-side model allowlist enforcement was verified: requirements `[models.new_thread]` only sets defaults, and explicit `--model`, `--config` or `--profile` overrides it. Unless the vendor's current documentation shows an enforcement key for your version, record "monitored, not enforced" and rely on recording (`codex.conversation_starts` telemetry, `codex exec --json`) plus PQ-01.
+No client-side model allowlist enforcement was verified: requirements `[models.new_thread]` only sets defaults, and explicit `--model`, `--config` or `--profile` overrides it. Unless the vendor's current documentation shows an enforcement key for your version, record "monitored only" and rely on recording (`codex.conversation_starts` telemetry, `codex exec --json`) plus PQ-01.
 {{/is_codex}}
 {{#is_copilot}}
 Record the enterprise / organisation model availability settings and the "Default availability for released models" policy (disable it or configure each model explicitly).
@@ -230,7 +230,7 @@ Record the enterprise / organisation model availability settings and the "Defaul
 Record the admin model allow / block list (models without zero data retention need admin sign-off); verify against the vendor's current documentation.
 {{/is_cursor}}
 {{#is_other}}
-Record whether {{vendor}} offers a central model restriction (verify against the vendor's current documentation); otherwise record "monitored, not enforced".
+Record whether {{vendor}} offers a central model restriction (verify against the vendor's current documentation); otherwise record "monitored only".
 {{/is_other}}
 
 ## 13. Logging, telemetry and retention
@@ -310,7 +310,7 @@ Precedence (highest first): managed settings > command-line `--settings` > `.cla
 |---|---|---|
 | macOS `/Library/Application Support/ClaudeCode/managed-settings.json`; Linux / WSL `/etc/claude-code/managed-settings.json`; Windows `C:\Program Files\ClaudeCode\managed-settings.json`; drop-ins in `managed-settings.d/*.json` beside it; `managed-mcp.json` in the same directory | managed (file) | Full content and SHA-256; file owner and permissions |
 | macOS managed preferences domain `com.anthropic.claudecode`; Windows `HKLM\SOFTWARE\Policies\ClaudeCode`, value `Settings` (JSON). `HKCU\SOFTWARE\Policies\ClaudeCode` is user-writable and not an admin source | managed (MDM) | Profile / registry export and SHA-256 |
-| claude.ai admin console: Organization settings > Claude Code > Managed settings (cached locally in `~/.claude/remote-settings.json`) | managed (server) | Export or screenshot; owner who changed it. The vendor calls this a client-side control, not a security boundary; it is skipped with third-party cloud providers or a custom base URL, and not delivered to Console API-key sessions (typical in CI) |
+| claude.ai admin console: Organization settings > Claude Code > Managed settings (cached locally in `~/.claude/remote-settings.json`) | managed (server) | Export or screenshot; owner who changed it. The vendor classes this as a client-side control only; it is skipped with third-party cloud providers or a custom base URL, and not delivered to Console API-key sessions (typical in CI) |
 | `managedSourcesBehavior` (`"first-wins"` default, or `"merge"`) | managed | Which managed sources are combined; `/status` "Skipped sources" |
 | `~/.claude/settings.json` | user | Content and SHA-256 on reference machines |
 | `.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json` | repository / local | Content and SHA-256 |

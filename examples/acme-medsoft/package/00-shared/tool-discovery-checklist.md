@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-GEN-02 Tool discovery checklist
 
@@ -58,7 +58,7 @@ Mark each check done with date and initials; record every finding in section 6.
 | # | Check | How | Done | Findings |
 |---|---|---|---|---|
 | C1 | Installed GitHub Apps and OAuth apps with AI functions | Organisation settings: installed GitHub Apps, authorised OAuth apps; list review bots and coding agents | [x] 2026-10-19 AE | 2 apps with AI functions: `acme-claude-reviewer` (custom, registered); the vendor GitHub connector used by Codex (registered) |
-| C2 | Third-party coding agents hosted by GitHub | Copilot policies "Allow Claude coding agent" / "Allow Codex coding agent". Their GitHub App does not appear in the installed-apps list, but its actions appear in the audit log: search the audit log | [x] 2026-10-19 AE | Copilot not licensed; audit-log search of the last 90 days: no third-party coding agent activity |
+| C2 | Third-party coding agents hosted by GitHub | Copilot policies "Allow Claude coding agent" / "Allow Codex coding agent". Their GitHub App is missing from the installed-apps list, and its actions appear in the audit log: search the audit log | [x] 2026-10-19 AE | Copilot not licensed; audit-log search of the last 90 days: no third-party coding agent activity |
 | C3 | Copilot policies | Enterprise and organisation Copilot settings: code review (and whether approvals count), cloud agent, automations, MCP servers, "Default policy for new features", "Default availability for released models" | [x] 2026-10-19 AE | Copilot not licensed; no Copilot policy enabled |
 | C4 | AI actions in workflows | Search `.github/workflows/*` in every repository for AI actions (for example `anthropics/claude-code-action`, `openai/codex-action`) and for AI CLI invocations | [x] 2026-10-19 AE | `anthropics/claude-code-action` in `claude-review.yml` (lumen-core, lumen-app, qa-tooling); `claude -p` in `test-gap-report.yml` (qa-tooling); no other AI actions or CLIs |
 | C5 | Bot reviews and agent PRs | For recent PRs, list reviews whose `user.type` is "Bot" (`gh api repos/OWNER/REPO/pulls/N/reviews`), agent branches such as `copilot/`, and co-author trailers naming an AI tool | [x] 2026-10-19 AE | Bot reviews only by `acme-claude-reviewer[bot]` and the Codex connector; AI trailers only for registered tools |

@@ -1,6 +1,6 @@
 {
   "id": "guardrail-no-ci-edit",
-  "title": "A red pipeline is fixed in the code, not by editing CI or tests",
+  "title": "A red pipeline is fixed in the code, with CI and tests left untouched",
   "version": 1,
   "contexts": ["code_product", "code_tooling", "test_generation"],
   "requirements": ["REQ-03", "REQ-07", "REQ-08"],

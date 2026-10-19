@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-06 Configuration baseline: OpenAI Codex
 
@@ -129,7 +129,7 @@ Only managed MCP servers may run: yes (requirements `[mcp_servers]` is deliberat
 | PR template (AI-assistance and model fields) | repository | `.github/pull_request_template.md` `e726f005260dc211`... (same file in all repositories) | `0e19f7b` | yes | Head of QA |
 | `CODEOWNERS` | repository | `393cfde55aaceeda`... | `77ac2e9` | n/a | Engineering Lead |
 
-Agent instruction files are guidance to the model, not enforcement. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of ACME-VAL-CODEX-08: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
+Agent instruction files are guidance to the model only. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of ACME-VAL-CODEX-08: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
 
 ## 12. Approved models and model policy
 
@@ -139,7 +139,7 @@ Any model matching an entry below may be used, because its output is independent
 
 | Envelope entry | Pre-authorised pattern (ACME-VAL-CODEX-04 section 5.2) | Admitted ids in the enforced allow-list | Enforcement mechanism | MA-01 admission record | Date admitted |
 |---|---|---|---|---|---|
-| `openai-model-a` | `openai-model-a-v*` | n/a: no enforced allow-list (admitted id `openai-model-a` recorded here) | monitored, not enforced (no verified client-side enforcement); recorded per session; weekly detection check, time-boxed admission after detection (ACME-VAL-CODEX-04 section 5.2) | CODEX-ADM-0001 | 2026-10-23 |
+| `openai-model-a` | `openai-model-a-v*` | n/a: no enforced allow-list (admitted id `openai-model-a` recorded here) | monitored only (no verified client-side enforcement); recorded per session; weekly detection check, time-boxed admission after detection (ACME-VAL-CODEX-04 section 5.2) | CODEX-ADM-0001 | 2026-10-23 |
 | `openai-model-b` | `openai-model-b-v*` | n/a (admitted id `openai-model-b` recorded here) | as above | CODEX-ADM-0002 | 2026-10-23 |
 
 The enforced allow-list holds admitted model ids only, never the pre-authorised patterns; an id is added after its admission record is approved.
@@ -151,7 +151,7 @@ The enforced allow-list holds admitted model ids only, never the pre-authorised 
 | Fallback models (all inside the envelope) | none configured | none | Match |
 | How the model used is recorded (trailer, PR template, log, telemetry) | PR template model field; `codex.conversation_starts` telemetry event; weekly model-use check against the envelope | as approved | Match |
 
-No client-side model allowlist enforcement was verified: requirements `[models.new_thread]` only sets defaults, and explicit `--model`, `--config` or `--profile` overrides it. Unless the vendor's current documentation shows an enforcement key for your version, record "monitored, not enforced" and rely on recording (`codex.conversation_starts` telemetry, `codex exec --json`) plus PQ-01.
+No client-side model allowlist enforcement was verified: requirements `[models.new_thread]` only sets defaults, and explicit `--model`, `--config` or `--profile` overrides it. Unless the vendor's current documentation shows an enforcement key for your version, record "monitored only" and rely on recording (`codex.conversation_starts` telemetry, `codex exec --json`) plus PQ-01.
 
 ## 13. Logging, telemetry and retention
 

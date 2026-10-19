@@ -24,7 +24,7 @@ from kit.config import full_profile_reasons, load_config  # noqa: E402
 from kit.package import render_package  # noqa: E402
 from test_templates import HARDCODED_MODEL_RE, LITE_TEMPLATES_DIR, TEMPLATES_DIR  # noqa: E402
 
-BANNER = "> FICTIONAL EXAMPLE - not a real validation record."
+BANNER = "> FICTIONAL EXAMPLE, invented for illustration only."
 NC_ROW = "| Nonconformity and CAPA (mandatory) |"
 FULL_WARNING = "WARNING: the full profile is recommended"
 

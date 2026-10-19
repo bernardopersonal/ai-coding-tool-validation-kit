@@ -100,7 +100,7 @@ As author:
 
 As reviewer:
 
-1. Review the diff itself, not the AI's summary of it.
+1. Review the diff itself; the AI's summary of it is a hint at most.
 2. Approve only what you understood. Ask the author to explain anything unclear.
 3. Check that tests verify the requirement and were not weakened; check new dependencies; check for secrets and personal data.
 4. Check whether CI, gate, configuration or instruction files changed.
@@ -132,7 +132,7 @@ Pull / merge request template fields (copy of `examples/github/pull_request_temp
 
 {{#tools_list}}
 {{#is_claude_code}}
-- {{tool_name}}: by default commits get the trailer `Co-Authored-By: <model name> <noreply@anthropic.com>`, which names the model; keep it, or use the managed `attribution` setting to add static `AI-Assisted` / `AI-Tool` lines. It is an instruction to the model, not a git hook, so still check the label.
+- {{tool_name}}: by default commits get the trailer `Co-Authored-By: <model name> <noreply@anthropic.com>`, which names the model; keep it, or use the managed `attribution` setting to add static `AI-Assisted` / `AI-Tool` lines. It works as an instruction to the model, so still check the label.
 {{/is_claude_code}}
 {{#is_codex}}
 - {{tool_name}}: no built-in commit attribution setting is documented; add the trailers yourself or through the PR template.
@@ -191,7 +191,7 @@ Pull / merge request template fields (copy of `examples/github/pull_request_temp
 - **Test generation:** generated tests trace to the requirement they verify; review them as carefully as product code; never generate test data from real patient or personal data.
 {{/ctx_test_generation}}
 {{#ctx_doc_drafting}}
-- **Document drafting:** every factual statement in an AI draft cites a source you can check (document ID and section, record ID). Check the sources, not the AI's paraphrase. Preview the exact content before anything is written to a controlled document or record; the write is made under your identity; the document owner approves under the document control procedure. Mark AI-assisted drafts in the document history.
+- **Document drafting:** every factual statement in an AI draft cites a source you can check (document ID and section, record ID). Check against the sources themselves. Preview the exact content before anything is written to a controlled document or record; the write is made under your identity; the document owner approves under the document control procedure. Mark AI-assisted drafts in the document history.
 {{/ctx_doc_drafting}}
 {{#ctx_agents_qms}}
 - **QMS agents:** only the configured agents may act on QMS systems, only on their declared write targets. Prompts, schedules and permissions change only through change control. Agent outputs that change records require confirmation by the accountable role. Report any write you did not expect.
@@ -201,7 +201,7 @@ Pull / merge request template fields (copy of `examples/github/pull_request_temp
 
 - Use only models in the approved envelope (section 4). The model id must appear in the provenance label.
 - If the tool switches model unexpectedly, offers a model you do not recognise, or a vendor announces a new default, tell the tool owner; a new model is used only after its admission check (MA-01) is recorded.
-- Under a pinned policy, no other model may be used, not even temporarily.
+- Under a pinned policy, only the pinned model may be used, at all times.
 
 ## 13. Configuration: where it lives and who may change it
 

@@ -311,7 +311,7 @@ def run_wizard(defaults: Optional[Dict[str, Any]] = None,
     io = _IO(input_fn, print_fn)
     io.print("AI Coding Tool Validation Kit - configuration wizard")
     io.print("Press Enter to accept the [default]. Validate the intended use and the "
-             "guardrails around the tool; do not try to qualify the LLM.")
+             "guardrails around the tool (the LLM itself changes too often to qualify).")
     io.print("")
 
     cfg: Dict[str, Any] = {}

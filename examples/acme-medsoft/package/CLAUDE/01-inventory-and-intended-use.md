@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CLAUDE-01 Inventory and intended use: Claude Code
 
@@ -55,7 +55,7 @@ The validation unit is **tool + vendor + surface + context of use**. The languag
 | Periodic review | Every 6 months, and on the triggers in ACME-VAL-CLAUDE-08 |
 | Last validation | 2026-10-23, ACME-VAL-CLAUDE-07: approved for intended use |
 
-Version evidence for Claude Code: `claude --version` and `claude doctor` (which reports the auto-update state). Update control options: the `autoUpdatesChannel` setting (`"stable"` or `"latest"`), the `DISABLE_UPDATES=1` environment variable, and the managed-only `requiredMinimumVersion` / `requiredMaximumVersion` keys. Invalid values of the two version keys are dropped instead of enforced, so confirm the effect with `claude --version` on a test machine before rollout. Releases are very frequent; the validated range must be explicit.
+Version evidence for Claude Code: `claude --version` and `claude doctor` (which reports the auto-update state). Update control options: the `autoUpdatesChannel` setting (`"stable"` or `"latest"`), the `DISABLE_UPDATES=1` environment variable, and the managed-only `requiredMinimumVersion` / `requiredMaximumVersion` keys. Invalid values of the two version keys are silently dropped, so confirm the effect with `claude --version` on a test machine before rollout. Releases are very frequent; the validated range must be explicit.
 
 ## 4. Approved model envelope and model policy
 
@@ -64,7 +64,7 @@ Approved models (ids or family patterns, as entered in the kit configuration):
 - `anthropic-model-a`
 - `anthropic-model-b`
 
-Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route, not the model itself.
+Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route only; each model still needs its own admission.
 
 The rationale for the policy is in ACME-VAL-CLAUDE-03. The approved envelope at release is restated in ACME-VAL-CLAUDE-07.
 
@@ -97,7 +97,7 @@ Decision: **QMS-relevant** (Q1, Q2, Q4, Q6). If QMS-relevant, it is validated un
 
 ## 7. GAMP 5 category
 
-Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is not categorised; it is managed through the envelope.
+Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is managed through the envelope, outside the categories.
 
 Selected category: **Category 4**. Category 3 was not selected, so no justification is needed. A configurable tool classified as non-configured, with its configuration never baselined, is a common audit finding.
 

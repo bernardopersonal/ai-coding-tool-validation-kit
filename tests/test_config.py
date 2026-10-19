@@ -280,7 +280,7 @@ class ValidationTests(unittest.TestCase):
                            "does not match any approved_models")
         self.assertInvalid(lambda c: c["tools"][0].update(model_policy="pinned",
                                                           pinned_model="vendor-a-large-*"),
-                           "not a pattern")
+                           "must be an exact model id")
         self.assertInvalid(lambda c: c["tools"][0].update(pinned_model="vendor-a-large-2"),
                            "only allowed with model_policy 'pinned'")
 

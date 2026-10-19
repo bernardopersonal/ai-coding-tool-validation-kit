@@ -76,7 +76,7 @@ The validation unit is **tool + vendor + surface + context of use**. The languag
 | Last validation | [fill in: date and report {{doc_id_07}}] |
 
 {{#is_claude_code}}
-Version evidence for Claude Code: `claude --version` and `claude doctor` (which reports the auto-update state). Update control options: the `autoUpdatesChannel` setting (`"stable"` or `"latest"`), the `DISABLE_UPDATES=1` environment variable, and the managed-only `requiredMinimumVersion` / `requiredMaximumVersion` keys. Invalid values of the two version keys are dropped instead of enforced, so confirm the effect with `claude --version` on a test machine before rollout. Releases are very frequent; the validated range must be explicit.
+Version evidence for Claude Code: `claude --version` and `claude doctor` (which reports the auto-update state). Update control options: the `autoUpdatesChannel` setting (`"stable"` or `"latest"`), the `DISABLE_UPDATES=1` environment variable, and the managed-only `requiredMinimumVersion` / `requiredMaximumVersion` keys. Invalid values of the two version keys are silently dropped, so confirm the effect with `claude --version` on a test machine before rollout. Releases are very frequent; the validated range must be explicit.
 {{/is_claude_code}}
 {{#is_codex}}
 Version evidence for Codex: `codex --version` (prints `codex-cli <version>`) and `codex doctor`. In CI, pin the GitHub Action to a tag or commit SHA and set its `codex-version` input explicitly: leaving it blank installs the latest published CLI.
@@ -100,7 +100,7 @@ Approved models (ids or family patterns, as entered in the kit configuration):
 {{/approved_models}}
 
 {{#policy_envelope}}
-Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route, not the model itself.
+Policy: **envelope**. AI output is independently verified downstream (human review plus required CI checks), so any model inside the envelope may be used. A model enters the envelope only after MA-01 passes, and the model used is recorded per PR or session (REQ-08). A family pattern pre-authorises the admission route only; each model still needs its own admission.
 {{/policy_envelope}}
 {{#policy_pinned}}
 Policy: **pinned**. The AI output itself counts as a control or as evidence in at least one context, so only `{{pinned_model}}` may be used. Any change of model or model version requires the confirmatory OQ subset and MA-01 before use (REQ-08, {{doc_id_08}}).
@@ -151,7 +151,7 @@ Decision: [QMS-relevant / not QMS-relevant].{{#reg_iso13485}} If QMS-relevant, i
 
 ## 7. GAMP 5 category
 
-Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is not categorised; it is managed through the envelope.
+Recommended: **Category 4 (configured product)**. Agentic coding tools are configured through settings, permission modes, allow/deny rules, sandbox options, hooks, MCP or extension allow-lists and instruction files, and that configuration changes behaviour. The model itself is managed through the envelope, outside the categories.
 
 Selected category: [fill in]. If Category 3 is selected, justify why no configuration is used and how that is enforced: [fill in]. A configurable tool classified as non-configured, with its configuration never baselined, is a common audit finding.
 

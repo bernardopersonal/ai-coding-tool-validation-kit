@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CODEX-08 Change and revalidation: OpenAI Codex
 
@@ -17,7 +17,7 @@ Related documents: ACME-VAL-CODEX-03 Risk assessment · ACME-VAL-CODEX-04 Valida
 
 ## 1. Purpose and principles
 
-This document keeps OpenAI Codex in a validated state after release. It works as a predetermined change protocol for the tool: it states in advance which future changes are pre-authorised and the exact tests that authorise them, so that routine changes (above all new models) need a defined test subset, not a new validation.
+This document keeps OpenAI Codex in a validated state after release. It works as a predetermined change protocol for the tool: it states in advance which future changes are pre-authorised and the exact tests that authorise them, so that routine changes (above all new models) need only a defined test subset.
 
 - **Configuration** (settings, rules, hooks, MCP servers, instruction files, code-host gates, model envelope) is baselined in ACME-VAL-CODEX-06 and changes only through a change record.
 - **Behaviour** varies: models change, sometimes without a version change. It is covered by the vendor monitoring routine (section 5), the model admission check MA-01 and the periodic review (section 6).
@@ -170,7 +170,7 @@ Eligibility (mandatory before the results; any "no" routes the change to a chang
 
 | Eligibility check | Answer and evidence |
 |---|---|
-| Matches a pre-authorised pattern of ACME-VAL-CODEX-04 section 5.2 (which one); not an excluded or repointable id | Tier 1 (initial envelope): the exact envelope entry itself; versioned id, not an alias |
+| Matches a pre-authorised pattern of ACME-VAL-CODEX-04 section 5.2 (which one); not an excluded or repointable id | Tier 1 (initial envelope): the exact envelope entry itself; a versioned id (no alias) |
 | Tool version within the validated versions of ACME-VAL-CODEX-06 (yes / no) | yes: codex-cli 0.163.0 |
 | IQ-03 re-capture SHA-256 equals the approved baseline (yes / no, evidence) | yes: IQ-03 captures of 2026-10-20 (ACME-VAL-CODEX-05 evidence index) |
 | Release notes screened (monitoring log ref); guardrail-relevant item? (no = Tier 2; yes = T7 / T3) | monitoring log entries of 2026-10-02 to 2026-10-19; the schema change handled in CR-2026-039 before this validation |
@@ -215,7 +215,7 @@ Eligibility (mandatory before the results; any "no" routes the change to a chang
 
 | Eligibility check | Answer and evidence |
 |---|---|
-| Matches a pre-authorised pattern of ACME-VAL-CODEX-04 section 5.2 (which one); not an excluded or repointable id | Tier 1 (initial envelope): the exact envelope entry itself; versioned id, not an alias |
+| Matches a pre-authorised pattern of ACME-VAL-CODEX-04 section 5.2 (which one); not an excluded or repointable id | Tier 1 (initial envelope): the exact envelope entry itself; a versioned id (no alias) |
 | Tool version within the validated versions of ACME-VAL-CODEX-06 (yes / no) | yes: codex-cli 0.163.0 |
 | IQ-03 re-capture SHA-256 equals the approved baseline (yes / no, evidence) | yes: IQ-03 captures of 2026-10-20 (ACME-VAL-CODEX-05 evidence index) |
 | Release notes screened (monitoring log ref); guardrail-relevant item? (no = Tier 2; yes = T7 / T3) | monitoring log entries of 2026-10-02 to 2026-10-19; the schema change handled in CR-2026-039 before this validation |

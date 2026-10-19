@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CLAUDE-02 Requirements: Claude Code
 
@@ -63,11 +63,11 @@ Risk traceability (risk to requirement to test) is in ACME-VAL-CLAUDE-03, sectio
 
 ## 5. Requirement details
 
-Each requirement lists the objective, the acceptance criteria used by the tests (fixed in ACME-VAL-CLAUDE-05 before execution), and implementation notes. Implementation notes describe known ways to meet the objective; they are not the acceptance criteria, and settings must be confirmed against the vendor's current documentation at IQ.
+Each requirement lists the objective, the acceptance criteria used by the tests (fixed in ACME-VAL-CLAUDE-05 before execution), and implementation notes. Implementation notes describe known ways to meet the objective and carry no acceptance criteria; settings must be confirmed against the vendor's current documentation at IQ.
 
 ### REQ-01 Human approval gate
 
-- **Objective:** every change to a protected branch of an in-scope repository requires at least 1 approval by a qualified human who is neither the author nor the person who launched the agent, given on the final commit.
+- **Objective:** every change to a protected branch of an in-scope repository requires at least 1 approval by a qualified human other than the author and the person who launched the agent, given on the final commit.
 - **Acceptance:** the platform rule requires the approvals; approvals become stale on a new push; 100% of sampled merged AI-assisted PRs had a qualified human approval submitted before merge on the head commit; merge without approval is refused (negative test); PRs authored by a bot or agent identity need 2 approvals or code-owner approval by a human team (compensating control, because the platform counts the launcher's approval of such a PR).
 - **Qualified reviewer:** trained on ACME-VAL-GEN-01 and authorised by ACME-QP-12 Code review and merge, Annex A (qualified-reviewer list).
 - **GitHub:** classic branch protection `required_approving_review_count` of 1 or more, `dismiss_stale_reviews`, `require_last_push_approval` (the most recent push must be approved by someone other than the pusher; enable stale-review dismissal as well), `require_code_owner_reviews` for protected paths; or a ruleset `pull_request` rule with `required_approving_review_count`, `dismiss_stale_reviews_on_push`, `require_last_push_approval` and `require_code_owner_review`. Only approvals from reviewers with write permission count.
@@ -77,7 +77,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 - **Objective:** approvals submitted by the AI tool, bots, apps or CI tokens are not counted toward the required approval, and no AI identity can merge.
 - **Acceptance:** negative tests show that an approval from each AI / bot / CI identity in scope does not satisfy the merge requirement and that a merge attempt by an AI identity is refused; settings that let AI approvals count are off and recorded in ACME-VAL-CLAUDE-06.
 - **GitHub:** Actions workflow permission `can_approve_pull_request_reviews` false at organisation and repository level ("Allow GitHub Actions to create and approve pull requests" off). GitHub documentation does not say whether approvals by a GitHub App count; prove it with OQ-04. If Copilot code review is enabled anywhere in the organisation, keep "Allow Copilot approvals to count toward merge requirements" off and the enterprise policy "Allow Copilot to approve pull requests" at "Disabled everywhere".
-- **Claude Code:** the Claude Code GitHub Action documents that it cannot approve pull requests, submit formal reviews or merge. This is behaviour of the action, not a platform boundary (its GitHub App holds pull-request write permission), so the platform settings above remain the control. The managed Code Review service never approves or blocks a PR; its check run concludes neutral.
+- **Claude Code:** the Claude Code GitHub Action documents that it cannot approve pull requests, submit formal reviews or merge. This is behaviour of the action, and its GitHub App holds pull-request write permission, so the platform settings above remain the control. The managed Code Review service never approves or blocks a PR; its check run concludes neutral.
 
 ### REQ-03 Required checks before merge
 
@@ -88,7 +88,7 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 
 ### REQ-04 No direct push and no silent bypass
 
-- **Objective:** nobody, including administrators and AI identities, can push directly to a protected branch; any bypass of the rules is either impossible or logged and reviewed.
+- **Objective:** direct pushes to a protected branch are refused for every identity, administrators and AI identities included; any bypass of the rules is either impossible or logged and reviewed.
 - **Acceptance:** direct push refused (OQ-03); admin bypass refused, or the bypass appears in the audit records and is reviewed (OQ-06); no bypass in the PQ-01 period without a review record.
 - **GitHub:** classic `enforce_admins` true ("Do not allow bypassing the above settings"), or rulesets with reviewed `bypass_actors`. Do not use `bypass_mode` "exempt" on QMS branches: exempt actors are not evaluated and no bypass audit entry is created. The organisation audit log shows 180 days and Git events only 7 days; export or stream it, and export ruleset and rule-suite (bypass) records periodically.
 
@@ -97,19 +97,19 @@ Each requirement lists the objective, the acceptance criteria used by the tests 
 - **Objective:** every change and every write is traceable to a named human (requester or author, and approver); activity of the AI agent is distinguishable from human activity.
 - **Acceptance:** the surface to identity mapping (IQ-04) shows no shared or anonymous identities; account ownership and SSO are confirmed (IQ-02); in the OQ-01 sample every PR shows a named human requester and approver, and AI involvement is identifiable.
 - **Note:** give agents a dedicated identity, or a mandatory label (REQ-10) that the reviewer checks.
-- **Claude Code:** in telemetry `user.id` is an anonymous identifier, not a person; user identity attributes (such as `user.email`) are present only with a claude.ai or Team / Enterprise login. For API-key fleets add an identity attribute through `OTEL_RESOURCE_ATTRIBUTES`.
+- **Claude Code:** in telemetry `user.id` is an anonymous identifier; user identity attributes (such as `user.email`) are present only with a claude.ai or Team / Enterprise login. For API-key fleets add an identity attribute through `OTEL_RESOURCE_ATTRIBUTES`.
 
 ### REQ-06 Configuration under control
 
 - **Objective:** the tool configuration that governs behaviour (managed or admin settings, permission mode, allow / deny rules, sandbox, hooks, MCP or extension allow-list, instruction files) is baselined with hashes, changed only through change control, and cannot be overridden by users.
 - **Acceptance:** baseline captured and hashed (`python3 checks/capture_baseline.py`, IQ-03) and recorded in ACME-VAL-CLAUDE-06; version recorded per surface (IQ-01); a user-level attempt to override a managed setting has no effect (OQ-09); instruction and configuration files in repositories require code-owner review.
-- **Claude Code:** managed settings (system `managed-settings.json`, MDM, or server-managed from the admin console) take precedence over `--settings`, `.claude/settings.local.json`, `.claude/settings.json` and `~/.claude/settings.json`. Candidate locks: `permissions.disableBypassPermissionsMode` = `"disable"`; `disableAutoMode` = `"disable"` or an explicit managed `permissions.defaultMode`; `allowManagedPermissionRulesOnly`; `allowManagedHooksOnly` (CI and agent runners) or, on developer machines, `pluginConfigs` `cc-plugin-sec-default@builtin` option `allowManagedModsOnly` with `disableSideloadFlags`; `allowManagedMcpServersOnly`; `availableModels` with `availableModelsMatch` = `"exact"` and `enforceAvailableModels`. `CLAUDE.md` is guidance, not enforcement. Verify the effective sources with `/status` ("Setting sources") and `claude doctor`. Server-managed settings are a client-side control, not a security boundary; endpoint-managed settings give stronger guarantees.
+- **Claude Code:** managed settings (system `managed-settings.json`, MDM, or server-managed from the admin console) take precedence over `--settings`, `.claude/settings.local.json`, `.claude/settings.json` and `~/.claude/settings.json`. Candidate locks: `permissions.disableBypassPermissionsMode` = `"disable"`; `disableAutoMode` = `"disable"` or an explicit managed `permissions.defaultMode`; `allowManagedPermissionRulesOnly`; `allowManagedHooksOnly` (CI and agent runners) or, on developer machines, `pluginConfigs` `cc-plugin-sec-default@builtin` option `allowManagedModsOnly` with `disableSideloadFlags`; `allowManagedMcpServersOnly`; `availableModels` with `availableModelsMatch` = `"exact"` and `enforceAvailableModels`. `CLAUDE.md` is guidance for the model. Verify the effective sources with `/status` ("Setting sources") and `claude doctor`. Server-managed settings are a client-side control only; endpoint-managed settings give stronger guarantees.
 
 ### REQ-07 Local guardrails behave as configured
 
 Applies: the local CLI / IDE surface is in scope.
 
-- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks rather than allows).
+- **Objective:** denied commands are not executed, writes outside the workspace are refused, network access is limited to approved destinations, and guardrails fail closed (an unavailable sandbox or a failing policy hook blocks).
 - **Acceptance:** OQ-08 negative cases (denied command, write outside workspace, non-approved network destination) are all refused; the failure-mode case blocks; OQ-40 shows that instructions planted in untrusted content do not lead to a denied action.
 - **Claude Code:** Bash deny rules match the command text and are not a security boundary (for example `Bash(curl *)` does not stop `/usr/bin/curl`); use the OS sandbox with `sandbox.enabled`, `sandbox.failIfUnavailable` and `sandbox.allowUnsandboxedCommands` = false (the sandbox is not available on native Windows; built-in file tools, hooks and MCP servers run outside it). Hooks fail open on errors and timeouts unless the hook sets `"onFailure": "block"`. In CI always pass `--permission-mode` explicitly.
 
@@ -133,7 +133,7 @@ Applies: the local CLI / IDE surface is in scope.
 
 - **Objective:** every AI-assisted change is declared using the labels defined in ACME-VAL-GEN-01 (commit trailer and / or PR template field; the model used is recorded once per PR or from telemetry).
 - **Acceptance:** OQ-11: 100% of sampled AI-assisted PRs carry the label; the required check `pr-template-check` rejects PRs whose AI-assistance question is left unanswered.
-- **Claude Code:** the default commit trailer is `Co-Authored-By: <model name> <noreply@anthropic.com>`; the `attribution` setting customises commit and PR text. Attribution is an instruction to the model, not a git hook, so it is not proof that every AI-assisted commit is labelled.
+- **Claude Code:** the default commit trailer is `Co-Authored-By: <model name> <noreply@anthropic.com>`; the `attribution` setting customises commit and PR text. Attribution works as an instruction to the model, so it is no proof that every AI-assisted commit is labelled.
 
 ### REQ-11 Reversibility
 
@@ -152,7 +152,7 @@ Applies: the local CLI / IDE surface is in scope.
 
 ### REQ-14 Bounded write scope and oracle-based verification
 
-Not applicable: the `agents_qms` context is not selected. Selecting it later is a new context of use (re-baseline trigger).
+Not applicable, because the `agents_qms` context is not selected; selecting it later is a new context of use (re-baseline trigger).
 
 ### REQ-15 AI review is advisory only
 

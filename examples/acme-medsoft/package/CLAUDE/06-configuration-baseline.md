@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-CLAUDE-06 Configuration baseline: Claude Code
 
@@ -133,7 +133,7 @@ Only managed MCP servers may run: yes (`allowManagedMcpServersOnly`: true; no ma
 | PR template (AI-assistance and model fields) | repository | `.github/pull_request_template.md` `e726f005260dc211`... (same file in all repositories) | `0e19f7b` | yes | Head of QA |
 | `CODEOWNERS` | repository | `393cfde55aaceeda`... | `77ac2e9` | n/a | Engineering Lead |
 
-Agent instruction files are guidance to the model, not enforcement. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of ACME-VAL-CLAUDE-08: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
+Agent instruction files are guidance to the model only. Because some review bots read them from the PR branch, they must be protected by code-owner review so that a PR cannot rewrite its own review rules (example: `examples/github/CODEOWNERS.example`). Changes that do not alter permissions, hooks or MCP servers follow T8b of ACME-VAL-CLAUDE-08: the reviewed PR is the change record and the hashes above are refreshed at the periodic review.
 
 ## 12. Approved models and model policy
 
@@ -155,7 +155,7 @@ The enforced allow-list holds admitted model ids only, never the pre-authorised 
 | Fallback models (all inside the envelope) | none configured (`fallbackModel` unset; `switchModelsOnFlag` unset) | none | Match |
 | How the model used is recorded (trailer, PR template, log, telemetry) | PR template model field; telemetry model attribute (OpenTelemetry to the Acme collector) | as approved | Match |
 
-Keys: `availableModels` (the admitted exact ids), `enforceAvailableModels` true, `availableModelsMatch` `"exact"` (managed-only), `deniedModels` (managed-only, for known unadmitted ids), `model` (starting default only, not a lock), `fallbackModel`, `switchModelsOnFlag`. With the default prefix matching a listed id would also permit later versions, which would make a new model selectable before admission; the kit's glob patterns are notation for ACME-VAL-CLAUDE-04 and ACME-VAL-CLAUDE-08 only.
+Keys: `availableModels` (the admitted exact ids), `enforceAvailableModels` true, `availableModelsMatch` `"exact"` (managed-only), `deniedModels` (managed-only, for known unadmitted ids), `model` (starting default only), `fallbackModel`, `switchModelsOnFlag`. With the default prefix matching a listed id would also permit later versions, which would make a new model selectable before admission; the kit's glob patterns are notation for ACME-VAL-CLAUDE-04 and ACME-VAL-CLAUDE-08 only.
 
 ## 13. Logging, telemetry and retention
 
@@ -202,7 +202,7 @@ Precedence (highest first): managed settings > command-line `--settings` > `.cla
 |---|---|---|
 | macOS `/Library/Application Support/ClaudeCode/managed-settings.json`; Linux / WSL `/etc/claude-code/managed-settings.json`; Windows `C:\Program Files\ClaudeCode\managed-settings.json`; drop-ins in `managed-settings.d/*.json` beside it; `managed-mcp.json` in the same directory | managed (file) | Full content and SHA-256; file owner and permissions |
 | macOS managed preferences domain `com.anthropic.claudecode`; Windows `HKLM\SOFTWARE\Policies\ClaudeCode`, value `Settings` (JSON). `HKCU\SOFTWARE\Policies\ClaudeCode` is user-writable and not an admin source | managed (MDM) | Profile / registry export and SHA-256 |
-| claude.ai admin console: Organization settings > Claude Code > Managed settings (cached locally in `~/.claude/remote-settings.json`) | managed (server) | Export or screenshot; owner who changed it. The vendor calls this a client-side control, not a security boundary; it is skipped with third-party cloud providers or a custom base URL, and not delivered to Console API-key sessions (typical in CI) |
+| claude.ai admin console: Organization settings > Claude Code > Managed settings (cached locally in `~/.claude/remote-settings.json`) | managed (server) | Export or screenshot; owner who changed it. The vendor classes this as a client-side control only; it is skipped with third-party cloud providers or a custom base URL, and not delivered to Console API-key sessions (typical in CI) |
 | `managedSourcesBehavior` (`"first-wins"` default, or `"merge"`) | managed | Which managed sources are combined; `/status` "Skipped sources" |
 | `~/.claude/settings.json` | user | Content and SHA-256 on reference machines |
 | `.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json` | repository / local | Content and SHA-256 |

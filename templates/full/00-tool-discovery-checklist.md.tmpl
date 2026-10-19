@@ -70,7 +70,7 @@ Mark each check done with date and initials; record every finding in section 6.
 |---|---|---|---|---|
 {{#code_github}}
 | C1 | Installed GitHub Apps and OAuth apps with AI functions | Organisation settings: installed GitHub Apps, authorised OAuth apps; list review bots and coding agents | [ ] | |
-| C2 | Third-party coding agents hosted by GitHub | Copilot policies "Allow Claude coding agent" / "Allow Codex coding agent". Their GitHub App does not appear in the installed-apps list, but its actions appear in the audit log: search the audit log | [ ] | |
+| C2 | Third-party coding agents hosted by GitHub | Copilot policies "Allow Claude coding agent" / "Allow Codex coding agent". Their GitHub App is missing from the installed-apps list, and its actions appear in the audit log: search the audit log | [ ] | |
 | C3 | Copilot policies | Enterprise and organisation Copilot settings: code review (and whether approvals count), cloud agent, automations, MCP servers, "Default policy for new features", "Default availability for released models" | [ ] | |
 | C4 | AI actions in workflows | Search `.github/workflows/*` in every repository for AI actions (for example `anthropics/claude-code-action`, `openai/codex-action`) and for AI CLI invocations | [ ] | |
 | C5 | Bot reviews and agent PRs | For recent PRs, list reviews whose `user.type` is "Bot" (`gh api repos/OWNER/REPO/pulls/N/reviews`), agent branches such as `copilot/`, and co-author trailers naming an AI tool | [ ] | |

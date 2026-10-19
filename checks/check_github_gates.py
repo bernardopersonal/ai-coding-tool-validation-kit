@@ -529,8 +529,8 @@ def evaluate_gate_config(state: Dict[str, Any]) -> List[Dict[str, str]]:
     if gate["pull_request_required"]:
         if not gate["require_last_push_approval"] and not gate["dismiss_stale_reviews"]:
             f.append(finding("warn", "final_commit_approval",
-                             "Neither 'require last push approval' nor 'dismiss stale reviews' is "
-                             "enabled: an approval given on an earlier commit still counts after "
+                             "'Require last push approval' and 'dismiss stale reviews' are both "
+                             "off: an approval given on an earlier commit still counts after "
                              "new pushes.", "REQ-01", "OQ-01"))
         elif not gate["require_last_push_approval"]:
             f.append(finding("info", "final_commit_approval",
@@ -764,9 +764,9 @@ def evaluate_pr(pr: Dict[str, Any], reviews: List[Dict[str, Any]], required_appr
 
     The latest state-changing review (APPROVED / CHANGES_REQUESTED / DISMISSED)
     of each reviewer submitted before the merge decides; COMMENTED reviews do not
-    change it. A qualifying approval is APPROVED, by a human (type User, not a
-    [bot] login, not in --non-human), not the PR author, not an agent launcher, before
-    merge, and on the head commit when require_head is true.
+    change it. A qualifying approval is APPROVED, by a human (type User, no [bot]
+    login, absent from --non-human) other than the PR author and any agent launcher,
+    given before merge, and on the head commit when require_head is true.
     """
     non_human = {x.lower() for x in (non_human or set())}
     launchers = {x.lower() for x in (launchers or set())}
@@ -1362,16 +1362,16 @@ def render_markdown(doc: Dict[str, Any], digest: str, json_name: str) -> str:
         "",
         "## Notes",
         "",
-        "- A qualifying approval is an APPROVED review by a user of type `User` (not a `[bot]` "
-        "login or a listed non-human login), not the PR author, submitted before the merge, and "
-        "on the head commit when last-push approval is required.",
+        "- A qualifying approval is an APPROVED review by a user of type `User` (no `[bot]` "
+        "login and no listed non-human login) other than the PR author, submitted before the "
+        "merge, and on the head commit when last-push approval is required.",
         "- The agent launcher is taken from trigger comments on the PR (%s) and from "
         "--launcher; launchers recorded only outside GitHub (for example a cloud task) must be "
         "given with --launcher. An approval by a launcher is not counted (OQ-05)." % ", ".join(
             "`%s`" % m for m in p.get("trigger_mentions") or []),
         "- Required checks: a check passes when it concluded successfully, skipped or neutral; "
-        "'evidence_expired' means the record was deleted by the retention setting, not that "
-        "the check failed.",
+        "'evidence_expired' means the retention setting deleted the record, so the check "
+        "result is unknown.",
         "- Whether app or machine-user approvals count toward required reviews must be shown "
         "empirically (OQ-04); this report only flags them.",
         "- This file is evidence produced by a script. Review, conclusion and approval are "
@@ -1398,7 +1398,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     ap.add_argument("--prs", type=int, default=20, help="number of most recent merged PRs to "
                     "check (default 20; 0 = configuration only)")
     ap.add_argument("--pr", type=int, action="append", default=[], metavar="NUMBER",
-                    help="check this PR instead of the last N (repeatable)")
+                    help="check only this PR, skipping the last-N sample (repeatable)")
     ap.add_argument("--min-approvals", type=int, default=None,
                     help="minimum qualifying approvals per PR (default: the configured required "
                          "count, at least 1)")

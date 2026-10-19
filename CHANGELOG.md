@@ -6,6 +6,19 @@ For organisations that have validated a tool with the kit: a new kit version is 
 
 ## Unreleased
 
+### Changed
+
+- Editorial pass on the public documentation (README.md, GUIDE.md, CONTRIBUTING.md, `docs/`, `checks/`, `admission/`, `tools/` and example READMEs): plainer wording, shorter paragraphs. The same pass rewords some sentences in the templates of both profiles, the filled examples and user-facing script messages. Facts, commands, paths, IDs, links and requirements are unchanged.
+- The model envelope status for tools without verified enforcement now reads "monitored only". `docs/regulatory-mapping.md` renames its section on non-binding signals to "Regulatory signals". FDA CSA's top level of scripted testing is written as "rigorous" scripted testing (templates `03`, `04`, `05` and the mapping), and per-step records as "complete records".
+- README.md: the profile comparison is written in plain language, without test IDs or condition codes, and says how the wizard recommends a profile (the exact test lists and conditions stay in `docs/lite-vs-full.md`). A new "Terms you'll meet" section explains the terms a newcomer meets, each with a link to its in-depth source. "What the kit checks" and the regulatory mapping summary describe each item in plain words and link to the templates and the filled fictional examples. Test IDs elsewhere in the README are explained or linked to the glossary. The author contact sits only in the footer, and an unsupported line about auditors is gone. The glossary also covers the test-ID prefixes, QA/RA, eQMS, notified bodies, the FDA QMSR, IEC 62304 class C, GAMP 5 and GxP. Quick start says which GitHub rights the checks need, where evidence shared by several tools goes (`evidence/GEN/`), which interim controls to check for a tool already in use, and how a release decision moves from "approved with conditions" to "approved for intended use".
+- `docs/GUIDE.pdf` is regenerated from the current GUIDE.md.
+- The example banner reads "FICTIONAL EXAMPLE, invented for illustration only." (`tests/test_examples.py` updated).
+- Admission suite: the titles of `doc-citation-probe` and `guardrail-no-ci-edit` and one rule in the `qms-docs` fixture's `AGENTS.md` / `CLAUDE.md` ("say so plainly" when the sources lack the answer) are reworded with the same meaning. Prompts and criteria are unchanged, but the suite SHA-256 changes, so treat the new suite version as a plan change.
+
+### Added
+
+- `tests/test_style.py`: no em dash in any tracked text file or rendered default package.
+
 ## 0.2.0 - 2026-10-19
 
 Two validation profiles, lite and full, in the same repository, distinct document IDs for lite, a style and messaging pass, plus the changes from the regulatory, practitioner and de-identification review of 0.1.0. Organisations that validated with 0.1.0: the admission suite changed (task `guardrail-denied-command` version 2, runner flags), so treat the new suite version as a plan change. Existing configs keep rendering the full profile (see Changed).
@@ -40,10 +53,10 @@ Two validation profiles, lite and full, in the same repository, distinct documen
 - `run_canary.sh`: server-side merge attempt through the REST API with HTTP status, admin and merge-queue detection, preconditions for OQ-07 variants, result `pass` / `fail` / `inconclusive`.
 - `capture_baseline.py`: Claude Code managed sources evaluated in the client's own order and merge behaviour, findings name their source, graded `--compare` with `--approved-version`.
 - `run_admission.py`: isolation from the executor's user configuration, denied-command control (`--deny-control`, N/A with a reason where no control exists), check of the model actually used (`--aux-model`, `--model-log`), baseline variants.
-- Claude Code example: secrets denied, gate files asked instead of denied, mods restricted with `allowManagedModsOnly` and `disableSideloadFlags` (`allowManagedHooksOnly` recommended for runners), realistic domain list, exact model matching, static attribution. Codex examples: `inherit = "all"` with explicit filters, `cli_auth_credentials_store = "auto"`, MCP allowlist shipped commented out.
+- Claude Code example: secrets denied, gate files set to ask, mods restricted with `allowManagedModsOnly` and `disableSideloadFlags` (`allowManagedHooksOnly` recommended for runners), realistic domain list, exact model matching, static attribution. Codex examples: `inherit = "all"` with explicit filters, `cli_auth_credentials_store = "auto"`, MCP allowlist shipped commented out.
 - 21 CFR Part 11 and ISO 13485 clause 6.2 c) mapped where they apply; audit-finding lists reworded as design rules of the kit.
 - Style: clauses and sections are cited without the section sign everywhere (templates of both profiles, examples, docs, tool notes, wizard labels): "ISO 13485:2016 clause 4.1.6", "IEC 62304 clauses 5.1.10 and 8.1", "21 CFR 820.10", "21 CFR 11.10(e)", "MDR Article 10(8)", "AI Act Article 4", "section 5 of `04`".
-- Style: README.md states no times or durations; GUIDE.md and `docs/` make no effort or speed claims (the worked example of `docs/model-change-protocol.md` uses steps instead of clock times and no effort total; the schedule of the full validation plan uses named steps instead of Day 0 to Day 5; the three tiers of the model change protocol are named by what they run, not by effort labels, in `docs/` and the full plan and change documents). Minimum observation periods and review cadences that are acceptance criteria stay. `GUIDE.md` shortened to stay within 1,250 words.
+- Style: README.md states no times or durations; GUIDE.md and `docs/` make no effort or speed claims (the worked example of `docs/model-change-protocol.md` uses steps, with no clock times or effort total; the schedule of the full validation plan uses named steps in place of Day 0 to Day 5; the three tiers of the model change protocol are named by what they run, in `docs/` and the full plan and change documents). Minimum observation periods and review cadences that are acceptance criteria stay. `GUIDE.md` shortened to stay within 1,250 words.
 - Defaults use obviously fictional placeholders (organisation "Acme MedSoft", model envelope `anthropic-model-*` / `openai-model-*`); the de-identification deny-list moved out of the repository.
 
 ## 0.1.0 - 2026-10-18

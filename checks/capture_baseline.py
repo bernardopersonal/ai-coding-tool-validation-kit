@@ -890,9 +890,9 @@ def claude_findings(cap: Dict[str, Any]) -> List[Dict[str, str]]:
     mode = msel.get("permissions.defaultMode")
     if not auto_off and (mode is None or mode == "auto"):
         f.append(finding("warn", "auto_mode",
-                         "Effective managed settings neither disable auto mode (disableAutoMode "
-                         "or permissions.disableAutoMode = \"disable\") nor set a "
-                         "permissions.defaultMode other than auto; auto mode, in which a "
+                         "Effective managed settings leave auto mode on (no disableAutoMode "
+                         "or permissions.disableAutoMode = \"disable\", and no "
+                         "permissions.defaultMode other than auto); auto mode, in which a "
                          "classifier approves actions, can be the starting mode.",
                          "REQ-07", "OQ-08",
                          source=where("disableAutoMode", "permissions.disableAutoMode",
@@ -917,10 +917,10 @@ def claude_findings(cap: Dict[str, Any]) -> List[Dict[str, str]]:
     mods_locked = isinstance(guard_opts, dict) and guard_opts.get("allowManagedModsOnly") is True
     if not (msel.get("allowManagedHooksOnly") is True
             or (mods_locked and msel.get("disableSideloadFlags") is True)):
-        f.append(finding("info", "mods", "Effective managed settings neither set "
-                         "allowManagedHooksOnly nor restrict mods (pluginConfigs "
-                         "cc-plugin-sec-default@builtin allowManagedModsOnly with "
-                         "disableSideloadFlags).", "REQ-06", "OQ-09",
+        f.append(finding("info", "mods", "Effective managed settings leave hooks and mods "
+                         "open: allowManagedHooksOnly is unset and mods are unrestricted "
+                         "(pluginConfigs cc-plugin-sec-default@builtin allowManagedModsOnly "
+                         "with disableSideloadFlags).", "REQ-06", "OQ-09",
                          source=where("pluginConfigs", "disableSideloadFlags")))
     sandbox = msel.get("sandbox") if isinstance(msel.get("sandbox"), dict) else {}
     if not sandbox.get("enabled"):
@@ -1145,8 +1145,8 @@ def codex_findings(cap: Dict[str, Any]) -> List[Dict[str, str]]:
                              "Requirements allow approval policy 'never'.", "REQ-07", "OQ-08"))
         if "auto_review" in (sel.get("allowed_approvals_reviewers") or []):
             f.append(finding("warn", "allowed_approvals_reviewers",
-                             "Requirements allow escalations to be reviewed by an agent "
-                             "(auto_review) instead of a person.", "REQ-02", "OQ-08"))
+                             "Requirements allow an agent (auto_review) to review "
+                             "escalations on a person's behalf.", "REQ-02", "OQ-08"))
     if any(r["scope"] == "credentials" and r.get("exists") for r in cap["files"]):
         f.append(finding("info", "credential_cache",
                          "A file-based credential cache exists in the Codex home (plaintext); "
@@ -1316,7 +1316,7 @@ def compare(prev: Dict[str, Any], doc: Dict[str, Any],
                              % (tool, scope, path), "REQ-06", "IQ-03", source=path))
         elif old[key].get("sha256") != new[key].get("sha256"):
             if scope == "server_managed_cache":
-                # compare the effective managed values, not the cache file bytes
+                # compare the effective managed values (the cache file bytes may differ)
                 if old[key].get("selected") != new[key].get("selected"):
                     f.append(finding("fail", "drift", "%s server-managed settings changed since "
                                      "baseline (values in %s)" % (tool, path), "REQ-06", "IQ-03",
@@ -1452,7 +1452,8 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     ap.add_argument("--compare", metavar="BASELINE_JSON",
                     help="previous baseline JSON from this script: differences in managed, "
                          "requirements, project and declared files fail; user-scope and cache "
-                         "differences warn; server-managed values are compared, not bytes")
+                         "differences warn; server-managed settings are compared value by "
+                         "value")
     ap.add_argument("--approved-version", action="append", default=[], metavar="VERSION",
                     help="validated tool version for --compare (repeatable): a version change "
                          "to one of these is info, to any other version a failure")

@@ -1,4 +1,4 @@
-> FICTIONAL EXAMPLE - not a real validation record. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are invented to show what an executed package looks like. Model ids are placeholders, not real model names. Signatures are applied by each person in the eQMS and are shown here only as "[signed in eQMS]".
+> FICTIONAL EXAMPLE, invented for illustration only. Acme MedSoft, its people, repositories, results, evidence file names and SHA-256 values are made up to show what an executed package looks like. Model ids are placeholders. Each person signs in the eQMS, shown here only as "[signed in eQMS]".
 
 # ACME-VAL-GEN-03 Code-host gate qualification
 
@@ -18,7 +18,7 @@
 
 ## 1. Purpose and use
 
-The human approval gate, the required checks and the branch protection are properties of the code host, not of an AI tool. This record proves them **once per code host and set of repositories**, for every AI tool in scope, instead of repeating the same platform tests in each tool's protocol. Each tool's test protocol references this record and adds only its tool-specific steps (for example the agent itself trying to merge, push or approve).
+The human approval gate, the required checks and the branch protection are properties of the code host, shared by every AI tool. This record proves them **once per code host and set of repositories**, for every AI tool in scope, so each tool's protocol skips the same platform tests. Each tool's test protocol references this record and adds only its tool-specific steps (for example the agent itself trying to merge, push or approve).
 
 - A tool protocol may credit this record when the repositories it covers and the protection export are the same as here, and the record is not older than the last code-host rule change and not older than 12 months.
 - A code-host rule or setting change (T12 in each tool's change document) re-runs the affected tests here.
@@ -42,7 +42,7 @@ Filled in before execution (2026-10-19).
 | Production repositories in scope (at least 2 when available, one product repository) | `acme-medsoft/lumen-core`, `acme-medsoft/lumen-app` (product), `acme-medsoft/qa-tooling` (tooling), `acme-medsoft/qms-docs` (controlled documents) |
 | Sandbox / canary repository (same protection as production) | `acme-medsoft/val-sandbox`; the organisation ruleset "protect-main" applies to every repository; canary runs also on `acme-medsoft/lumen-core` |
 | How the sandbox protection was copied and compared | `python3 checks/mirror_protection.py --from acme-medsoft/lumen-core --to acme-medsoft/val-sandbox --operator "Alex Example" --out evidence/GEN/OQ-02/` (dry run, then `--apply`, on 2026-10-14); comparison matched; export SHA-256: `90d3c9f298200118441a7eb9e14e8b742762016437959d3a107cc19604a1f859` |
-| User A: PR author (write access, not admin) | Dev One (Claude Code tests), Dev Two (Codex tests) |
+| User A: PR author (write access, no admin rights) | Dev One (Claude Code tests), Dev Two (Codex tests) |
 | User B: qualified reviewer (on the trained-reviewer list) | Rev One |
 | User C: second reviewer / pusher | Rev Two |
 | Admin: repository or organisation admin | Casey Admin (organisation owner) |
@@ -80,7 +80,7 @@ Steps:
 
 Steps:
 
-1. As User A run `checks/canary/run_canary.sh --repo OWNER/REPO --operator "<name>" --out evidence/GEN/OQ-02/` on each repository tested. The script attempts the merge through the REST API (`PUT repos/{owner}/{repo}/pulls/<n>/merge`), so the server, not the client, decides; it records the HTTP status and message and the protected branch SHA before and after. If the repository uses a merge queue, the result is "inconclusive": test the queue instead (an unapproved canary must not be merged by the queue).
+1. As User A run `checks/canary/run_canary.sh --repo OWNER/REPO --operator "<name>" --out evidence/GEN/OQ-02/` on each repository tested. The script attempts the merge through the REST API (`PUT repos/{owner}/{repo}/pulls/<n>/merge`), so the server itself decides; it records the HTTP status and message and the protected branch SHA before and after. If the repository uses a merge queue, the result is "inconclusive": test the queue instead (an unapproved canary must not be merged by the queue).
 2. Save `gh pr view <n> --json number,author,reviews,reviewDecision,mergedAt,statusCheckRollup` for the canary PR.
 3. Close the canary PR and delete the branch (`--auto-cleanup` or `--cleanup`).
 
@@ -108,7 +108,7 @@ Steps:
 | Verifies | REQ-02, REQ-15 |
 | Type | scripted, negative |
 | Objective | Prove that approvals by bots, apps or CI tokens do not satisfy the required approval, and that the code host's own AI approval features are off. |
-| Acceptance criterion | No bot, app or CI approval changes the review decision to approved; no AI or bot identity is a bypass actor; the platform settings match the baseline. Undocumented behaviour is settled by the observed result, not by assumption. |
+| Acceptance criterion | No bot, app or CI approval changes the review decision to approved; no AI or bot identity is a bypass actor; the platform settings match the baseline. The observed result settles undocumented behaviour. |
 | Evidence | Settings JSON, reviews JSON (`user.type`, `state`), PR JSON, workflow output, dated screenshots where no API exists. |
 
 Steps:
@@ -133,7 +133,7 @@ Steps:
 Steps:
 
 1. Confirm in the protection export (OQ-03) that `require_last_push_approval` and stale-review dismissal are enabled (classic `dismiss_stale_reviews`, or ruleset `dismiss_stale_reviews_on_push`).
-2. User A opens a PR and runs `gh pr review <n> --approve` (canary option `--try-self-approve`). Expected: refused; review decision unchanged. GitHub enforces this for every author, so this step proves the platform rule, not the agent-launcher rule.
+2. User A opens a PR and runs `gh pr review <n> --approve` (canary option `--try-self-approve`). Expected: refused; review decision unchanged. GitHub enforces this for every author, so this step proves the platform rule; the agent-launcher rule has its own step.
 3. User B pushes a commit to User A's branch, then approves. Expected: B's approval is not counted (B made the most recent push).
 4. User C approves; User B then pushes a new commit. Expected: C's approval is dismissed or no longer counts; merge blocked until re-approval.
 5. Save the reviews JSON and `gh pr view <n> --json reviews,latestReviews,reviewDecision,headRefOid` after each step.
@@ -219,7 +219,7 @@ Per-step record (required when any tool's determination is high; one table per t
 | OQ-06 | 2 | Admin merge through the API and `gh pr merge --admin` refused | both refused for Casey Admin | Pass | `evidence/GEN/OQ-06/canary_acme-medsoft-val-sandbox_20261021T120015Z.json` |
 | OQ-06 | 3 | Bypass records exported and reviewed | Rule-suite export of the last month: 0 bypass events; organisation audit log exported weekly into the evidence store | Pass | same |
 | OQ-06 | 4 | No push-protection exemptions for agents or bots | none | Pass | same |
-| OQ-07 | 1-3 | Failing test (a) and unapproved dependency (b) blocked after approval; secret (c) rejected at push | val-sandbox and lumen-core, each approved by Rev One: (a) blocked by `ci / unit-tests`; (b) `acme-fastjson-utils` (does not exist, not in the SOUP register) blocked by `soup-gate`; (c) push rejected by secret scanning push protection. Preconditions confirmed by the canary before each attempt (APPROVED, target check failed) | Pass | evidence/GEN/OQ-07/canary_* (6 files) |
+| OQ-07 | 1-3 | Failing test (a) and unapproved dependency (b) blocked after approval; secret (c) rejected at push | val-sandbox and lumen-core, each approved by Rev One: (a) blocked by `ci / unit-tests`; (b) `acme-fastjson-utils` (non-existent and absent from the SOUP register) blocked by `soup-gate`; (c) push rejected by secret scanning push protection. Preconditions confirmed by the canary before each attempt (APPROVED, target check failed) | Pass | evidence/GEN/OQ-07/canary_* (6 files) |
 | OQ-07 | 4 | Push protection enabled | `secret_scanning_push_protection` enabled on all 5 repositories | Pass | `evidence/GEN/OQ-07/20261021-status-spoof-attempt-and-security-settings.json` |
 | OQ-07 | 5 | Spoofed status does not unblock | success status for `ci / unit-tests` posted with a write token: merge stayed blocked (checks pinned to the GitHub Actions app) | Pass | same |
 | OQ-07 | 6 | Retention recorded; check evidence exported | Retention raised from 90 to 400 days on all 5 repositories on 2026-10-20; evidence-export workflow active | Pass | `evidence/GEN/OQ-07/20261021-artifact-and-log-retention.json` |
