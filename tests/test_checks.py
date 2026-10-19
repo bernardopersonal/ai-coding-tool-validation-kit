@@ -240,6 +240,31 @@ class GithubGatesTest(unittest.TestCase):
         self.assertEqual({p["checks"]["overall"] for p in doc["pull_requests"]}, {"passed"})
         self.assertEqual(doc["gate"]["check_retention_days"], 400)
 
+    def test_commit_reconciliation(self):
+        routes = good_routes()
+        rp = "repos/acme/app"
+        routes[rp + "/commits"] = (200, [
+            {"sha": "m" * 40, "commit": {"committer": {"date": "2026-10-12T12:00:00Z"}}},
+            {"sha": "d" * 40, "commit": {"committer": {"date": "2026-10-05T12:00:00Z"}}},
+            {"sha": "e" * 40, "commit": {"committer": {"date": "2026-10-04T12:00:00Z"}}}])
+        routes[rp + "/commits/%s/pulls" % ("d" * 40)] = (200, [])
+        routes[rp + "/commits/%s/pulls" % ("e" * 40)] = (200, [
+            {"number": 7, "merged_at": "2026-10-04T13:00:00Z", "base": {"ref": "main"}}])
+        rc, out, _ = self.run_main(routes, "--commits-since", "2026-10-01")
+        self.assertEqual(rc, 1, out)
+        doc, md = assert_evidence(self, self.out, "github-gates_")
+        rec = doc["commit_reconciliation"]
+        self.assertEqual({c["sha"][0]: c["status"] for c in rec["commits"]},
+                         {"m": "checked_pr", "d": "no_merged_pr", "e": "pr_not_checked"})
+        self.assertEqual(doc["parameters"]["commits_since"], "2026-10-01")
+        checks = {(f["check"], f["severity"]) for f in doc["findings"]}
+        self.assertIn(("commit_without_pr", "fail"), checks)
+        self.assertIn(("commit_pr_not_checked", "warn"), checks)
+        self.assertIn("Commit reconciliation since 2026-10-01", md)
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            gates.parse_args(["--repo", "acme/app", "--operator", "T",
+                              "--commits-since", "01/10/2026"])
+
     def test_required_checks_and_expired_evidence(self):
         routes = good_routes()
         rp = "repos/acme/app"
@@ -841,10 +866,13 @@ class FootprintTest(unittest.TestCase):
 
     def test_footprint_detects_tools_and_risks(self):
         rc, out, _ = quiet(footprint.main, ["--path", str(self.repo), "--out", str(self.out),
-                                            "--known-tools", "claude_code,codex"],
+                                            "--known-tools", "claude_code,codex",
+                                            "--operator", "Test Operator"],
                            runner=self.git_runner)
         self.assertEqual(rc, 1, out)
         doc, md = assert_evidence(self, self.out, "ai-footprint_")
+        self.assertEqual(doc["executed_by"]["operator"], "Test Operator")
+        self.assertIn("operator Test Operator", md)
         r = doc["report"]
         self.assertTrue({"claude_code", "codex", "copilot", "cursor", "shared"}
                         <= set(r["detected_tools"]))
@@ -877,7 +905,7 @@ class FootprintTest(unittest.TestCase):
         (clean / "src").mkdir(parents=True)
         (clean / "src" / "main.py").write_text("print('hi')\n", encoding="utf-8")
         rc, _, _ = quiet(footprint.main, ["--path", str(clean), "--out", str(self.out),
-                                          "--known-tools", "claude_code"])
+                                          "--known-tools", "claude_code", "--operator", "T"])
         self.assertEqual(rc, 0)
         doc, _ = assert_evidence(self, self.out, "ai-footprint_")
         self.assertEqual(doc["report"]["detected_tools"], {})
@@ -890,7 +918,8 @@ class FootprintTest(unittest.TestCase):
              "permissions": {"contents": "read"}}]})}
         client = gates.GitHubClient(FakeTransport(routes), API)
         rc, _, _ = quiet(footprint.main, ["--path", str(self.repo), "--out", str(self.out),
-                                          "--org", "acme", "--git-log", "0"], client=client)
+                                          "--org", "acme", "--git-log", "0", "--operator", "T"],
+                         client=client)
         self.assertEqual(rc, 1)  # the risky workflow still fails
         doc, md = assert_evidence(self, self.out, "ai-footprint_")
         apps = {a["app_slug"]: a for a in doc["report"]["org"]["installations"]}
@@ -899,6 +928,16 @@ class FootprintTest(unittest.TestCase):
         self.assertIn(("org_ai_app", "warn"),
                       {(f["check"], f["severity"]) for f in doc["report"]["findings"]})
         self.assertIn("audit log", md)
+
+    def test_operator_required(self):
+        env = dict(os.environ)
+        env.pop("KIT_OPERATOR", None)
+        proc = subprocess.run([sys.executable, str(CHECKS / "find_ai_footprint.py"), "--path",
+                               str(self.repo), "--out", str(self.out)], env=env,
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              universal_newlines=True, timeout=60)
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("--operator", proc.stderr)
 
     def test_glob_to_regex(self):
         rx = footprint.glob_to_regex
@@ -971,6 +1010,14 @@ class AdmissionTest(unittest.TestCase):
 
     def tearDown(self):
         self._tmp.cleanup()
+
+    def test_list_prints_the_suite_hash(self):
+        rc, out, _ = quiet(admission.main, ["--list", "--task", "function-fix-failing-test"])
+        self.assertEqual(rc, 0, out)
+        tasks = admission.load_tasks(admission.DEFAULT_TASKS, admission.DEFAULT_FIXTURES,
+                                     ["function-fix-failing-test"])
+        self.assertIn("suite_sha256 %s" % admission.suite_fingerprint(tasks)["suite_sha256"],
+                      out)
 
     def test_shipped_tasks_and_fixtures_are_valid(self):
         tasks = admission.load_tasks(admission.DEFAULT_TASKS, admission.DEFAULT_FIXTURES)

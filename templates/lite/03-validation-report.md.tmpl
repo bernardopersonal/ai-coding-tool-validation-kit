@@ -1,0 +1,139 @@
+# {{doc_id_03}} Validation report: {{tool_name}}
+
+| Field | Value |
+|---|---|
+| Document ID, version | {{doc_id_03}}, 0.1 (draft), lite profile |
+| Tool / vendor | {{tool_name}} / {{vendor}} |
+| Drafted / technical review / release decision (roles) | {{role_executor}} / {{#owner_is_executor}}{{role_approver}}{{/owner_is_executor}}{{^owner_is_executor}}{{role_tool_owner}}{{/owner_is_executor}} / {{role_approver}} |
+| Organisation, date | {{org_name}}, {{today}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}, lite profile. Complete every `[fill in]` after execution.
+{{#lite_blocked}}
+
+> **NOT VALID FOR RELEASE:** hard stop for the lite profile ({{doc_id_01}}, banner). Only "Not approved" can be decided on this record.
+{{/lite_blocked}}
+
+## 1. Summary
+
+| Item | Value |
+|---|---|
+| Surfaces; contexts | {{#surfaces}}`{{.}}` {{/surfaces}}; {{#contexts}}`{{.}}` {{/contexts}} |
+| Plan and record versions executed, amendments | [fill in] |
+| Profile decision ({{doc_id_01}} section 2) | [fill in] |
+| Tool version(s) validated; IQ-03 baseline SHA-256 | [fill in] |
+| Execution period (UTC); repositories | [fill in] |
+| Tests executed / passed / failed / N/A | [fill in] |
+
+Summary of results (author named in section 5): [fill in]
+
+Basis: {{#reg_iso13485}}ISO 13485:2016 clause 4.1.6, records under clause 4.2.5; {{/reg_iso13485}}{{#reg_fda_qmsr}}21 CFR 820.10 (QMSR, incorporating ISO 13485) and the record content of the FDA CSA guidance; {{/reg_fda_qmsr}}{{#reg_gxp}}EU GMP Annex 11; {{/reg_gxp}}ISO/TR 80002-2:2017.{{#ctx_code_product}} IEC 62304 (clauses 5.1.4, 5.1.10, 8.1): tool, configuration and model ids are configuration items, named in the software development plan where required.{{/ctx_code_product}}
+
+## 2. Results per requirement
+
+Result per requirement of {{doc_id_01}} section 6 (met / restricted / not met; deviations):
+
+- REQ-01:
+- REQ-02:
+- REQ-03:
+- REQ-04:
+- REQ-05:
+- REQ-06:
+{{#surf_local_cli_ide}}
+- REQ-07:
+{{/surf_local_cli_ide}}
+{{^surf_local_cli_ide}}
+{{#surf_ci_headless}}
+- REQ-07:
+{{/surf_ci_headless}}
+{{^surf_ci_headless}}
+- REQ-07: not applicable
+{{/surf_ci_headless}}
+{{/surf_local_cli_ide}}
+- REQ-08:
+- REQ-09:
+- REQ-10:
+{{#ctx_pr_review}}
+- REQ-15:
+{{/ctx_pr_review}}
+{{^ctx_pr_review}}
+{{#surf_pr_review_bot}}
+- REQ-15:
+{{/surf_pr_review_bot}}
+{{/ctx_pr_review}}
+- REQ-16:
+- REQ-17:
+
+Per-test results: {{doc_id_02}}; PQ-01 and PQ-02 "pending" until the signed addendum. Deviations (ID, class, resolution, status): [fill in]; an open one needs a risk assessment, restriction and target date.
+
+Residual risk: automation bias (PQ-01 outliers, PQ-02), silent model changes (MA-01), vendor changes (section 6), local guardrails as defence in depth{{#code_github}}, GitHub evidence retention (export){{/code_github}}; accepted limitations [fill in]. Acceptable: [yes / no], because [fill in].
+
+## 3. Approved model list at release
+
+Model policy **{{model_policy}}**; only admitted ids are used, new ones only under {{doc_id_01}} section 8.
+
+| Approved entry | Enforced (OQ-10 passed) or monitored | MA-01 admission record, date |
+|---|---|---|
+{{#approved_models}}
+| `{{.}}` | | |
+{{/approved_models}}
+
+## 4. Release decision
+
+Conditions: intended use of {{doc_id_01}} only; organisation SSO accounts; baseline configuration, changed only under section 6; human gate and required checks on every protected-branch change, the AI never approving, merging, signing or closing records; admitted models only; changes declared; trained users; no secrets or personal data beyond the contract. Further: [fill in]
+
+- [ ] **Approved with conditions** for the intended use: PQ-01 and PQ-02 addendum due [fill in]; "approved for intended use" once it is signed
+- [ ] **Approved with restrictions:** [fill in]
+- [ ] **Not approved:** no QMS-relevant use{{#already_in_use}} from the decision date (continued use needs a nonconformity, top-management approval and an end date){{/already_in_use}}; actions [fill in]
+
+Effective from [fill in]; accepted open deviations [fill in]; {{#already_in_use}}interim use (look-back, NC / CAPA) [fill in] ends on the decision date; {{/already_in_use}}{{^already_in_use}}no QMS-relevant use before this decision (discovery date [fill in]); {{/already_in_use}}next periodic review [fill in] ({{periodic_review_months}} months){{#role_prrc}}; PRRC ({{.}}) informed [fill in]{{/role_prrc}}.
+
+## 5. Authorship and signatures
+
+Drafted by [fill in]; summary, residual risk and decision by [fill in]; AI assistance: [none / which]. {{tool_name}} did not execute or judge tests, write the conclusion or approve its validation, and the AI tool did not draft the conclusion without independent review; executor and approver differ. Each signatory signs personally in the eQMS{{#reg_fda_qmsr}}; signatures show name, date and time and meaning, linked to this report (21 CFR 11.50, 11.70){{/reg_fda_qmsr}}.
+
+| Role | Name | Meaning | Signature | Date (UTC) |
+|---|---|---|---|---|
+| {{role_executor}} | | Tests executed and reported accurately | | |
+{{^owner_is_executor}}
+| {{role_tool_owner}} | | Technical review | | |
+| {{role_approver}} | | Release decision | | |
+{{/owner_is_executor}}
+{{#owner_is_executor}}
+| {{role_approver}} | | Technical review and release decision | | |
+{{/owner_is_executor}}
+{{#role_prrc}}
+| {{.}} (PRRC) | | Informed | | |
+{{/role_prrc}}
+
+## 6. Change triggers and revalidation
+
+Subset of the full profile's T1 to T19 (same numbers): action required before further use, criteria as in {{doc_id_02}}; anything else: normal change control.
+
+- T1 new id matching a pre-authorised pattern: MA-01, admission record (section 7)
+- T3 other new model id, family or tier: MA-01, OQ-08, OQ-10
+- T4, T5 model used unadmitted; MA-01 fails: stop its use, review its changes, deviation; MA-01 (T4); OQ-08, OQ-09 if a guardrail failed
+- T7a client version, no guardrail-relevant release note: IQ-03 `--compare`; approved `checks/client_regression.py` probes
+- T7 guardrail-relevant or major release: impact assessment, IQ-03, OQ-08 to OQ-10
+- T8a, T8b managed configuration change; instruction files only: IQ-03, OQ-09, test of the control; code-owner reviewed PR
+- T9, T10 new surface; new context of use: plan update, IQ-03, OQ-04 or OQ-08, {{doc_id_01}} section 2 again
+- T11, T12 new repository; code-host rule change: OQ-02 and OQ-03 there; OQ-02 to OQ-07
+- T13, T14 vendor terms or plan change; account, workspace or SSO change: supplier re-evaluation; REQ-16 check, OQ-04 and OQ-05 with the new identities
+- T15, T16 incident or deviation; vendor drops a feature a control relies on: investigation, CAPA; impact assessment, re-test of the control
+- T17, T18 new vendor or tool; retirement: new initial validation; retirement record (evidence archived, shared `evidence/GEN/` records moved to a remaining tool, seats and keys revoked)
+- T19 every [fill in: 3] months: MA-01
+- Periodic review every {{periodic_review_months}} months: {{doc_id_discovery}}, IQ-03 `--compare`, OQ-01 sample, models, seats against training
+
+The {{role_tool_owner}} screens vendor releases at least [fill in: weekly] and logs each screening.
+
+## 7. Admission record (copy for each new model id)
+
+| Field | Value |
+|---|---|
+| Record {{tool_id}}-ADM-[fill in]: model id as reported; matched pattern; first seen; used before (deviation) | [fill in] |
+| Tool version; IQ-03 SHA-256 unchanged; release notes screened (log) | [fill in] |
+| Suite SHA-256, tasks, runs; results: guardrail (every run), function (2 of 3){{#ctx_doc_drafting}}, citation probes{{/ctx_doc_drafting}}; evidence SHA-256 | [fill in] |
+| Decision (admitted / not); executed by; approved by the {{role_approver}} (eQMS, date) | [fill in] |
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft (kit {{kit_version}}, lite) |

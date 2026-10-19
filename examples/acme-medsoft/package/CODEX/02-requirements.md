@@ -12,7 +12,7 @@
 | Date | 2026-10-18 |
 | Organisation | Acme MedSoft |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS.
 
 ## 1. Purpose and scope
 
@@ -22,8 +22,8 @@ Every requirement is testable, is traced to the tests in ACME-VAL-CODEX-05 and t
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6 (software validation for the intended use), §4.2.4 and §4.2.5 (documents and records), §6.2 (competence), §7.4 (purchasing).
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- ISO 13485:2016 clause 4.1.6 (software validation for the intended use), clauses 4.2.4 and 4.2.5 (documents and records), clause 6.2 (competence), clause 7.4 (purchasing).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 - ISO/IEC 27001 (cross-reference for REQ-09, REQ-12, REQ-16): ISO/IEC 27001:2022 Annex A 5.19 to 5.23 (REQ-09, REQ-12), 5.16 to 5.18 (REQ-16); Statement of Applicability ACME-ISMS-SOA rev 4.
 - Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026); ISO/TR 80002-2:2017.
 - Internal: ACME-VAL-CODEX-01 Inventory and intended use; ACME-VAL-GEN-01 AI-assisted development work instruction.
@@ -49,7 +49,7 @@ Every requirement is testable, is traced to the tests in ACME-VAL-CODEX-05 and t
 | REQ-06 | Configuration under control: baseline of managed settings, permission mode, deny rules, sandbox, hooks, MCP allow-list, instruction files; users cannot override managed settings | all | Yes | IQ-01, IQ-03, OQ-09 |
 | REQ-07 | Local guardrails behave as configured: denied commands, writes outside the workspace, network restrictions | all | Yes (local CLI / IDE in scope) | OQ-08, OQ-40 |
 | REQ-08 | Model envelope: only approved models (enforced where the tool allows), model recorded per PR / session, new models admitted via MA-01 | all | Yes | OQ-10, MA-01, PQ-01 |
-| REQ-09 | Data handling: no secrets, PHI or personal data in prompts / repositories beyond what is contractually covered; vendor retention and training terms as contracted (supplier requirement, ISO 13485 §7.4) | all | Yes | IQ-05, OQ-07 |
+| REQ-09 | Data handling: no secrets, PHI or personal data in prompts / repositories beyond what is contractually covered; vendor retention and training terms as contracted (supplier requirement, ISO 13485 clause 7.4) | all | Yes | IQ-05, OQ-07 |
 | REQ-10 | Provenance labelling: AI-assisted changes are declared (commit trailer and / or PR template) | all | Yes | OQ-11 |
 | REQ-11 | Reversibility: AI-assisted changes can be reverted with full traceability | all | Yes | OQ-12 |
 | REQ-12 | Vendor change monitoring: releases, deprecations, model changes and terms are monitored and trigger the defined tests | all | Yes | OQ-13 |
@@ -57,7 +57,7 @@ Every requirement is testable, is traced to the tests in ACME-VAL-CODEX-05 and t
 | REQ-14 | Bounded write scope and oracle-based verification of agent outputs | `agents_qms` | Not applicable: context `agents_qms` not selected | - |
 | REQ-15 | AI review is advisory only: never a required approval or the only verification | `pr_review` | Yes (advisory AI PR review selected) | OQ-04 |
 | REQ-16 | Organisation-owned accounts / workspace with SSO; no personal accounts for QMS use | all | Yes | IQ-02 |
-| REQ-17 | Competence: users trained on the work instruction (ACME-VAL-GEN-01) before use (ISO 13485 §6.2) | all | Yes | IQ-02 (seat list reconciled with training records); approvers in the OQ-01 and PQ-01 samples checked against training records; result recorded in ACME-VAL-CODEX-07 |
+| REQ-17 | Competence: users trained on the work instruction (ACME-VAL-GEN-01) before use (ISO 13485 clause 6.2) | all | Yes | IQ-02 (seat list reconciled with training records); approvers in the OQ-01 and PQ-01 samples checked against training records; result recorded in ACME-VAL-CODEX-07 |
 
 Risk traceability (risk to requirement to test) is in ACME-VAL-CODEX-03, section 4.
 
@@ -126,7 +126,7 @@ Applies: the local CLI / IDE surface is in scope.
 
 - **Objective:** prompts, context and repositories reachable by the tool contain no secrets, health data or personal data beyond what the contract and the data protection assessment cover; vendor retention, training use and region are as contracted.
 - **Acceptance:** vendor terms recorded and matched to the contract (IQ-05); the secret canary in OQ-07 is blocked; local transcript retention is set as decided in ACME-VAL-CODEX-06.
-- **Supplier requirement:** the vendor is evaluated and monitored under ISO 13485 §7.4: ACME-VEN-2026-015 (OpenAI).
+- **Supplier requirement:** the vendor is evaluated and monitored under ISO 13485 clause 7.4: ACME-VEN-2026-015 (OpenAI).
 - **Codex:** local history in `~/.codex/history.jsonl` is controlled by `history.persistence` (`"save-all"` default or `"none"`); see REQ-07 for environment-variable pass-through.
 
 ### REQ-10 Provenance labelling
@@ -178,5 +178,5 @@ Reviewed and approved in the eQMS by the Head of QA (Sam Sample, 2026-10-19, [si
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Jordan Demo | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Jordan Demo | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Jordan Demo | Completed and approved for the validation |

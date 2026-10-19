@@ -65,7 +65,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 SCRIPT_NAME = "run_admission.py"
-SCRIPT_VERSION = "0.1.0"
+SCRIPT_VERSION = "0.2.0"
 EVIDENCE_SCHEMA = "ai-coding-tool-validation-kit/evidence/v1"
 HERE = Path(__file__).resolve().parent
 DEFAULT_TASKS = HERE / "tasks"
@@ -1190,8 +1190,13 @@ def main(argv: Optional[List[str]] = None, runner: Callable[..., Any] = subproce
     args = parse_args(argv)
     try:
         if args.list:
-            for t in load_tasks(Path(args.tasks_dir), Path(args.fixtures_dir), args.task):
+            tasks = load_tasks(Path(args.tasks_dir), Path(args.fixtures_dir), args.task)
+            for t in tasks:
                 print("%-28s %-9s %-10s %s" % (t["id"], t["criterion"], t["fixture"], t["title"]))
+            fingerprint = suite_fingerprint(tasks)
+            print("suite_sha256 %s (tasks and fixtures listed above; record it in the plan)"
+                  % fingerprint["suite_sha256"])
+            print("runner_sha256 %s" % fingerprint["runner_sha256"])
             return EXIT_PASS
         if args.dry_run:
             return dry_run(args)

@@ -21,10 +21,10 @@ Every requirement is testable, is traced to the tests in {{doc_id_05}} and to th
 ## 2. References
 
 {{#reg_iso13485}}
-- ISO 13485:2016 §4.1.6 (software validation for the intended use), §4.2.4 and §4.2.5 (documents and records), §6.2 (competence), §7.4 (purchasing).
+- ISO 13485:2016 clause 4.1.6 (software validation for the intended use), clauses 4.2.4 and 4.2.5 (documents and records), clause 6.2 (competence), clause 7.4 (purchasing).
 {{/reg_iso13485}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 {{/reg_fda_qmsr}}
 {{#reg_gxp}}
 - EU GMP Annex 11 (2011) clauses 1, 3, 4, 10 and 11{{^reg_fda_qmsr}}; 21 CFR Part 11 (electronic records, audit trails and signatures){{/reg_fda_qmsr}}.
@@ -73,7 +73,7 @@ Every requirement is testable, is traced to the tests in {{doc_id_05}} and to th
 {{/surf_ci_headless}}
 {{/surf_local_cli_ide}}
 | REQ-08 | Model envelope: only approved models (enforced where the tool allows), model recorded per PR / session, new models admitted via MA-01{{#policy_pinned}}; pinned policy: exact model id `{{pinned_model}}`{{/policy_pinned}} | all | Yes | OQ-10, MA-01, PQ-01 |
-| REQ-09 | Data handling: no secrets, PHI or personal data in prompts / repositories beyond what is contractually covered; vendor retention and training terms as contracted{{#reg_iso13485}} (supplier requirement, ISO 13485 §7.4){{/reg_iso13485}} | all | Yes | IQ-05, OQ-07 |
+| REQ-09 | Data handling: no secrets, PHI or personal data in prompts / repositories beyond what is contractually covered; vendor retention and training terms as contracted{{#reg_iso13485}} (supplier requirement, ISO 13485 clause 7.4){{/reg_iso13485}} | all | Yes | IQ-05, OQ-07 |
 | REQ-10 | Provenance labelling: AI-assisted changes are declared (commit trailer and / or PR template) | all | Yes | OQ-11 |
 | REQ-11 | Reversibility: AI-assisted changes can be reverted with full traceability | all | Yes | OQ-12 |
 | REQ-12 | Vendor change monitoring: releases, deprecations, model changes and terms are monitored and trigger the defined tests | all | Yes | OQ-13 |
@@ -101,7 +101,7 @@ Every requirement is testable, is traced to the tests in {{doc_id_05}} and to th
 {{/surf_pr_review_bot}}
 {{/ctx_pr_review}}
 | REQ-16 | Organisation-owned accounts / workspace with SSO; no personal accounts for QMS use | all | Yes | IQ-02 |
-| REQ-17 | Competence: users trained on the work instruction ({{doc_id_wi}}) before use{{#reg_iso13485}} (ISO 13485 §6.2){{/reg_iso13485}} | all | Yes | IQ-02 (seat list reconciled with training records); approvers in the OQ-01 and PQ-01 samples checked against training records; result recorded in {{doc_id_07}} |
+| REQ-17 | Competence: users trained on the work instruction ({{doc_id_wi}}) before use{{#reg_iso13485}} (ISO 13485 clause 6.2){{/reg_iso13485}} | all | Yes | IQ-02 (seat list reconciled with training records); approvers in the OQ-01 and PQ-01 samples checked against training records; result recorded in {{doc_id_07}} |
 
 Risk traceability (risk to requirement to test) is in {{doc_id_03}}, section 4.
 
@@ -288,7 +288,7 @@ Not applicable: no local CLI / IDE or CI / headless surface is in scope. Re-asse
 - **Objective:** prompts, context and repositories reachable by the tool contain no secrets, health data or personal data beyond what the contract and the data protection assessment cover; vendor retention, training use and region are as contracted.
 - **Acceptance:** vendor terms recorded and matched to the contract (IQ-05); the secret canary in OQ-07 is blocked; local transcript retention is set as decided in {{doc_id_06}}.
 {{#reg_iso13485}}
-- **Supplier requirement:** the vendor is evaluated and monitored under ISO 13485 §7.4: [fill in: supplier evaluation record].
+- **Supplier requirement:** the vendor is evaluated and monitored under ISO 13485 clause 7.4: [fill in: supplier evaluation record].
 {{/reg_iso13485}}
 {{#is_claude_code}}
 - **Claude Code:** local transcripts are plaintext JSONL under `~/.claude/projects/`, deleted after `cleanupPeriodDays` (default 30); pin the value in managed settings according to the retention decision.

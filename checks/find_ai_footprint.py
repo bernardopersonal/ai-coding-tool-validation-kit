@@ -18,8 +18,9 @@ and, with --org, lists the GitHub App installations of the organisation and
 flags AI-related apps (GET /orgs/{org}/installations; needs an organisation
 owner token). Text scanning is heuristic: review every hit.
 
-Writes JSON + Markdown evidence with UTC timestamp, script version and the
-SHA-256 of the JSON. Python 3.9+ standard library only.
+Writes JSON + Markdown evidence with UTC timestamp, script version, who ran it
+on which machine (``executed_by``; --operator is required) and the SHA-256 of
+the JSON. Python 3.9+ standard library only.
 
 Exit codes: 0 no failing finding, 1 failing finding (risky AI workflow option,
 or a detected tool missing from --known-tools), 2 usage / API error.
@@ -38,11 +39,11 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_github_gates import (ApiError, GitHubClient, make_client,  # noqa: E402
-                                write_evidence)
+from check_github_gates import (ApiError, GitHubClient, executed_by,  # noqa: E402
+                                make_client, write_evidence)
 
 SCRIPT_NAME = "find_ai_footprint.py"
-SCRIPT_VERSION = "0.1.0"
+SCRIPT_VERSION = "0.2.0"
 EVIDENCE_SCHEMA = "ai-coding-tool-validation-kit/evidence/v1"
 EXIT_PASS, EXIT_FAIL, EXIT_ERROR = 0, 1, 2
 SEVERITY_ORDER = {"fail": 0, "warn": 1, "info": 2}
@@ -453,6 +454,10 @@ def render_markdown(doc: Dict[str, Any], digest: str, json_name: str) -> str:
         "| Result | **%s** |" % doc["result"].upper(),
         "| Generated (UTC) | %s |" % doc["generated_at_utc"],
         "| Script | %s %s |" % (doc["script"], doc["script_version"]),
+        "| Executed by | operator %s; OS user %s; host %s |" % (
+            (doc.get("executed_by") or {}).get("operator"),
+            (doc.get("executed_by") or {}).get("os_user"),
+            (doc.get("executed_by") or {}).get("hostname")),
         "| Requirements | %s |" % ", ".join(doc["requirements"]),
         "| Detected tools | %s |" % (", ".join("%s (%s)" % (k, ", ".join(v)) for k, v in
                                               r["detected_tools"].items()) or "none"),
@@ -534,6 +539,9 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
                          "detected tool fails" % ", ".join(TOOL_KEYS))
     ap.add_argument("--git-log", type=int, default=200, metavar="N",
                     help="scan the last N commit messages for AI attribution (0 = skip)")
+    ap.add_argument("--operator", default=os.environ.get("KIT_OPERATOR"), metavar="NAME",
+                    help="name of the person running the scan, recorded in the evidence "
+                         "(required; default $KIT_OPERATOR)")
     ap.add_argument("--out", default="evidence", help="evidence directory (default: evidence)")
     ap.add_argument("--api-url", help="GitHub API base URL (default: $GITHUB_API_URL or "
                     "https://api.github.com)")
@@ -547,6 +555,9 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     for t in args.known_tools or []:
         if t not in TOOL_KEYS:
             ap.error("unknown tool key %r in --known-tools (use: %s)" % (t, ", ".join(TOOL_KEYS)))
+    if not (args.operator or "").strip():
+        ap.error("--operator NAME (or $KIT_OPERATOR) is required: the evidence records who ran "
+                 "the scan")
     return args
 
 
@@ -567,6 +578,7 @@ def main(argv: Optional[List[str]] = None, runner: Callable[..., Any] = subproce
         "script_version": SCRIPT_VERSION,
         "generated_at_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "requirements": ["REQ-05", "REQ-06", "REQ-12"],
+        "executed_by": executed_by(args.operator, None),
         "parameters": {"path_name": root.name, "org": args.org,
                        "known_tools": args.known_tools, "git_log": args.git_log},
         "result": "fail" if counts["fail"] else "pass",

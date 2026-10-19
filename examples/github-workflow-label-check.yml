@@ -1,7 +1,8 @@
 # Optional required check: every pull request declares whether it is AI-assisted
-# (REQ-10; OQ-11 of the AI Coding Tool Validation Kit). It reads the "AI
-# assistance" boxes of examples/github/pull_request_template.md: exactly one must be
-# ticked, and an AI-assisted PR must name the tool.
+# (REQ-10; OQ-11 in the full profile, OQ-01 / PQ-01 in the lite profile of the AI
+# Coding Tool Validation Kit). It reads the "AI assistance" boxes of
+# examples/github/pull_request_template.md: exactly one must be ticked, and an
+# AI-assisted PR must name the tool.
 #
 # The check makes the declaration mandatory; it cannot prove that an undeclared
 # change was not AI-assisted (that is the OQ-11 cross-check with telemetry).

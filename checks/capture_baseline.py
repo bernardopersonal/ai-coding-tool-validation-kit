@@ -58,7 +58,7 @@ except ImportError:  # pragma: no cover - depends on the interpreter
     tomllib = None  # type: ignore
 
 SCRIPT_NAME = "capture_baseline.py"
-SCRIPT_VERSION = "0.1.0"
+SCRIPT_VERSION = "0.2.0"
 EVIDENCE_SCHEMA = "ai-coding-tool-validation-kit/evidence/v1"
 EXIT_PASS, EXIT_FAIL, EXIT_ERROR = 0, 1, 2
 REDACTED = "<redacted>"

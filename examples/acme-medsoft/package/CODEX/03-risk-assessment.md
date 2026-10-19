@@ -12,7 +12,7 @@
 | Date | 2026-10-18 |
 | Organisation | Acme MedSoft |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` and confirm every suggested determination before review. Approval is given by the approver personally in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` and confirm every suggested determination before review. Approval is given by the approver personally in the eQMS.
 
 ## 1. Purpose and scope
 
@@ -22,8 +22,8 @@ Process risk is not device risk. Where an AI-assisted change could affect a risk
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6: validation approach and activities proportionate to the risk associated with the use of the software.
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- ISO 13485:2016 clause 4.1.6: validation approach and activities proportionate to the risk associated with the use of the software.
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 - ISO/IEC 27001 (cross-reference): information security risk treatment for R-05, R-06 and R-10. ISMS risk register entries ISR-2026-031 (AI vendor data handling) and ISR-2026-032 (agent credentials).
 - Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026); ISO/TR 80002-2:2017 (risk-based, critical thinking); ISPE GAMP 5 Second Edition (2022).
 
@@ -121,15 +121,15 @@ These limitations are inputs to the residual risk. Confirm each against the vend
 | R-12 | Policy hooks may fail open on error or timeout (KL-01) | yes: hooks are not relied on alone; requirements, sandbox and server-side gates enforce | OQ-08 re-test on releases touching hooks (T7) |
 | R-05, R-12 | No verified deny control for commands inside the sandbox; command rules cover only commands outside it, so the MA-01 denied-command check is N/A (KL-07) | yes: commands inside `workspace-write` have no network and cannot change protected paths; the server-side gate binds | Re-assess at each release review; declare a verified control to MA-01 once one exists |
 | R-15 | Cloud PR / commit identity not documented by the vendor | yes, with restriction | Empirical IQ-04 result recorded; cloud agent limited to non-product repositories until ACME-VEN-2026-015-B is closed |
-| R-11 | Outsourced cloud execution (ISO 13485 §4.1.5) not yet covered by a terms review; certificate scope does not name the coding product | yes, with restriction | ACME-VEN-2026-015-A and ACME-VEN-2026-015-B, due 2026-11-30 |
+| R-11 | Outsourced cloud execution (ISO 13485 clause 4.1.5) not yet covered by a terms review; certificate scope does not name the coding product | yes, with restriction | ACME-VEN-2026-015-A and ACME-VEN-2026-015-B, due 2026-11-30 |
 | R-08 | Rubber-stamp review of large AI-generated diffs | yes, with monitoring | PQ-01 review-time metrics; PQ-02 at each periodic review |
 
-Overall conclusion: residual risk acceptable with restrictions (cloud agent limited to non-product repositories until the §4.1.5 terms review ACME-VEN-2026-015-B is approved). Written by Alex Example (Validation Engineer) on 2026-10-23 after the test results; accepted by Sam Sample on 2026-10-23 [signed in eQMS]; Robin Specimen informed on 2026-10-23. The conclusion is written by a named human author, not by the AI tool. Accepted in the eQMS by the Head of QA, with Regulatory Affairs Manager informed.
+Overall conclusion: residual risk acceptable with restrictions (cloud agent limited to non-product repositories until the ISO 13485 clause 4.1.5 terms review ACME-VEN-2026-015-B is approved). Written by Alex Example (Validation Engineer) on 2026-10-23 after the test results; accepted by Sam Sample on 2026-10-23 [signed in eQMS]; Robin Specimen informed on 2026-10-23. The conclusion is written by a named human author, not by the AI tool. Accepted in the eQMS by the Head of QA, with Regulatory Affairs Manager informed.
 
 ## Revision history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Alex Example | Determinations confirmed; approved before execution |
 | 1.1 | 2026-10-23 | Alex Example | Residual risks (section 9) completed with the test results |

@@ -12,9 +12,9 @@
 | Code host | GitHub |
 | Prepared by (role) | Validation Engineer |
 | Approved before execution by (role) | Head of QA |
-| Rendered | 2026-10-18 (kit 0.1.0) |
+| Rendered | 2026-10-18 (kit 0.2.0) |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` before review. This record is approved **before** any test in it is executed. Approval is given by the approver personally in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` before review. This record is approved **before** any test in it is executed. Approval is given by the approver personally in the eQMS.
 
 ## 1. Purpose and use
 
@@ -290,7 +290,7 @@ An "Inconclusive" result is repeated before it can be credited; it is never coun
 
 ## 8. Approval
 
-Signed by the people themselves in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU); never typed by an AI tool or by another person on someone's behalf. Each signature shows the printed name, the date and time, and the meaning of the signature, and is linked to this record (21 CFR §11.50, §11.70).
+Signed by the people themselves in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU); never typed by an AI tool or by another person on someone's behalf. Each signature shows the printed name, the date and time, and the meaning of the signature, and is linked to this record (21 CFR 11.50 and 11.70).
 
 | Step | Role | Name | Signature (eQMS / e-signature) | Date and time (UTC) |
 |---|---|---|---|---|

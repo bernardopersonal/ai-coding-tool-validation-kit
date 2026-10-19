@@ -14,7 +14,7 @@
 
 ## 1. Purpose and scope
 
-AI coding tools spread faster than inventories are updated: IDE extensions, review bots, CI actions, cloud agents and personal accounts appear without a formal request. This checklist finds AI tools that are in use at {{org_name}} and reconciles them with the software inventory, so that every QMS-relevant tool is registered, validated or stopped.
+AI coding tools spread faster than inventories are updated: IDE extensions, review bots, CI actions, cloud agents and personal accounts appear without a formal request. This checklist finds AI tools that are in use at {{org_name}} and reconciles them with the software inventory, so that every QMS-relevant tool is registered, validated or stopped. No shadow AI: a tool the organisation does not know about cannot be validated, controlled or defended in an audit.
 
 When to run it:
 
@@ -25,10 +25,10 @@ When to run it:
 ## 2. References
 
 {{#reg_iso13485}}
-- ISO 13485:2016 §4.1.6 (software used in the QMS is validated before use), §7.4 (purchased products and suppliers are controlled).
+- ISO 13485:2016 clause 4.1.6 (software used in the QMS is validated before use), clause 7.4 (purchased products and suppliers are controlled).
 {{/reg_iso13485}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7).
 {{/reg_fda_qmsr}}
 {{#reg_gxp}}
 - EU GMP Annex 11 (2011) clause 4 (validation) and clause 11 (periodic evaluation).
@@ -93,7 +93,7 @@ Mark each check done with date and initials; record every finding in section 6.
 Run for every repository in scope and attach the output:
 
 ```
-python3 checks/find_ai_footprint.py --path REPO_DIR
+python3 checks/find_ai_footprint.py --path REPO_DIR --operator "<name>" --out evidence/GEN/DISCOVERY/
 ```
 
 | # | Check | How | Done | Findings |

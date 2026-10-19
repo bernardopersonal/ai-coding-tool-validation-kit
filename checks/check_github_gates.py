@@ -60,7 +60,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 SCRIPT_NAME = "check_github_gates.py"
-SCRIPT_VERSION = "0.1.0"
+SCRIPT_VERSION = "0.2.0"
 EVIDENCE_SCHEMA = "ai-coding-tool-validation-kit/evidence/v1"
 API_VERSION = "2022-11-28"  # pinned REST API version, recorded in the evidence
 DEFAULT_API_URL = "https://api.github.com"
@@ -953,6 +953,89 @@ def pr_findings(results: List[Dict[str, Any]], requested: int) -> List[Dict[str,
     return f
 
 
+def reconcile_commits(client: "GitHubClient", rp: str, branch: str, args: argparse.Namespace,
+                      results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Match every commit on ``branch`` since ``args.commits_since`` to a merged PR.
+
+    A commit is "checked_pr" when it belongs to a merged PR of the checked sample,
+    "pr_not_checked" when it belongs to a merged PR into the branch outside the
+    sample (raise --prs), "no_merged_pr" when no merged PR into the branch contains
+    it (direct, admin or pre-protection push) and "unknown" when the lookup failed.
+    """
+    checked = {r["number"] for r in results}
+    by_merge_sha = {r["merge_commit_sha"]: r["number"] for r in results
+                    if r.get("merge_commit_sha")}
+    since = args.commits_since + "T00:00:00Z"
+    resp, commits = client.paginate("%s/commits" % rp, {"sha": branch, "since": since},
+                                    max_pages=args.max_pages)
+    if not resp.ok:
+        return {"readable": False, "status": resp.status, "since": args.commits_since,
+                "commits": [], "truncated": False, "counts": {}}
+    rows: List[Dict[str, Any]] = []
+    for c in commits:
+        sha = c.get("sha")
+        committed = ((c.get("commit") or {}).get("committer") or {}).get("date")
+        row = {"sha": sha, "committed_at": committed, "pr": None, "status": "unknown"}
+        if sha in by_merge_sha:
+            row.update(pr=by_merge_sha[sha], status="checked_pr")
+        else:
+            pr_resp, pulls = client.paginate("%s/commits/%s/pulls" % (rp, sha), max_pages=1)
+            if pr_resp.ok:
+                merged = [x.get("number") for x in pulls if x.get("merged_at") and
+                          (x.get("base") or {}).get("ref") == branch]
+                if not merged:
+                    row["status"] = "no_merged_pr"
+                else:
+                    inside = [n for n in merged if n in checked]
+                    row.update(pr=(inside or merged)[0],
+                               status="checked_pr" if inside else "pr_not_checked")
+        rows.append(row)
+    counts = {k: sum(1 for r in rows if r["status"] == k)
+              for k in ("checked_pr", "pr_not_checked", "no_merged_pr", "unknown")}
+    return {"readable": True, "since": args.commits_since, "commits": rows, "counts": counts,
+            "truncated": len(commits) >= args.max_pages * 100}
+
+
+def commit_findings(rec: Optional[Dict[str, Any]], branch: str) -> List[Dict[str, str]]:
+    if rec is None:
+        return []
+    if not rec["readable"]:
+        return [finding("inconclusive", "commit_reconciliation",
+                        "Commit history of %s not readable (HTTP %s)." % (branch, rec["status"]),
+                        "REQ-04", "RV-01")]
+    f: List[Dict[str, str]] = []
+    rows, since = rec["commits"], rec["since"]
+
+    def shas(status: str) -> str:
+        return ", ".join([r["sha"][:12] for r in rows if r["status"] == status][:20])
+    if rec["truncated"]:
+        f.append(finding("inconclusive", "commit_reconciliation",
+                         "More commits since %s than --max-pages reads; raise --max-pages." % since,
+                         "REQ-04", "RV-01"))
+    if rec["counts"]["no_merged_pr"]:
+        f.append(finding("fail", "commit_without_pr",
+                         "%d commit(s) on %s since %s are in no merged PR (direct, admin or "
+                         "pre-protection push): %s." % (rec["counts"]["no_merged_pr"], branch,
+                                                        since, shas("no_merged_pr")),
+                         "REQ-04", "RV-01"))
+    if rec["counts"]["pr_not_checked"]:
+        prs = sorted({r["pr"] for r in rows if r["status"] == "pr_not_checked"})
+        f.append(finding("warn", "commit_pr_not_checked",
+                         "%d commit(s) since %s belong to merged PRs outside the checked sample "
+                         "(%s); raise --prs to cover the period." % (
+                             rec["counts"]["pr_not_checked"], since,
+                             ", ".join("#%s" % n for n in prs[:20])), "REQ-01", "RV-01"))
+    if rec["counts"]["unknown"]:
+        f.append(finding("inconclusive", "commit_reconciliation",
+                         "%d commit(s) since %s could not be matched (API error): %s." % (
+                             rec["counts"]["unknown"], since, shas("unknown")), "REQ-04", "RV-01"))
+    if not f:
+        f.append(finding("info", "commit_reconciliation",
+                         "All %d commit(s) on %s since %s belong to checked merged PRs." % (
+                             len(rows), branch, since), "REQ-04", "RV-01"))
+    return f
+
+
 # ---------------------------------------------------------------------------
 # Data collection
 # ---------------------------------------------------------------------------
@@ -1121,6 +1204,8 @@ def collect(client: GitHubClient, args: argparse.Namespace) -> Dict[str, Any]:
                                    launchers, args.agent_pr_min_approvals, checks))
     state["required_contexts"] = required_contexts
     state["pull_requests"] = results
+    state["commit_reconciliation"] = reconcile_commits(client, rp, branch, args, results) \
+        if args.commits_since else None
     state["required_approvals_used"] = required
     state["head_approval_required"] = require_head
     return state
@@ -1129,7 +1214,8 @@ def collect(client: GitHubClient, args: argparse.Namespace) -> Dict[str, Any]:
 def build_report(state: Dict[str, Any], args: argparse.Namespace, started: datetime.datetime,
                  client: GitHubClient) -> Dict[str, Any]:
     findings = evaluate_gate_config(state) + pr_findings(state["pull_requests"],
-                                                         len(args.pr) if args.pr else args.prs)
+                                                         len(args.pr) if args.pr else args.prs) \
+        + commit_findings(state.get("commit_reconciliation"), state["branch"])
     findings.sort(key=lambda x: SEVERITY_ORDER.get(x["severity"], 9))
     sev = {s: sum(1 for x in findings if x["severity"] == s) for s in SEVERITY_ORDER}
     if sev["fail"]:
@@ -1156,6 +1242,7 @@ def build_report(state: Dict[str, Any], args: argparse.Namespace, started: datet
             "trigger_mentions": list(args.trigger),
             "agent_pr_min_approvals": args.agent_pr_min_approvals,
             "checks_evaluated": not args.no_checks,
+            "commits_since": args.commits_since,
         },
         "executed_by": state.get("executed_by"),
         "result": result,
@@ -1168,6 +1255,7 @@ def build_report(state: Dict[str, Any], args: argparse.Namespace, started: datet
                                              "required_contexts", "check_retention_days")},
         "pull_requests": state["pull_requests"],
         "pr_summary": summarize_prs(state["pull_requests"]),
+        "commit_reconciliation": state.get("commit_reconciliation"),
         "api_calls": client.calls,
         "errors": state["errors"],
     }
@@ -1251,6 +1339,23 @@ def render_markdown(doc: Dict[str, Any], digest: str, json_name: str) -> str:
                               for n in r["non_qualifying_approvals"])),
             md_cell((r.get("checks") or {}).get("overall", "not evaluated")),
             r["status"]))
+    rec = doc.get("commit_reconciliation")
+    if rec is not None:
+        lines += ["", "## Commit reconciliation since %s" % rec["since"], ""]
+        if not rec["readable"]:
+            lines.append("- commit history not readable (HTTP %s)" % rec["status"])
+        else:
+            lines.append("Commits: %d; in checked merged PRs: %d; in other merged PRs: %d; in no "
+                         "merged PR: %d; unknown: %d." % (
+                             len(rec["commits"]), rec["counts"]["checked_pr"],
+                             rec["counts"]["pr_not_checked"], rec["counts"]["no_merged_pr"],
+                             rec["counts"]["unknown"]))
+            odd = [r for r in rec["commits"] if r["status"] != "checked_pr"]
+            if odd:
+                lines += ["", "| Commit | Committed (UTC) | PR | Status |", "|---|---|---|---|"]
+                lines += ["| `%s` | %s | %s | %s |" % (r["sha"][:12], r["committed_at"],
+                                                      "#%s" % r["pr"] if r["pr"] else "-",
+                                                      r["status"]) for r in odd[:50]]
     if doc["errors"]:
         lines += ["", "## Errors and skipped items", ""] + ["- " + md_cell(e) for e in doc["errors"]]
     lines += [
@@ -1316,6 +1421,10 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
                          "control; default 2; fewer is flagged)")
     ap.add_argument("--no-checks", action="store_true",
                     help="do not read check runs and statuses of merged PRs")
+    ap.add_argument("--commits-since", metavar="YYYY-MM-DD",
+                    help="interim use / look-back: match every commit on the branch since this "
+                         "date to a merged PR; a commit in no merged PR fails (one API call per "
+                         "commit outside the checked PRs)")
     ap.add_argument("--operator", default=os.environ.get("KIT_OPERATOR"), metavar="NAME",
                     help="name of the person running the check, recorded in the evidence "
                          "(required; default $KIT_OPERATOR)")
@@ -1336,6 +1445,13 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         ap.error("--repo must be OWNER/REPO")
     if args.prs < 0:
         ap.error("--prs must be >= 0")
+    if args.commits_since is not None:
+        try:
+            datetime.date.fromisoformat(args.commits_since)
+            if len(args.commits_since) != 10:
+                raise ValueError
+        except ValueError:
+            ap.error("--commits-since must be a date YYYY-MM-DD")
     args.non_human = {x.lower() for x in args.non_human}
     launchers: Dict[int, set] = {}
     for item in args.launcher:

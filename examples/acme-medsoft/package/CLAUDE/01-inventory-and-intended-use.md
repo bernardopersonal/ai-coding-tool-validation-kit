@@ -13,7 +13,7 @@
 | Organisation | Acme MedSoft |
 | Product context | Class II SaMD (FDA 510(k)); EU MDR Class IIa planned |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS (or with an electronic signature); never type a name or signature into this document on someone else's behalf, and never let the AI tool do it.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS (or with an electronic signature); never type a name or signature into this document on someone else's behalf, and never let the AI tool do it.
 
 ## 1. Purpose and scope
 
@@ -23,9 +23,9 @@ The validation unit is **tool + vendor + surface + context of use**. The languag
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6 (validation of computer software used in the QMS), §4.2.4 (control of documents: instruction and settings files are controlled configuration items), §6.2 (competence), §7.4 (purchasing: evaluation of the AI vendor).
-- ISO 13485:2016 §4.1.5 (outsourced processes): interpretation, relevant when agents run on vendor infrastructure (cloud agents). Document either the quality agreement / terms review or why the clause does not apply.
-- 21 CFR Part 820 (QMSR), §820.10, which incorporates ISO 13485:2016 by reference (§820.7). Software validation duties come from ISO 13485 §4.1.6, §7.5.6 and §7.6 as incorporated; the former §820.70(i) no longer exists and is not cited. 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- ISO 13485:2016 clause 4.1.6 (validation of computer software used in the QMS), clause 4.2.4 (control of documents: instruction and settings files are controlled configuration items), clause 6.2 (competence), clause 7.4 (purchasing: evaluation of the AI vendor).
+- ISO 13485:2016 clause 4.1.5 (outsourced processes): interpretation, relevant when agents run on vendor infrastructure (cloud agents). Document either the quality agreement / terms review or why the clause does not apply.
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, which incorporates ISO 13485:2016 by reference (21 CFR 820.7). Software validation duties come from ISO 13485 clauses 4.1.6, 7.5.6 and 7.6 as incorporated; the former 21 CFR 820.70(i) no longer exists and is not cited. 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 - ISO/IEC 27001 (cross-reference): supplier relationships, secure development, configuration and change management controls: ISO/IEC 27001:2022 Annex A 5.19 to 5.23 (supplier relationships, cloud services), 8.9 (configuration management), 8.25 and 8.28 (secure development and coding), 8.32 (change management); Statement of Applicability ACME-ISMS-SOA rev 4.
 - Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026); ISO/TR 80002-2:2017; ISPE GAMP 5 Second Edition (2022), Appendix D9 (Software Tools) and D11 (AI/ML).
 - Internal: ACME-VAL-GEN-01 AI-assisted development work instruction; ACME-VAL-GEN-02 Tool discovery checklist; ACME-QP-04 Validation of QMS and development software; supplier evaluation record ACME-VEN-2026-011 (Anthropic).
@@ -93,7 +93,7 @@ Answer each question for the contexts in section 8. One "yes" makes the use QMS-
 | Q5 | Could a failure affect product conformity or QMS compliance without another control detecting it? | no, if the gates hold | Human approval gate and required checks detect failures; these controls are what this validation tests (REQ-01 to REQ-04) |
 | Q6 | Does it process confidential design data, personal data or health data? | yes (design data only) | Source code and design documents; personal and health data excluded by the data rules (section 10) |
 
-Decision: **QMS-relevant** (Q1, Q2, Q4, Q6). If QMS-relevant, it is validated under ISO 13485:2016 §4.1.6 before (further) use. If not QMS-relevant, record why and keep the tool on the inventory for periodic re-check.
+Decision: **QMS-relevant** (Q1, Q2, Q4, Q6). If QMS-relevant, it is validated under ISO 13485:2016 clause 4.1.6 before (further) use. If not QMS-relevant, record why and keep the tool on the inventory for periodic re-check.
 
 ## 7. GAMP 5 category
 
@@ -184,7 +184,7 @@ The following are not part of the intended use and are prohibited unless this do
 | Processing region / residency | As stated in the contract; no residency commitment purchased; accepted in DPIA-2026-03 |
 | Certifications (scope and expiry as stated on the certificate) | Scope text and expiry recorded in IQ-05 evidence; coverage of the coding tool to be confirmed (ACME-VEN-2026-011-A) |
 | Change and deprecation notification commitments | Contract notice for material changes of terms; product changes followed through the monitoring routine (ACME-VAL-CLAUDE-08) |
-| Supplier evaluation record | ACME-VEN-2026-011, approved supplier since 2026-01-09 (ISO 13485 §7.4) |
+| Supplier evaluation record | ACME-VEN-2026-011, approved supplier since 2026-01-09 (ISO 13485 clause 7.4) |
 
 Anthropic points to its Trust Center (trust.anthropic.com) for the SOC 2 Type 2 report and ISO/IEC 27001 certificate, and holds an ISO/IEC 42001 certificate. Record the certificate scope text; public statements do not explicitly name Claude Code within those scopes.
 
@@ -210,6 +210,6 @@ Reviewed and approved in the eQMS by the Head of QA. Author: Jordan Demo (Engine
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Jordan Demo | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Jordan Demo | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Jordan Demo | Completed and approved for the validation |
 | 1.1 | 2026-10-23 | Jordan Demo | Status, criticality and last validation updated after the release decision |

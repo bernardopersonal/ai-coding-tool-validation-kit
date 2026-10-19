@@ -47,7 +47,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 SCRIPT_NAME = "client_regression.py"
-SCRIPT_VERSION = "0.1.0"
+SCRIPT_VERSION = "0.2.0"
 EVIDENCE_SCHEMA = "ai-coding-tool-validation-kit/evidence/v1"
 KIT_ROOT = Path(__file__).resolve().parent.parent
 EXIT_PASS, EXIT_FAIL, EXIT_ERROR = 0, 1, 2

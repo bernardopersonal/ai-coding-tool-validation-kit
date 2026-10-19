@@ -1,0 +1,73 @@
+# {{doc_id_discovery}} Tool discovery checklist
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_discovery}} (lite profile) |
+| Version | 0.1 (draft) |
+| Owner / approver (roles) | {{role_executor}} / {{role_approver}} |
+| Date | {{today}} |
+| Organisation | {{org_name}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}, lite profile. Copy this checklist for each execution, record who did each check and when, and file the completed copy as a record approved in the eQMS.
+
+## 1. Purpose and when to run
+
+Find the AI tools actually in use at {{org_name}} (including shadow AI: unsanctioned tools, personal accounts, undeclared AI-assisted changes) and reconcile them with the software inventory, so that every QMS-relevant tool is registered, validated or stopped{{#reg_iso13485}} (ISO 13485:2016 clauses 4.1.6 and 7.4){{/reg_iso13485}}. Run it before a validation plan is approved{{#already_in_use}} (and as part of the interim-use justification){{/already_in_use}}, at every periodic review (every {{periodic_review_months}} months), and on a trigger: a new AI vendor invoice, a new app or bot on the code host, or a report under {{doc_id_wi}}.
+
+| Execution date(s) | Executed by | Reason | Repositories in scope | Previous execution |
+|---|---|---|---|---|
+| [fill in] | [fill in] | [initial / periodic / trigger] | [fill in] | [fill in] |
+
+Registered tools to compare against: {{#tools_list}}{{tool_name}} ({{vendor}}, `{{tool_id}}`, plan {{doc_id_01}}); {{/tools_list}}[fill in: other registered AI tools].
+
+## 2. Checks
+
+Run for every repository in scope and attach the output: `python3 checks/find_ai_footprint.py --path REPO_DIR --known-tools {{#tools_list}}{{tool_key}},{{/tools_list}}shared --operator "<name>" --out evidence/GEN/DISCOVERY/` (add `--org ORG` for app installations on GitHub); a detected tool outside the inventory fails the run.
+
+Check IDs are those of the full checklist; a lite row may combine several.
+
+| # | Check | How | Done (date, initials) | Findings |
+|---|---|---|---|---|
+{{#code_github}}
+| C1-C3 | Apps, bots and AI settings on the code host | Installed GitHub Apps and authorised OAuth apps with AI functions; third-party coding agents hosted by GitHub (search the audit log, they are not in the installed-apps list); Copilot policies, including whether approvals count, "Default policy for new features" and "Default availability for released models" | [ ] | |
+| C4-C5, R2-R3 | AI in workflows and PRs | AI actions or CLIs in `.github/workflows/*`; reviews whose `user.type` is "Bot"; agent branches such as `copilot/`; AI co-author trailers | [ ] | |
+| C6 | Automation tokens | Tokens, deploy keys and service accounts used by bots or agents, and who owns each | [ ] | |
+{{/code_github}}
+{{#code_gitlab}}
+| C1-C2 | AI settings on the code host | GitLab Duo settings (code review, automatic reviews, "GitLab Duo can approve and request changes", Agent Platform) and their audit events | [ ] | |
+| C3, R2-R3 | AI in pipelines and MRs | AI CLIs or review jobs in `.gitlab-ci.yml` and included files; bot users; AI co-author trailers | [ ] | |
+| C4 | Automation tokens | Project and group tokens, service accounts and bot users used by AI tools, and who owns each | [ ] | |
+{{/code_gitlab}}
+{{#code_other}}
+| C1 | Integrations on the code host | [fill in: where the platform lists integrations, apps and bot users with AI functions] | [ ] | |
+| C2, R2-R3 | AI in CI and PRs | AI CLIs or review jobs in CI definitions; bot reviews; AI co-author trailers | [ ] | |
+| C3 | Automation tokens | Tokens and service accounts used by bots or agents, and who owns each | [ ] | |
+{{/code_other}}
+| R1 | Agent configuration and instruction files | `.claude/`, `CLAUDE.md`, `.mcp.json`, `AGENTS.md`, `.codex/`, `.cursor/`, `.github/copilot-instructions.md`, `.github/instructions/`, `.github/hooks/`, `.gemini/`, `GEMINI.md` (output of the script above) | [ ] | |
+| R4 | CODEOWNERS coverage | The files from R1 and the CI definitions require code-owner review | [ ] | |
+| B1-B2 | Identity provider and vendor consoles | AI applications in the SSO catalogue; seat lists of each registered tool against the identity provider (leavers, external accounts) | [ ] | |
+| B3-B4 | Purchasing | Expense reports, card statements and invoices from AI vendors (including individual subscriptions) against the approved supplier list | [ ] | |
+| E1-E3 | Endpoints and CI images | IDE extensions, AI CLIs and desktop apps on developer machines; AI CLIs in CI images; AI vendor credentials stored as CI secrets (names only) | [ ] | |
+| P1-P2 | People | Ask every team, including non-engineering teams that draft documents, which AI tools, accounts and models they use, and who runs scheduled or autonomous agents | [ ] | |
+
+## 3. Reconciliation and decision rules
+
+| # | Found item (tool, surface, account) | Check | On inventory? | QMS-relevant? | Action, owner, due | Record ref |
+|---|---|---|---|---|---|---|
+| 1 | [fill in] | [fill in] | [yes/no] | [yes/no] | [fill in] | [fill in] |
+
+- **QMS-relevant tool not on the inventory:** register it, stop QMS-relevant use or document an interim-use justification, raise a deviation per [fill in: procedure] and plan its validation.
+- **Not QMS-relevant:** record the determination; re-check at the next execution.
+- **Registered tool on a new surface, model or context:** a change trigger of that tool's validation (see its validation report).
+- **Personal or foreign account used for QMS work:** stop that use, move to the organisation account, assess the records produced.
+- **Instruction or configuration files without CODEOWNERS protection:** raise a change to protect them.
+
+## 4. Conclusion
+
+Unregistered QMS-relevant tools found: [fill in]. Actions raised: [fill in]. Inventory updated: [yes/no, ref]. Conclusion: [inventory complete / complete after actions / not complete].
+
+Written by: [fill in: name]. Approved in the eQMS by the {{role_approver}}.
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft generated with the kit ({{kit_version}}, lite profile) |

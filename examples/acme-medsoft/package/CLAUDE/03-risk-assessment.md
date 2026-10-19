@@ -12,7 +12,7 @@
 | Date | 2026-10-18 |
 | Organisation | Acme MedSoft |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` and confirm every suggested determination before review. Approval is given by the approver personally in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` and confirm every suggested determination before review. Approval is given by the approver personally in the eQMS.
 
 ## 1. Purpose and scope
 
@@ -22,8 +22,8 @@ Process risk is not device risk. Where an AI-assisted change could affect a risk
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6: validation approach and activities proportionate to the risk associated with the use of the software.
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- ISO 13485:2016 clause 4.1.6: validation approach and activities proportionate to the risk associated with the use of the software.
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 - ISO/IEC 27001 (cross-reference): information security risk treatment for R-05, R-06 and R-10. ISMS risk register entries ISR-2026-031 (AI vendor data handling) and ISR-2026-032 (agent credentials).
 - Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026); ISO/TR 80002-2:2017 (risk-based, critical thinking); ISPE GAMP 5 Second Edition (2022).
 
@@ -130,6 +130,6 @@ Overall conclusion: residual risk acceptable for the intended use, with the comp
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Alex Example | Determinations confirmed; approved before execution |
 | 1.1 | 2026-10-23 | Alex Example | Residual risks (section 9) completed with the test results |

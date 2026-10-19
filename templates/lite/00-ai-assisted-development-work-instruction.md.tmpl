@@ -1,0 +1,121 @@
+# {{doc_id_wi}} AI-assisted development work instruction
+
+| Field | Value |
+|---|---|
+| Document ID | {{doc_id_wi}} (lite profile) |
+| Version | 0.1 (draft) |
+| Owner / approver (roles) | {{role_tool_owner}} / {{role_approver}} |
+| Date | {{today}} |
+| Organisation | {{org_name}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}, lite profile. Complete every `[fill in]` before review. The approver approves personally in the eQMS.
+
+## 1. Scope
+
+Applies to everyone at {{org_name}} who uses an AI coding tool, or reviews work produced with one, on any surface and in any context below. Using these tools is encouraged; these rules make sure every change still reaches the product and the QMS only through qualified human control.
+
+References: {{#reg_iso13485}}ISO 13485:2016 clauses 4.1.6 and 6.2; {{/reg_iso13485}}{{#reg_fda_qmsr}}21 CFR Part 820 (QMSR, incorporating ISO 13485); {{/reg_fda_qmsr}}{{#reg_gxp}}EU GMP Annex 11 and 21 CFR Part 11; {{/reg_gxp}}EU AI Act Article 4 (AI literacy) where applicable; {{doc_id_discovery}} Tool discovery checklist; [fill in: code review, SOUP / dependency, deviation procedures].
+
+## 2. Approved tools and contexts
+
+| Tool | Surfaces | Model policy and approved models | Validation | Status |
+|---|---|---|---|---|
+{{#tools_list}}
+| {{tool_name}} ({{vendor}}) | {{#surfaces}}`{{.}}` {{/surfaces}} | {{model_policy}}: {{#approved_models}}`{{.}}` {{/approved_models}} | {{doc_id_01}} to {{doc_id_03}} | {{#already_in_use}}Interim use until the release decision in {{doc_id_03}}{{/already_in_use}}{{^already_in_use}}Not used before the release decision in {{doc_id_03}}{{/already_in_use}} |
+{{/tools_list}}
+
+Approved contexts: {{#contexts_list}}{{label}} (`{{key}}`); {{/contexts_list}}nothing else. Any other purpose needs validation first: ask the {{role_tool_owner}}.
+
+## 3. Rules
+
+1. **No shadow AI:** use only the declared, organisation-approved tools of section 2, with organisation accounts; never use an AI tool on a personal account for {{org_name}} development or QMS work. Label every AI-assisted change (section 4). Report any AI tool, extension, bot or agent you find that is not in section 2 (section 6); it needs registration and validation first. AI use the organisation does not know about cannot be validated, controlled or defended in an audit.
+2. **Accounts:** only the organisation account or workspace, through single sign-on. No foreign or shared accounts or tokens. Agent and CI tokens are issued and recorded by the tool owner.
+3. **Data:** never put secrets, patient or health data or personal data into prompts, context or instruction files, or repositories the tool can read, unless the contract and [fill in: data protection assessment] cover it. Use synthetic data for tests.
+4. **Untrusted content:** issues, PR comments, web pages and MCP results can carry instructions aimed at the agent (prompt injection). Do not combine such content with write access to protected systems.
+5. **You own every line you merge.** As author: keep changes reviewable; read and understand every changed line; never let the AI delete tests, weaken assertions or change expected values to make CI pass; check that every new dependency exists and is approved (AI tools invent package names).
+6. **As reviewer:** review the diff, not the AI's summary; approve only what you understood; check tests, dependencies, secrets and changes to CI, gate, tool configuration or instruction files (these need code-owner review). AI review comments are hints, and their absence proves nothing.
+7. **Separation of duties:** never approve your own PR or a PR whose agent you launched. Where the agent opens PRs under its own identity, the code host counts your approval, so this rule is yours to keep; such PRs need 2 approvals or code-owner approval.
+8. **Models:** only models from the approved list, and a newly released model only after its admission record (MA-01) exists. Report unexpected model switches to the tool owner.
+9. **Configuration:** managed or admin configuration changes only by the {{role_tool_owner}}, through change control. Instruction files guide the AI; they do not enforce anything.
+10. **Prohibited:** letting the AI approve, merge, sign, close or release anything; recording an approval for someone else; merging without approvals, pushing directly to a protected branch or bypassing gates outside [fill in: emergency procedure]; permission-bypass or unsandboxed modes; MCP servers, plugins or extensions not on the allow-list; agent write access to QMS systems outside the code-host gate (for example through MCP) unless validated for it; asking the AI to execute, conclude or approve the validation of an AI tool.
+{{#tools_list}}
+{{#is_claude_code}}
+    - {{tool_name}}: never use `--dangerously-skip-permissions` or the `bypassPermissions` mode; do not change files in the managed settings location.
+{{/is_claude_code}}
+{{#is_codex}}
+    - {{tool_name}}: never use `--dangerously-bypass-approvals-and-sandbox` or the `danger-full-access` sandbox mode; do not change the admin `requirements.toml`.
+{{/is_codex}}
+{{#is_copilot}}
+    - {{tool_name}}: do not enable Copilot approvals or add Copilot as a ruleset bypass actor.
+{{/is_copilot}}
+{{#is_cursor}}
+    - {{tool_name}}: do not switch the Run Mode to run commands without review, and do not disable Privacy Mode.
+{{/is_cursor}}
+{{#is_other}}
+    - {{tool_name}}: [fill in: unsafe or bypass modes that must not be used].
+{{/is_other}}
+{{/tools_list}}
+
+## 4. Provenance label
+
+Declare every AI-assisted change with commit trailers (some tools add a trailer for you) and record the model id once per PR in the PR template (`examples/github/pull_request_template.md` in the kit):
+
+```
+AI-Assisted: yes
+AI-Tool: <tool name>
+```
+
+{{#tools_list}}
+{{#is_claude_code}}
+- {{tool_name}}: the default trailer `Co-Authored-By: <model name> <noreply@anthropic.com>` names the model; keep it or set the managed `attribution` setting. It is an instruction to the model, not a git hook: still check the label.
+{{/is_claude_code}}
+{{#is_codex}}
+- {{tool_name}}: no built-in commit attribution setting is documented; add the trailers yourself or through the PR template.
+{{/is_codex}}
+{{#is_copilot}}
+- {{tool_name}}: cloud agent commits are authored by Copilot with you as co-author; for IDE use fill in the PR template.
+{{/is_copilot}}
+{{#is_cursor}}
+- {{tool_name}}: add the trailers yourself or through the PR template.
+{{/is_cursor}}
+{{#is_other}}
+- {{tool_name}}: [fill in: built-in attribution, otherwise add the trailers yourself].
+{{/is_other}}
+{{/tools_list}}
+
+## 5. Context rules
+
+{{#ctx_code_product}}
+- **Product code:** changes reach protected branches only through an approved PR with green required checks; give extra scrutiny to [fill in: safety-related and security-sensitive code named in the development plan].
+{{/ctx_code_product}}
+{{#ctx_code_tooling}}
+- **Internal tooling:** same review rules; tooling that produces QMS records or verification results is validated before its output is used as evidence.
+{{/ctx_code_tooling}}
+{{#ctx_pr_review}}
+- **AI PR review:** advisory only; never the required approval and never the only review.
+{{/ctx_pr_review}}
+{{#ctx_test_generation}}
+- **Test generation:** generated tests trace to the requirement they verify and are reviewed like product code.
+{{/ctx_test_generation}}
+{{#ctx_doc_drafting}}
+- **Document drafting:** every factual statement cites a source you check yourself; you preview the exact content before anything is written to a controlled record; the document owner approves under document control.
+{{/ctx_doc_drafting}}
+{{#ctx_agents_qms}}
+- **QMS agents:** only configured agents, only on their declared write targets; agent outputs that change records require confirmation by the accountable role.
+{{/ctx_agents_qms}}
+
+## 6. Report without delay
+
+To [fill in: deviation / nonconformity channel]: a defective AI-assisted change that passed review; a guardrail that did not behave as expected; a model outside the approved list or an unexpected switch; an AI tool, bot or agent not listed in section 2; suspected leakage of secrets, health data or personal data; an attempted prompt injection.
+
+## 7. Training
+
+Users and reviewers are trained on this work instruction before access or their first approval of an AI-assisted change{{#reg_iso13485}} (ISO 13485:2016 clause 6.2){{/reg_iso13485}}: these rules, typical AI failure modes (plausible but wrong code, invented dependencies, missed defects, prompt injection, automation bias) and reporting. Retrain on material changes. Records: [fill in]. Effectiveness check: [fill in, e.g. PQ-01 review-time outliers and periodic review findings].
+
+## 8. Approval
+
+Approved in the eQMS by the {{role_approver}}. Author: [fill in]. AI assistance in drafting: [yes/no; which sections].
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft generated with the kit ({{kit_version}}, lite profile) |

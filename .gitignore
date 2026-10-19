@@ -3,4 +3,5 @@ __pycache__/
 # company-specific answers and rendered packages stay out of the kit repo
 /kit.config.json
 /output/
+/output-*/
 /tests/deid-local.txt

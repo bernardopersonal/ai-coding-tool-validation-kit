@@ -12,7 +12,7 @@
 | Report drafted by (role) | Validation Engineer |
 | Technical review (role) | Engineering Lead |
 | Release decision (role) | Head of QA |
-| Rendered | 2026-10-18 (kit 0.1.0) |
+| Rendered | 2026-10-18 (kit 0.2.0) |
 
 Related documents: ACME-VAL-CODEX-01 Inventory and intended use · ACME-VAL-CODEX-02 Requirements · ACME-VAL-CODEX-03 Risk assessment · ACME-VAL-CODEX-04 Validation plan · ACME-VAL-CODEX-05 Test protocol · ACME-VAL-CODEX-06 Configuration baseline · ACME-VAL-CODEX-08 Change and revalidation · ACME-VAL-GEN-01 Work instruction · ACME-VAL-GEN-02 Tool discovery checklist · ACME-VAL-GEN-03 Code-host gate qualification.
 
@@ -42,13 +42,13 @@ Contexts of use:
 - Advisory AI PR review: AI review comments on pull requests; advisory only, never counted as the required human approval.
 - Document drafting: Drafting of controlled documents and records, previewed and approved by a human before they are written or released.
 
-Summary of results (written by the person named in section 14, not by the AI tool): all 22 tests passed. The server-side gate held in every negative test, including attempts driven through Codex; admin requirements could not be overridden; both models in the envelope passed MA-01; 4 weeks of in-use data showed qualified human approval on every merged PR. The model envelope is monitored, not enforced, because no client-side enforcement was found. The ISO 13485 §4.1.5 terms review of cloud execution is still open, so the cloud agent is restricted to non-product repositories until it is approved.
+Summary of results (written by the person named in section 14, not by the AI tool): all 22 tests passed. The server-side gate held in every negative test, including attempts driven through Codex; admin requirements could not be overridden; both models in the envelope passed MA-01; 4 weeks of in-use data showed qualified human approval on every merged PR. The model envelope is monitored, not enforced, because no client-side enforcement was found. The ISO 13485 clause 4.1.5 terms review of cloud execution is still open, so the cloud agent is restricted to non-product repositories until it is approved.
 
 ## 2. Regulatory basis
 
-- ISO 13485:2016 §4.1.6: validation of QMS software before initial use and after changes, proportionate to risk, with records (§4.2.5). Supporting clauses: §4.2.4 (controlled configuration), §6.2 (competence), §7.4 (supplier), §4.1.5 (outsourced processes, for vendor-hosted agents).
-- 21 CFR Part 820 (QMSR, in force since 2 February 2026), which incorporates ISO 13485:2016 by reference (§820.10). FDA guidance "Computer Software Assurance for Production and Quality Management System Software": this report records the intended use, the risk determination, the assurance activities, the issues found and their disposition, a conclusion, the date and the name of the people involved, and the approval.
-- 21 CFR Part 11: this report and the validation records are records required by Part 820; kept and signed electronically, they meet the organisation's Part 11 controls (§11.10 controls, §11.50 signature manifestation, §11.70 signature-to-record linking).
+- ISO 13485:2016 clause 4.1.6: validation of QMS software before initial use and after changes, proportionate to risk, with records (clause 4.2.5). Supporting clauses: 4.2.4 (controlled configuration), 6.2 (competence), 7.4 (supplier), 4.1.5 (outsourced processes, for vendor-hosted agents).
+- 21 CFR Part 820 (QMSR, in force since 2 February 2026): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). FDA guidance "Computer Software Assurance for Production and Quality Management System Software": this report records the intended use, the risk determination, the assurance activities, the issues found and their disposition, a conclusion, the date and the name of the people involved, and the approval.
+- 21 CFR Part 11: this report and the validation records are records required by Part 820; kept and signed electronically, they meet the organisation's Part 11 controls (21 CFR 11.10 controls, 11.50 signature manifestation, 11.70 signature-to-record linking).
 - ISO/IEC 27001: information-security aspects (access, supplier security, logging) are cross-referenced to the ISMS; see section 4 for requirements whose evidence comes from the ISMS.
 - IEC 62304: the tool, its configuration and the model identifiers are supporting items under configuration control and are named in the software development plan where required.
 - ISO/TR 80002-2:2017: risk-based confidence-building activities for software used in device development and the QMS; the validated state is maintained under ACME-VAL-CODEX-08.
@@ -169,7 +169,7 @@ Context-specific conditions:
 - Document drafting: sources are cited for every factual claim and a human approves a full preview before any write to a controlled record.
 - Any further condition set by the approver: PQ-01 and PQ-02 run on the released configuration from 2026-10-26 to 2026-11-20 and are reported in a signed addendum by 2026-11-27.
 
-**Restrictions** (only for "approved with restrictions"): the cloud agent (`cloud_agent`) may be used only on `acme-medsoft/qa-tooling` and `acme-medsoft/val-sandbox` (contexts `code_tooling` and `pr_review`) until the ISO 13485 §4.1.5 terms review of cloud execution (ACME-VEN-2026-015-B) is approved. The local CLI / IDE is not restricted beyond the intended use.
+**Restrictions** (only for "approved with restrictions"): the cloud agent (`cloud_agent`) may be used only on `acme-medsoft/qa-tooling` and `acme-medsoft/val-sandbox` (contexts `code_tooling` and `pr_review`) until the ISO 13485 clause 4.1.5 terms review of cloud execution (ACME-VEN-2026-015-B) is approved. The local CLI / IDE is not restricted beyond the intended use.
 
 ## 10. Approved model envelope at release
 
@@ -190,7 +190,7 @@ Models outside this list may not be used. Adding a model follows ACME-VAL-CODEX-
 | Interim-use justification (ACME-VAL-CODEX-04) and interim controls applied | Section 12 of ACME-VAL-CODEX-04, approved 2026-10-19; interim controls verified and effective from the same day (gate script on all repositories, work instruction briefing, tool discovery) |
 | Historical changes reviewed (RV-01: period, number of PRs, method) | 2026-06-15 to 2026-10-18: 402 PRs merged in lumen-core, lumen-app and qa-tooling checked with the gate script (approval and required checks), 32 of them Codex-assisted; review metrics and a re-review sample for 2026-09-14 to 2026-10-11 (21 Codex-assisted PRs); OQ-11 cross-check |
 | Historical changes merged without qualified human approval | number 0; deviation refs none |
-| Nonconformity / CAPA for use before validation | NC-2026-032 (use since 2026-06-15 without validation, ISO 13485 §4.1.6), open; CAPA-2026-012 (shared with NC-2026-031: validation trigger in software onboarding), in progress, effectiveness check due 2027-01-29 |
+| Nonconformity / CAPA for use before validation | NC-2026-032 (use since 2026-06-15 without validation, ISO 13485 clause 4.1.6), open; CAPA-2026-012 (shared with NC-2026-031: validation trigger in software onboarding), in progress, effectiveness check due 2027-01-29 |
 | Models used during interim use outside the current envelope | none found (telemetry and PR records since 2026-06-15) |
 | Records or product changes needing follow-up | none; check evidence expired for 105 PRs, credited through the ruleset history and re-runs of the 5 safety-relevant ones (RV-01) |
 | End of interim use | on the date of the release decision in section 13 |
@@ -240,7 +240,7 @@ Statement: OpenAI Codex did not execute any test in ACME-VAL-CODEX-05, did not r
 
 ## 15. Signatures
 
-Each signatory signs personally in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU). Signatures are never typed by the AI tool or by another person on someone's behalf. Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (§11.50) and is linked to this report (§11.70).
+Each signatory signs personally in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU). Signatures are never typed by the AI tool or by another person on someone's behalf. Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (21 CFR 11.50) and is linked to this report (21 CFR 11.70).
 
 | Role | Name | Meaning of the signature | Signature (eQMS / e-signature) | Date and time (UTC) |
 |---|---|---|---|---|

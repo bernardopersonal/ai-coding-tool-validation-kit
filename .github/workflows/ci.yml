@@ -20,7 +20,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Unit tests (engine, config, wizard, CLI, all templates x config matrix)
+      - name: Unit tests (engine, config, wizard, CLI, both profiles x config matrix)
         run: python -m unittest discover -s tests -v
-      - name: Smoke render with default answers
-        run: python kit.py init --defaults --config "$RUNNER_TEMP/kit.config.json" --out "$RUNNER_TEMP/kit-out"
+      - name: Smoke render, lite profile (default answers)
+        run: python kit.py init --defaults --profile lite --config "$RUNNER_TEMP/kit.config.json" --out "$RUNNER_TEMP/kit-out-lite"
+      - name: Smoke render, full profile (same answers)
+        run: python kit.py render --config "$RUNNER_TEMP/kit.config.json" --profile full --out "$RUNNER_TEMP/kit-out-full"
+      - name: Smoke render, fictional example (full profile)
+        run: python kit.py render --config examples/acme-medsoft/kit.config.json --out "$RUNNER_TEMP/kit-out-example"
+      - name: Smoke render, fictional example (lite profile)
+        run: python kit.py render --config examples/acme-medsoft-lite/kit.config.json --out "$RUNNER_TEMP/kit-out-example-lite"

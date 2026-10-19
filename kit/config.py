@@ -91,7 +91,7 @@ TOOL_KEYS = list(TOOL_TYPES)
 
 REGULATIONS: List[Tuple[str, str, str]] = [
     # (config key, wizard key, label)
-    ("reg_iso13485", "iso13485", "ISO 13485:2016 (§4.1.6 software validation)"),
+    ("reg_iso13485", "iso13485", "ISO 13485:2016 (clause 4.1.6, software validation)"),
     ("reg_fda_qmsr", "fda_qmsr", "FDA QMSR (21 CFR Part 820, incorporates ISO 13485)"),
     ("reg_gxp", "gxp", "GxP: EU GMP Annex 11 + 21 CFR Part 11"),
     ("reg_iso27001", "iso27001", "ISO/IEC 27001 (cross-references)"),
@@ -112,6 +112,20 @@ MODEL_POLICIES: List[Tuple[str, str]] = [
                "evidence; any change = confirmatory OQ subset + MA-01 before use"),
 ]
 
+# Validation profiles. Both use the same canonical IDs (REQ-xx, IQ-xx, OQ-xx, MA-01,
+# PQ-xx); lite is a strict subset of full, so lite evidence is reused when upgrading.
+PROFILES: List[Tuple[str, str]] = [
+    ("lite", "risk-proportionate minimum: validation plan, test record and report per "
+             "tool, for AI output that is always independently verified downstream "
+             "(human review + CI); needs an approver at two gates and a PQ addendum after "
+             "release; not available with a hard stop (L1, L2, L8, L9)"),
+    ("full", "in-depth package: 8 documents per tool plus the shared code-host gate "
+             "qualification"),
+]
+PROFILE_KEYS = [p[0] for p in PROFILES]
+NEW_CONFIG_PROFILE = "lite"   # default for configs created by the kit (init --defaults)
+LEGACY_PROFILE = "full"       # configs without the key (kit 0.1.0) keep rendering as full
+
 # Per-tool documents (template number -> title) and shared documents.
 TOOL_DOCS: List[Tuple[str, str]] = [
     ("01", "Inventory and intended use"),
@@ -123,11 +137,44 @@ TOOL_DOCS: List[Tuple[str, str]] = [
     ("07", "Validation report"),
     ("08", "Change and revalidation"),
 ]
+LITE_TOOL_DOCS: Dict[str, str] = {
+    "01": "Validation plan",
+    "02": "Test record",
+    "03": "Validation report",
+}
+# Lite documents get their own number token (per tool nn "L01" to "L03", shared
+# GEN-L01 and GEN-L02) so that a document ID always names one document: the lite plan
+# never shares an ID with the full inventory (01), nor the lite work instruction with
+# the full one (GEN-01). On upgrade the full documents supersede the lite records under
+# their own IDs; the evidence IDs (IQ, OQ, MA, PQ) are reused.
+LITE_DOC_NN: Dict[str, str] = {nn: "L" + nn for nn in LITE_TOOL_DOCS}
+
+# Answers that make the lite profile impossible or questionable. Each item:
+# (config key, wizard question, L number). All are optional booleans (absent = false).
+LITE_STOP_KEYS: List[Tuple[str, str, str]] = [
+    ("agent_qms_write",
+     "Can an agent, interactive or autonomous, write to QMS systems outside the code-host "
+     "gate (eQMS, issue tracker or document system, for example through MCP or an API)?",
+     "L2"),
+    ("ai_output_as_evidence",
+     "Are AI-generated tests or other AI output used as verification evidence or as QMS "
+     "records without independent review of their adequacy?",
+     "L8"),
+    ("agent_untrusted_with_secrets",
+     "Does an agent that holds write credentials or secrets beyond the pull-request path read "
+     "untrusted content (issues or comments from outside contributors, web pages, "
+     "third-party MCP results)?",
+     "L9"),
+]
+LITE_STOP_CONFIG_KEYS = [k for k, _, _ in LITE_STOP_KEYS]
 SHARED_DOCS: List[Tuple[str, str, str]] = [
     ("doc_id_wi", "01", "AI-assisted development work instruction"),
     ("doc_id_discovery", "02", "Tool discovery checklist"),
     ("doc_id_gates", "03", "Code-host gate qualification"),
 ]
+# Shared documents of the lite profile (doc_id_gates has no lite counterpart: lite records
+# the code-host steps in the first tool's test record, so it keeps the full ID).
+LITE_SHARED_NN: Dict[str, str] = {"doc_id_wi": "L01", "doc_id_discovery": "L02"}
 SHARED_TOOL_TOKEN = "GEN"
 
 # --------------------------------------------------------------------------
@@ -135,6 +182,7 @@ SHARED_TOOL_TOKEN = "GEN"
 # --------------------------------------------------------------------------
 
 DEFAULT_CONFIG: Dict[str, Any] = {
+    "profile": NEW_CONFIG_PROFILE,
     "org_name": "Acme MedSoft",
     "org_code": "ACME",
     "doc_id_pattern": "{org}-VAL-{tool}-{nn}",
@@ -171,8 +219,10 @@ DEFAULT_CONFIG: Dict[str, Any] = {
             "pinned_model": "",
         },
     ],
-    "contexts": ["code_product", "code_tooling", "pr_review", "test_generation",
-                 "doc_drafting"],
+    "contexts": ["code_product", "code_tooling", "pr_review"],
+    "agent_qms_write": False,
+    "ai_output_as_evidence": False,
+    "agent_untrusted_with_secrets": False,
     "risk_model": "csa",
     "already_in_use": True,
     "periodic_review_months": 12,
@@ -204,6 +254,28 @@ VARIABLES: List[Tuple[str, str, str, str]] = (
         ("global", "doc_id_pattern", "str", "Document ID pattern with tokens `{org}`, "
                                             "`{tool}`, `{nn}`."),
         ("global", "product_context", "str", "Product / regulatory context (free text)."),
+        ("global", "profile", "str", "Validation profile rendered: `lite` or `full` (config key "
+                                     "`profile`, overridden by `--profile`; a config without the "
+                                     "key renders as `full`)."),
+        ("global", "profile_lite", "bool", "`profile` is `lite` (templates/lite/)."),
+        ("global", "profile_full", "bool", "`profile` is `full` (templates/full/)."),
+        ("global", "full_recommended", "bool", "The answers contain a trigger for the full "
+                                               "profile: a hard stop (`lite_blocked`), context "
+                                               "`doc_drafting` (L3) or GxP (L4). Independent of "
+                                               "the profile rendered."),
+        ("global", "full_reasons", "list[str]", "One short sentence per trigger behind "
+                                                "`full_recommended`, starting with its L number; "
+                                                "empty list when none (scalars: use `{{.}}`)."),
+        ("global", "lite_blocked", "bool", "The answers contain a hard stop for the lite "
+                                           "profile: model policy `pinned` (L1), context "
+                                           "`agents_qms` or `agent_qms_write` (L2), "
+                                           "`ai_output_as_evidence` (L8), "
+                                           "`agent_untrusted_with_secrets` (L9). A lite render "
+                                           "then needs `--force` and is not valid for release."),
+        ("global", "lite_blockers", "list[str]", "The reasons of `full_reasons` that are hard "
+                                                 "stops (scalars: use `{{.}}`)."),
+        ("global", "config_file", "str", "Config file as given to `render` / `init` "
+                                         "(`kit.config.json` when rendered without a file)."),
     ]
     + [("global", key, "bool", label) for key, _, label in REGULATIONS]
     + [
@@ -211,6 +283,9 @@ VARIABLES: List[Tuple[str, str, str, str]] = (
         ("global", "role_approver", "str", "Role that approves the validation "
                                            "(always different from the executor)."),
         ("global", "role_tool_owner", "str", "Role that owns the tool and its configuration."),
+        ("global", "owner_is_executor", "bool", "`role_tool_owner` and `role_executor` are the "
+                                                "same role (small team: the approver does the "
+                                                "technical review)."),
         ("global", "role_prrc", "str", "PRRC role/name; empty string if not set (use "
                                        "`{{#role_prrc}}...{{/role_prrc}}`)."),
         ("global", "code_host", "str", "Git hosting: `github`, `gitlab` or `other`."),
@@ -224,6 +299,8 @@ VARIABLES: List[Tuple[str, str, str, str]] = (
     ]
     + [("global", "ctx_" + k, "bool", "Context `%s` selected: %s" % (k, d))
        for k, _, d in CONTEXTS]
+    + [("global", k, "bool", "%s: %s (optional config key, default false)." % (n, q))
+       for k, q, n in LITE_STOP_KEYS]
     + [
         ("global", "risk_model", "str", "`csa` or `three_level`."),
         ("global", "risk_csa", "bool", "`risk_model` is `csa` (high / not high process risk)."),
@@ -232,12 +309,14 @@ VARIABLES: List[Tuple[str, str, str, str]] = (
                                              "validation and interim-use justification."),
         ("global", "periodic_review_months", "int", "Periodic review interval in months."),
         ("global", "doc_id_wi", "str", "Doc ID of the shared work instruction "
-                                       "(tool token `GEN`, nn `01`)."),
+                                       "(tool token `GEN`; full: nn `01`; lite: nn `L01`)."),
         ("global", "doc_id_discovery", "str", "Doc ID of the shared tool-discovery checklist "
-                                              "(tool token `GEN`, nn `02`)."),
+                                              "(tool token `GEN`; full: nn `02`; lite: nn "
+                                              "`L02`)."),
         ("global", "doc_id_gates", "str", "Doc ID of the shared code-host gate qualification "
                                           "(tool token `GEN`, nn `03`): OQ-01 to OQ-07 and OQ-12 "
-                                          "executed once per code host for all tools."),
+                                          "executed once per code host for all tools (full "
+                                          "profile only)."),
         ("global", "tools_list", "list[tool]", "All tools (each item has the tool variables "
                                                "below)."),
         ("global", "tools", "list[tool]", "Alias of `tools_list`."),
@@ -261,8 +340,10 @@ VARIABLES: List[Tuple[str, str, str, str]] = (
         ("tool", "pinned_model", "str", "Exact pinned model id; empty string when envelope."),
     ]
     + _tool_bool_vars()
-    + [("tool", "doc_id_" + nn, "str", "Doc ID of per-tool document %s (%s)." % (nn, title))
-       for nn, title in TOOL_DOCS]
+    + [("tool", "doc_id_" + nn, "str", "Doc ID of per-tool document %s (%s)." % (
+        nn, "full: %s, nn `%s`; lite: %s, nn `%s`" % (title, nn, LITE_TOOL_DOCS[nn],
+                                                     LITE_DOC_NN[nn])
+        if nn in LITE_TOOL_DOCS else "full: %s" % title)) for nn, title in TOOL_DOCS]
     + [
         ("context item", "key", "str", "Context key, e.g. `code_product`."),
         ("context item", "label", "str", "Short human-readable label."),
@@ -318,7 +399,7 @@ REQUIRED_KEYS = [
     "role_executor", "role_approver", "role_tool_owner", "code_host", "tools",
     "contexts", "risk_model", "already_in_use", "periodic_review_months",
 ]
-OPTIONAL_KEYS = ["role_prrc", "today"]
+OPTIONAL_KEYS = ["role_prrc", "today", "profile"] + LITE_STOP_CONFIG_KEYS
 TOOL_REQUIRED_KEYS = ["tool_key", "tool_name", "tool_id", "vendor", "surfaces",
                       "approved_models", "model_policy"]
 TOOL_OPTIONAL_KEYS = ["pinned_model"]
@@ -517,13 +598,15 @@ def validate_config(cfg: Any) -> List[str]:
         add(check_org_code(cfg["org_code"]))
     if "doc_id_pattern" in cfg:
         add(check_doc_id_pattern(cfg["doc_id_pattern"]))
-    for key in REG_KEYS + ["already_in_use"]:
+    for key in REG_KEYS + ["already_in_use"] + LITE_STOP_CONFIG_KEYS:
         if key in cfg and not _is_bool(cfg[key]):
             add("%s must be true or false" % key)
     executor, approver = cfg.get("role_executor"), cfg.get("role_approver")
     if isinstance(executor, str) and isinstance(approver, str) and executor.strip() and \
             executor.strip().casefold() == approver.strip().casefold():
         add("role_executor and role_approver must be different (executor != approver)")
+    if "profile" in cfg and cfg["profile"] not in PROFILE_KEYS:
+        add("profile must be one of: " + ", ".join(PROFILE_KEYS))
     if "code_host" in cfg and cfg["code_host"] not in [h[0] for h in CODE_HOSTS]:
         add("code_host must be one of: " + ", ".join(h[0] for h in CODE_HOSTS))
     if "risk_model" in cfg and cfg["risk_model"] not in [r[0] for r in RISK_MODELS]:
@@ -578,7 +661,9 @@ def load_config(path: Union[str, Path]) -> Dict[str, Any]:
 
 
 def _ordered(obj: Dict[str, Any], order: List[str]) -> Dict[str, Any]:
-    rank = {k: i for i, k in enumerate(order)}
+    rank: Dict[str, int] = {}
+    for i, k in enumerate(order):
+        rank.setdefault(k, i)  # first occurrence wins
     keys = sorted(obj, key=lambda k: (0 if k.startswith("_") else 1, rank.get(k, len(rank))))
     return {k: obj[k] for k in keys}
 
@@ -593,6 +678,75 @@ def config_to_json(cfg: Dict[str, Any]) -> str:
 
 
 # --------------------------------------------------------------------------
+# Profiles
+# --------------------------------------------------------------------------
+
+def config_profile(cfg: Dict[str, Any]) -> str:
+    """Profile stored in a config; a config without the key renders as full (0.1.0)."""
+    return cfg.get("profile") or LEGACY_PROFILE
+
+
+def effective_profile(cfg: Dict[str, Any], override: Optional[str] = None) -> str:
+    """``override`` (e.g. ``--profile``) wins over the config; raises ConfigError if invalid."""
+    if override is not None and override not in PROFILE_KEYS:
+        raise ConfigError(["profile must be one of: " + ", ".join(PROFILE_KEYS)])
+    return override or config_profile(cfg)
+
+
+def _profile_triggers(cfg: Dict[str, Any]) -> List[Tuple[str, bool]]:
+    """[(reason, hard stop)] in L-number order, read from the answers."""
+    out: List[Tuple[str, bool]] = []
+    tools = cfg.get("tools") if isinstance(cfg.get("tools"), list) else []
+    pinned = ["%s (%s)" % (t.get("tool_name", ""), t.get("tool_id", "")) for t in tools
+              if isinstance(t, dict) and t.get("model_policy") == "pinned"]
+    if pinned:
+        out.append(("L1, hard stop: Model policy pinned for %s: the AI output itself counts "
+                    "as a control or as evidence." % ", ".join(pinned), True))
+    contexts = cfg.get("contexts") if isinstance(cfg.get("contexts"), list) else []
+    if "agents_qms" in contexts:
+        out.append(("L2, hard stop: Context agents_qms: autonomous or scheduled agents act on "
+                    "QMS systems (REQ-14, OQ-30).", True))
+    if cfg.get("agent_qms_write") is True:
+        out.append(("L2, hard stop: An agent can write to QMS systems outside the code-host "
+                    "gate (agent_qms_write).", True))
+    if "doc_drafting" in contexts:
+        out.append(("L3: Context doc_drafting: the AI drafts controlled documents or records; "
+                    "full is required unless each draft is independently verified (REQ-13, "
+                    "OQ-20).", False))
+    if cfg.get("reg_gxp") is True:
+        out.append(("L4: GxP in scope (EU GMP Annex 11, 21 CFR Part 11): full is required for "
+                    "high-impact GxP use.", False))
+    if cfg.get("ai_output_as_evidence") is True:
+        out.append(("L8, hard stop: AI output is used as verification evidence or as a QMS "
+                    "record without independent review of its adequacy.", True))
+    if cfg.get("agent_untrusted_with_secrets") is True:
+        out.append(("L9, hard stop: An agent with write credentials or secrets reads untrusted "
+                    "content (full adds OQ-40).", True))
+    return out
+
+
+def full_profile_reasons(cfg: Dict[str, Any]) -> List[str]:
+    """Short reasons why the answers call for the full profile (empty: lite may do).
+
+    Triggers read from the answers, each starting with its L number (lite plan
+    section 2): model policy ``pinned`` (L1), context ``agents_qms`` or
+    ``agent_qms_write`` (L2), context ``doc_drafting`` (L3), GxP (L4),
+    ``ai_output_as_evidence`` (L8) and ``agent_untrusted_with_secrets`` (L9).
+    L1, L2, L8 and L9 are hard stops (:func:`lite_blockers`). ``risk_model``
+    ``three_level`` is not a trigger by itself. Triggers that cannot be read from
+    the answers (L5 to L7: a CSA "high process risk" determination, auditor or
+    customer expectations, previous audit findings on the tool) are decided in
+    the lite plan.
+    """
+    return [reason for reason, _hard in _profile_triggers(cfg)]
+
+
+def lite_blockers(cfg: Dict[str, Any]) -> List[str]:
+    """The hard stops among :func:`full_profile_reasons` (L1, L2, L8, L9)."""
+    return [reason for reason, hard in _profile_triggers(cfg) if hard]
+
+
+# --------------------------------------------------------------------------
 # Derivation
 # --------------------------------------------------------------------------
 
@@ -601,7 +755,8 @@ def format_doc_id(pattern: str, org: str, tool: str, nn: str) -> str:
     return re.sub(r"\{(org|tool|nn)\}", lambda m: values[m.group(1)], pattern)
 
 
-def derive_tool(tool: Dict[str, Any], cfg: Dict[str, Any]) -> Dict[str, Any]:
+def derive_tool(tool: Dict[str, Any], cfg: Dict[str, Any],
+                profile: str = LEGACY_PROFILE) -> Dict[str, Any]:
     surfaces = [k for k in SURFACE_KEYS if k in tool["surfaces"]]
     policy = tool["model_policy"]
     out: Dict[str, Any] = {
@@ -623,20 +778,26 @@ def derive_tool(tool: Dict[str, Any], cfg: Dict[str, Any]) -> Dict[str, Any]:
     for key in TOOL_KEYS:
         out["is_" + key] = tool["tool_key"] == key
     for nn, _title in TOOL_DOCS:
+        token = LITE_DOC_NN.get(nn, nn) if profile == "lite" else nn
         out["doc_id_" + nn] = format_doc_id(cfg["doc_id_pattern"], cfg["org_code"],
-                                            tool["tool_id"], nn)
+                                            tool["tool_id"], token)
     return out
 
 
-def derive(cfg: Dict[str, Any], today: Optional[str] = None) -> Dict[str, Any]:
+def derive(cfg: Dict[str, Any], today: Optional[str] = None,
+           profile: Optional[str] = None,
+           config_file: Optional[str] = None) -> Dict[str, Any]:
     """Validate ``cfg`` and return the global template context.
 
-    Each item of ``tools_list`` is the per-tool context (pushed on top of the
-    global context when per-tool templates are rendered).
+    ``profile`` overrides the config's ``profile`` (``--profile``).
+    ``config_file`` is the config path as given on the command line. Each item
+    of ``tools_list`` is the per-tool context (pushed on top of the global
+    context when per-tool templates are rendered).
     """
     errors = validate_config(cfg)
     if errors:
         raise ConfigError(errors)
+    profile = effective_profile(cfg, profile)
     cfg = copy.deepcopy(cfg)
     ctx: Dict[str, Any] = {
         "kit_version": KIT_VERSION,
@@ -644,10 +805,22 @@ def derive(cfg: Dict[str, Any], today: Optional[str] = None) -> Dict[str, Any]:
     }
     for key in ("org_name", "org_code", "doc_id_pattern", "product_context"):
         ctx[key] = cfg[key]
+    ctx["profile"] = profile
+    for key in PROFILE_KEYS:
+        ctx["profile_" + key] = profile == key
+    reasons = full_profile_reasons(cfg)
+    ctx["full_recommended"] = bool(reasons)
+    ctx["full_reasons"] = reasons
+    blockers = lite_blockers(cfg)
+    ctx["lite_blocked"] = bool(blockers)
+    ctx["lite_blockers"] = blockers
+    ctx["config_file"] = config_file or "kit.config.json"
     for key in REG_KEYS:
         ctx[key] = bool(cfg[key])
     for key in ("role_executor", "role_approver", "role_tool_owner"):
         ctx[key] = cfg[key].strip()
+    ctx["owner_is_executor"] = (ctx["role_tool_owner"].casefold() ==
+                                ctx["role_executor"].casefold())
     ctx["role_prrc"] = cfg.get("role_prrc", "").strip()
     ctx["code_host"] = cfg["code_host"]
     for host, _label in CODE_HOSTS:
@@ -658,15 +831,18 @@ def derive(cfg: Dict[str, Any], today: Optional[str] = None) -> Dict[str, Any]:
                             for k, label, desc in CONTEXTS if k in selected]
     for key in CONTEXT_KEYS:
         ctx["ctx_" + key] = key in selected
+    for key in LITE_STOP_CONFIG_KEYS:
+        ctx[key] = cfg.get(key) is True
     ctx["risk_model"] = cfg["risk_model"]
     ctx["risk_csa"] = cfg["risk_model"] == "csa"
     ctx["risk_three"] = cfg["risk_model"] == "three_level"
     ctx["already_in_use"] = bool(cfg["already_in_use"])
     ctx["periodic_review_months"] = cfg["periodic_review_months"]
     for var, nn, _title in SHARED_DOCS:
+        token = LITE_SHARED_NN.get(var, nn) if profile == "lite" else nn
         ctx[var] = format_doc_id(cfg["doc_id_pattern"], cfg["org_code"],
-                                 SHARED_TOOL_TOKEN, nn)
-    tools = [derive_tool(t, cfg) for t in cfg["tools"]]
+                                 SHARED_TOOL_TOKEN, token)
+    tools = [derive_tool(t, cfg, profile) for t in cfg["tools"]]
     ctx["tools_list"] = tools
     ctx["tools"] = tools
     return ctx

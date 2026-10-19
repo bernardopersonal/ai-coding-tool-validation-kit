@@ -45,13 +45,13 @@ Summary of results (written by the person named in section 14, not by the AI too
 ## 2. Regulatory basis
 
 {{#reg_iso13485}}
-- ISO 13485:2016 §4.1.6: validation of QMS software before initial use and after changes, proportionate to risk, with records (§4.2.5). Supporting clauses: §4.2.4 (controlled configuration), §6.2 (competence), §7.4 (supplier), §4.1.5 (outsourced processes, for vendor-hosted agents).
+- ISO 13485:2016 clause 4.1.6: validation of QMS software before initial use and after changes, proportionate to risk, with records (clause 4.2.5). Supporting clauses: 4.2.4 (controlled configuration), 6.2 (competence), 7.4 (supplier), 4.1.5 (outsourced processes, for vendor-hosted agents).
 {{/reg_iso13485}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 820 (QMSR, in force since 2 February 2026), which incorporates ISO 13485:2016 by reference (§820.10). FDA guidance "Computer Software Assurance for Production and Quality Management System Software": this report records the intended use, the risk determination, the assurance activities, the issues found and their disposition, a conclusion, the date and the name of the people involved, and the approval.
+- 21 CFR Part 820 (QMSR, in force since 2 February 2026): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). FDA guidance "Computer Software Assurance for Production and Quality Management System Software": this report records the intended use, the risk determination, the assurance activities, the issues found and their disposition, a conclusion, the date and the name of the people involved, and the approval.
 {{/reg_fda_qmsr}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 11: this report and the validation records are records required by Part 820; kept and signed electronically, they meet the organisation's Part 11 controls (§11.10 controls, §11.50 signature manifestation, §11.70 signature-to-record linking).
+- 21 CFR Part 11: this report and the validation records are records required by Part 820; kept and signed electronically, they meet the organisation's Part 11 controls (21 CFR 11.10 controls, 11.50 signature manifestation, 11.70 signature-to-record linking).
 {{/reg_fda_qmsr}}
 {{#reg_gxp}}
 - EU GMP Annex 11 (2011 revision in force; draft revisions and a draft Annex 22 on AI were published for consultation and are monitored under {{doc_id_08}}){{^reg_fda_qmsr}}; 21 CFR Part 11 for electronic records and signatures{{/reg_fda_qmsr}}.
@@ -337,7 +337,7 @@ Statement: {{tool_name}} did not execute any test in {{doc_id_05}}, did not reco
 
 ## 15. Signatures
 
-Each signatory signs personally in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU). Signatures are never typed by the AI tool or by another person on someone's behalf.{{#reg_fda_qmsr}} Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (§11.50) and is linked to this report (§11.70).{{/reg_fda_qmsr}}{{^reg_fda_qmsr}}{{#reg_gxp}} Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (§11.50) and is linked to this report (§11.70).{{/reg_gxp}}{{/reg_fda_qmsr}}
+Each signatory signs personally in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU). Signatures are never typed by the AI tool or by another person on someone's behalf.{{#reg_fda_qmsr}} Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (21 CFR 11.50) and is linked to this report (21 CFR 11.70).{{/reg_fda_qmsr}}{{^reg_fda_qmsr}}{{#reg_gxp}} Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (21 CFR 11.50) and is linked to this report (21 CFR 11.70).{{/reg_gxp}}{{/reg_fda_qmsr}}
 
 | Role | Name | Meaning of the signature | Signature (eQMS / e-signature) | Date and time (UTC) |
 |---|---|---|---|---|

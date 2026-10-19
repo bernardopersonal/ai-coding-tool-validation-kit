@@ -1,4 +1,5 @@
-<!-- Pull request template for AI-assisted development (work instruction, section 9).
+<!-- Pull request template for AI-assisted development (work instruction section 9 in the
+     full profile, section 4 in the lite profile).
      Copy to .github/pull_request_template.md in each repository in scope.
      The label check (examples/github-workflow-label-check.yml) reads the two
      "AI assistance" boxes: tick exactly one. -->

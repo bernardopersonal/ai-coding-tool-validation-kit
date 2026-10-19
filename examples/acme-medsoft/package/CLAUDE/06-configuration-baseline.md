@@ -10,7 +10,7 @@
 | Tool / vendor | Claude Code / Anthropic |
 | Configuration owner (role) | Engineering Lead |
 | Approved by (role) | Head of QA |
-| Rendered | 2026-10-18 (kit 0.1.0) |
+| Rendered | 2026-10-18 (kit 0.2.0) |
 
 Related documents: ACME-VAL-CLAUDE-05 Test protocol (IQ-03 verifies this baseline) · ACME-VAL-CLAUDE-08 Change and revalidation (how this baseline changes) · ACME-VAL-GEN-01 Work instruction · ACME-VAL-GEN-03 Code-host gate qualification.
 
@@ -21,9 +21,9 @@ This record is the approved, versioned configuration of Claude Code at Acme MedS
 The binding controls live server-side (code host and CI). The tool's local configuration is defence in depth and is recorded here so that drift can be detected.
 
 Regulatory anchors:
-- ISO 13485:2016 §4.1.6 (validated state maintained after changes), §4.2.4 (agent configuration and instruction files are controlled items), §4.2.5 (records).
-- 21 CFR Part 820 (QMSR), which incorporates ISO 13485:2016 by reference (§820.10). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
-- IEC 62304: tools and settings used to develop the software are supporting items under configuration control (§5.1.10, §8.1).
+- ISO 13485:2016 clause 4.1.6 (validated state maintained after changes), clause 4.2.4 (agent configuration and instruction files are controlled items), clause 4.2.5 (records).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- IEC 62304: tools and settings used to develop the software are supporting items under configuration control (clauses 5.1.10 and 8.1).
 
 ## 2. How to fill in this record
 
@@ -41,7 +41,7 @@ Regulatory anchors:
 | Baseline ID / revision | CLAUDE-BL-01 / rev 1 |
 | Capture date (UTC) | 2026-10-20 |
 | Captured by (name) | Alex Example |
-| Capture method | capture script (version 0.1.0) plus manual fields (admin console, code host) |
+| Capture method | capture script (version 0.2.0) plus manual fields (admin console, code host) |
 | Evidence files and SHA-256 | `evidence/CLAUDE/IQ-03/baseline_claude_code_20261020T101512Z.json`, `evidence/CLAUDE/IQ-03/baseline_claude_code_20261020T110144Z.json`, `evidence/CLAUDE/IQ-03/baseline_claude_code_20261020T113020Z.json` (SHA-256 in ACME-VAL-CLAUDE-05, evidence index) |
 | Machines / runners captured | ACME-MBP-017 (macOS 15), ACME-WS-004 (Ubuntu 24.04), runner image acme-ci-ubuntu-2026.10.2 |
 | Supersedes revision | none (first baseline) |

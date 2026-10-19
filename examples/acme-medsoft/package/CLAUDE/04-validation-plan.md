@@ -13,7 +13,7 @@
 | Organisation | Acme MedSoft |
 | Product context | Class II SaMD (FDA 510(k)); EU MDR Class IIa planned |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` before review. This plan and the test protocol ACME-VAL-CLAUDE-05 are approved **before** any test is executed. Approval is given by the approver personally in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` before review. This plan and the test protocol ACME-VAL-CLAUDE-05 are approved **before** any test is executed. Approval is given by the approver personally in the eQMS.
 
 ## 1. Purpose
 
@@ -21,8 +21,8 @@ This plan defines how Acme MedSoft validates Claude Code (Anthropic) for the int
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6: documented procedure; validation before initial use and, as appropriate, after changes to the software or its application; approach proportionate to risk; records (§4.2.5).
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7).
+- ISO 13485:2016 clause 4.1.6: documented procedure; validation before initial use and, as appropriate, after changes to the software or its application; approach proportionate to risk; records (clause 4.2.5).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7).
 - 21 CFR Part 11: records required by Part 820 that are kept or signed electronically, including the validation records of this package, follow the organisation's Part 11 controls.
 - ISO/IEC 27001 (cross-reference for the exclusions in section 3.3): Statement of Applicability ACME-ISMS-SOA rev 4, controls 5.19 to 5.23 and 8.25 to 8.32.
 - Informative: FDA guidance "Computer Software Assurance for Production and Quality Management System Software" (February 2026): intended use, risk-based approach, assurance activities, record; ISO/TR 80002-2:2017 (develop, maintain, retire); ISPE GAMP 5 Second Edition (2022).
@@ -59,7 +59,7 @@ An exclusion is accepted only with a reference to the record that covers the top
 |---|---|---|
 | Information security of the vendor service | Assessed under the supplier evaluation and the ISMS | ISO/IEC 27001 Statement of Applicability: ACME-ISMS-SOA rev 4, controls 5.19 to 5.23; supplier file ACME-VEN-2026-011 |
 | Personal data protection (DPA, data protection impact assessment) | Assessed by the privacy function | DPA of 2026-01-05; DPIA-2026-03 |
-| Supplier evaluation and monitoring | Purchasing process (ISO 13485 §7.4); this plan only checks the contracted data terms (IQ-05) | ACME-VEN-2026-011 under ACME-QP-09 Supplier control |
+| Supplier evaluation and monitoring | Purchasing process (ISO 13485 clause 7.4); this plan only checks the contracted data terms (IQ-05) | ACME-VEN-2026-011 under ACME-QP-09 Supplier control |
 | AI governance and AI impact | Organisation AI policy | AI use policy ACME-POL-08 |
 | Qualification of the language model itself | Not performed: the validation covers intended use, guardrails and output verification | This plan, section 3.2 |
 | AI functions inside the medical device | Design and development controls of the product, not this plan | Not applicable: the product contains no AI functions (design history file ACME-DHF-LUMEN) |
@@ -101,7 +101,7 @@ This protocol applies under ACME-QP-04 rev 5, clause 6.4 (section 2). Models cha
 - Initial validation fixes the admission suite version and its acceptance criteria (section 5.4).
 - Output: release decision in ACME-VAL-CLAUDE-07, with the approved envelope at release.
 
-### 5.2 Tier 2: model admission (light, per new model or model version)
+### 5.2 Tier 2: model admission (MA-01 only, per new model or model version)
 
 Pre-authorised scope, one row per envelope entry (patterns use the kit's glob semantics, `*` and `?`; the vendor's own allow-list syntax is translated in ACME-VAL-CLAUDE-06 section 12):
 
@@ -145,7 +145,7 @@ Anything not listed above is **not pre-authorised** and goes through normal chan
 
 | Item | Value |
 |---|---|
-| Suite version | kit 0.1.0 with the review changes (task `guardrail-denied-command` version 2, runner with isolation and deny-control); public suite SHA-256 (tasks + fixtures) `8a9da2d013f136c78ebb5562184680193be339dd4bcb287c9af83f7d077de2fc`; runner SHA-256 `de4c73cf42dda1f85307b24c770477b1cdcbf6a857763e6f1b26109c2d54feb9`; private task set SHA-256 `be97125251b30b2d60d4884809dfd46ec57f7cacbd0298d411c262c5e215c13e`; frozen 2026-10-19 |
+| Suite version | kit 0.2.0 (task `guardrail-denied-command` version 2, runner with isolation and deny-control); public suite SHA-256 (tasks + fixtures) `8a9da2d013f136c78ebb5562184680193be339dd4bcb287c9af83f7d077de2fc`; runner SHA-256 `de4c73cf42dda1f85307b24c770477b1cdcbf6a857763e6f1b26109c2d54feb9`; private task set SHA-256 `be97125251b30b2d60d4884809dfd46ec57f7cacbd0298d411c262c5e215c13e`; frozen 2026-10-19 |
 | Tasks | public: `guardrail-protected-paths`, `guardrail-no-ci-edit`, `guardrail-denied-command`, `function-fix-failing-test`, `doc-citation-probe`; organisation-private (repository `acme-medsoft/val-admission-private`, not published): `acme-guardrail-release-manifest` (guardrail), `acme-function-lumen-units` (function), `acme-citation-qms-sources` (citation probe, `doc_drafting`) |
 | Runs per model | 3 for tasks whose guardrail is also enforced by configuration; 10 for `doc-citation-probe` and `acme-citation-qms-sources` (the control depends only on the model) |
 | Rationale | MA-01 screens for gross regression of model behaviour at the guardrails; it does not estimate reliability (zero failures in 3 runs still allows a high per-run failure rate). Guardrail assurance rests on the enforced server-side and configuration controls (OQ-02 to OQ-09). 3 runs suffice where a configured control stands behind the guardrail, because a model failure there is blocked and visible. The citation probes have no configured control behind them: zero failures in 10 runs bounds the per-run failure rate at about 26% (95% one-sided), and every drafted document is reviewed by a qualified person before approval (REQ-13) |
@@ -198,8 +198,8 @@ Detailed steps, expected results and acceptance criteria are in ACME-VAL-CLAUDE-
 - `python3 checks/mirror_protection.py --from OWNER/PROD --to OWNER/SANDBOX --operator "<name>" --out evidence/GEN/OQ-02/` (copies branch protection, rulesets and the Actions approval setting to the sandbox repository; dry run unless `--apply`).
 - `python3 checks/soup_gate.py` (reference dependency / SOUP gate for OQ-07; usage in `checks/README.md`).
 - `python3 checks/capture_baseline.py --tool claude_code --repo PATH --operator "<name>" --out evidence/CLAUDE/IQ-03/` (IQ-01, IQ-03).
-- `python3 checks/client_regression.py --probes <probe file> --operator "<name>" --out evidence/CLAUDE/CS-3a/` (automated client regression on a candidate version, ACME-VAL-CLAUDE-08).
-- `python3 checks/find_ai_footprint.py --path REPO_DIR` (tool discovery, ACME-VAL-GEN-02).
+- `python3 checks/client_regression.py --probes <probe file> --candidate-version <version> --var NAME=VALUE --operator "<name>" --out evidence/CLAUDE/CS-3a/` (automated client regression on a candidate version, ACME-VAL-CLAUDE-08; `--var` as the probe file needs).
+- `python3 checks/find_ai_footprint.py --path REPO_DIR --operator "<name>" --out evidence/GEN/DISCOVERY/` (tool discovery, ACME-VAL-GEN-02).
 
 ## 7. Sample sizes and fixed rules
 
@@ -208,7 +208,7 @@ Detailed steps, expected results and acceptance criteria are in ACME-VAL-CLAUDE-
 | OQ-01 positive gate sample | 3 merged AI-assisted PRs made with Claude Code per repository, in at least 2 repositories when available | at least 3 Claude Code PRs per repository in lumen-core, lumen-app, qa-tooling and qms-docs (4 in lumen-core) |
 | Negative gate tests OQ-02 to OQ-07 | at least 1 negative test per gate, on at least 2 repositories when available (one product repository) | ACME-VAL-GEN-03: val-sandbox and lumen-core for OQ-02, OQ-03 and OQ-07; val-sandbox for OQ-04 to OQ-06 (same organisation ruleset); tool-specific agent attempts in ACME-VAL-CLAUDE-05 |
 | MA-01 | every model in the envelope (concrete model ids for each pattern); runs per task per model as in section 5.4 | `anthropic-model-a`, `anthropic-model-b` (exact ids, no patterns), in both baseline variants (`developer`, `ci-runner`) |
-| OQ-20 citation probes | 4 probes per session (1 not answerable from the sources), in 2 drafting sessions that differ in length and subject | 4 probes in each of 2 sessions |
+| OQ-20 citation probes | 3 probes per session (1 not answerable from the sources), one drafting session per document type: work instruction, design document, test report | 3 probes in each of 3 sessions |
 | OQ-13 monitoring review period | from the start of the monitoring routine, and at least the 4 weeks before release | 2026-10-02 (start of the routine) to 2026-10-23 |
 | IQ-04 surface mapping | every surface in scope | `local_cli_ide` `pr_review_bot` `ci_headless`  |
 | PQ-01 in-use monitoring | at least 4 weeks or 20 AI-assisted PRs, starting on the deployment date of the approved ACME-VAL-CLAUDE-06 revision | 2026-10-26 (deployment of ACME-VAL-CLAUDE-06 rev 1.0) to 2026-11-20, all repositories in scope |
@@ -245,7 +245,7 @@ Samples are selected by a rule written here before execution, not chosen after l
 - Timestamps in UTC. Each record names the executor and the date and time of execution.
 - Evidence about the AI tool is captured by scripts, platforms or people, never only by the AI tool's own account of what it did.
 - GitHub retention: the organisation audit log shows 180 days and Git events only 7 days. The Actions retention setting (default 90 days; private repositories up to 400) applies since 2026-10-01 also to checks, workflow runs and commit statuses, so required-check evidence on PRs is deleted after the retention period. Set to 400 days on every repository in scope on 2026-10-20 (ACME-VAL-CLAUDE-06), and review records and check runs are exported when a PR is merged (`evidence-export` workflow built from `examples/github-workflow-evidence-export.yml`) and archived in the evidence store.
-- Retention: until 10 years after the last device of the product family is placed on the market (technical documentation period); at least the lifetime of the device as defined by Acme MedSoft and not less than two years from release (ISO 13485 §4.2.5), or longer where other regulations require, for example technical documentation periods.
+- Retention: until 10 years after the last device of the product family is placed on the market (technical documentation period); at least the lifetime of the device as defined by Acme MedSoft and not less than two years from release (ISO 13485 clause 4.2.5), or longer where other regulations require, for example technical documentation periods.
 
 ## 10. Roles and responsibilities
 
@@ -276,7 +276,7 @@ Rules:
 
 ## 12. Interim-use justification (tool already in use)
 
-Claude Code is in use at Acme MedSoft before this validation is complete. This is declared openly. ISO 13485 §4.1.6 requires validation before initial use; use before validation is a nonconformity, and this section documents how the gap is handled until the release decision.
+Claude Code is in use at Acme MedSoft before this validation is complete. This is declared openly. ISO 13485 clause 4.1.6 requires validation before initial use; use before validation is a nonconformity, and this section documents how the gap is handled until the release decision.
 
 | Item | Content |
 |---|---|
@@ -290,7 +290,7 @@ Claude Code is in use at Acme MedSoft before this validation is complete. This i
 | Tool discovery | ACME-VAL-GEN-02 executed before this plan is approved, to find other AI tools in use |
 | Deadline for the release decision | 2026-11-02 (at most 2 weeks from approval of this plan) |
 | Approval of interim use | Head of QA, in the eQMS |
-| Nonconformity and CAPA (mandatory) | Use before validation is a nonconformity against ISO 13485 §4.1.6. NC ref: NC-2026-031: Claude Code used since 2026-01-12 without validation (ISO 13485 §4.1.6). CAPA ref: CAPA-2026-012; root cause: the software onboarding steps in ACME-QP-04 and ACME-QP-09 had no validation trigger for subscription-based development tools. Interim controls effective only from 2026-10-19; the period 2026-01-12 to 2026-10-18 is covered by RV-01 |
+| Nonconformity and CAPA (mandatory) | Use before validation is a nonconformity against ISO 13485 clause 4.1.6. NC ref: NC-2026-031: Claude Code used since 2026-01-12 without validation (ISO 13485 clause 4.1.6). CAPA ref: CAPA-2026-012; root cause: the software onboarding steps in ACME-QP-04 and ACME-QP-09 had no validation trigger for subscription-based development tools. Interim controls effective only from 2026-10-19; the period 2026-01-12 to 2026-10-18 is covered by RV-01 |
 
 If the interim controls cannot be shown to be in place, QMS-relevant use stops until they are.
 
@@ -298,13 +298,13 @@ If the interim controls cannot be shown to be in place, QMS-relevant use stops u
 
 | Step | Activities | Output | Target date |
 |---|---|---|---|
-| Day 0 (before the execution week) | Tool discovery; ACME-VAL-CLAUDE-01 to ACME-VAL-CLAUDE-03, this plan, ACME-VAL-CLAUDE-05 and ACME-VAL-GEN-03 drafted and reviewed; sandbox repository protected like production (`checks/mirror_protection.py`) | Drafts ready for approval | 2026-10-12 to 2026-10-14 |
-| Day 1 | This plan, ACME-VAL-CLAUDE-05 and ACME-VAL-GEN-03 approved (criteria fixed) | Approved plan and protocols | 2026-10-19 |
-| Day 2 | IQ-01 to IQ-05; configuration baseline ACME-VAL-CLAUDE-06 | IQ records, baseline with hashes | 2026-10-20 |
-| Day 3 | Code-host gate qualification ACME-VAL-GEN-03 (once per code host; skip if a current record covers the same repositories and protection export); tool-specific parts of OQ-01 to OQ-05 | OQ records | 2026-10-21 |
-| Day 4 | OQ-08 to OQ-13, OQ-40 and context tests; MA-01 on every model in the envelope; RV-01 | OQ and MA-01 records | 2026-10-22 |
-| Day 5 | Results review, deviations, ACME-VAL-CLAUDE-07 and release decision | Approved report | 2026-10-23 |
-| Release + at least 4 weeks | PQ-01, PQ-02 on the released configuration | Signed report addendum | 2026-11-27 (PQ-01 period 2026-10-26 to 2026-11-20) |
+| Preparation (before execution) | Tool discovery; ACME-VAL-CLAUDE-01 to ACME-VAL-CLAUDE-03, this plan, ACME-VAL-CLAUDE-05 and ACME-VAL-GEN-03 drafted and reviewed; sandbox repository protected like production (`checks/mirror_protection.py`) | Drafts ready for approval | 2026-10-12 to 2026-10-14 |
+| Approval | This plan, ACME-VAL-CLAUDE-05 and ACME-VAL-GEN-03 approved (criteria fixed) | Approved plan and protocols | 2026-10-19 |
+| Installation | IQ-01 to IQ-05; configuration baseline ACME-VAL-CLAUDE-06 | IQ records, baseline with hashes | 2026-10-20 |
+| Gates | Code-host gate qualification ACME-VAL-GEN-03 (once per code host; skip if a current record covers the same repositories and protection export); tool-specific parts of OQ-01 to OQ-05 | OQ records | 2026-10-21 |
+| Operation and models | OQ-08 to OQ-13, OQ-40 and context tests; MA-01 on every model in the envelope; RV-01 | OQ and MA-01 records | 2026-10-22 |
+| Report and release | Results review, deviations, ACME-VAL-CLAUDE-07 and release decision | Approved report | 2026-10-23 |
+| After release (PQ period, minimum as in section 7) | PQ-01, PQ-02 on the released configuration | Signed report addendum | 2026-11-27 (PQ-01 period 2026-10-26 to 2026-11-20) |
 
 ## 14. Design rules of this plan
 
@@ -321,5 +321,5 @@ This plan is approved in the eQMS by the Head of QA before any test in ACME-VAL-
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Alex Example | Completed; approved before execution |

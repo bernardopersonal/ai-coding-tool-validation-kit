@@ -22,10 +22,10 @@ Using AI coding tools is encouraged. The rules below exist so that every change 
 ## 2. References
 
 {{#reg_iso13485}}
-- ISO 13485:2016 §4.1.6 (validated software for the intended use), §4.2.4 (controlled documents and configuration), §6.2 (competence, training, awareness).
+- ISO 13485:2016 clause 4.1.6 (validated software for the intended use), clause 4.2.4 (controlled documents and configuration), clause 6.2 (competence, training, awareness).
 {{/reg_iso13485}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 {{/reg_fda_qmsr}}
 {{#reg_gxp}}
 - EU GMP Annex 11 (2011) clause 2 (personnel) and clause 12 (security){{^reg_fda_qmsr}}; 21 CFR Part 11 (electronic records and signatures){{/reg_fda_qmsr}}.
@@ -36,7 +36,7 @@ Using AI coding tools is encouraged. The rules below exist so that every change 
 {{#reg_iso42001}}
 - ISO/IEC 42001 (cross-reference): AI policy and AI awareness: [fill in].
 {{/reg_iso42001}}
-- EU AI Act Art. 4 (AI literacy measures of providers and deployers of AI systems), where applicable.
+- EU AI Act Article 4 (AI literacy measures of providers and deployers of AI systems), where applicable.
 - Internal: {{doc_id_discovery}} Tool discovery checklist; validation packages listed in section 4; [fill in: code review procedure; document control procedure; information security / acceptable use policy; deviation and CAPA procedure].
 
 ## 3. Definitions
@@ -60,7 +60,7 @@ Only the tools below may be used for QMS-relevant work, only through the listed 
 | {{tool_name}} | {{vendor}} | {{#surfaces}}`{{.}}` {{/surfaces}} | {{model_policy}}{{#policy_pinned}}: `{{pinned_model}}` only{{/policy_pinned}} | {{#approved_models}}`{{.}}` {{/approved_models}} | {{doc_id_01}} to {{doc_id_08}} | {{#already_in_use}}Interim use until the release decision in {{doc_id_07}}{{/already_in_use}}{{^already_in_use}}Not to be used before the release decision in {{doc_id_07}}{{/already_in_use}} |
 {{/tools_list}}
 
-Any other AI tool, extension, bot or agent needs to be registered and validated first. If you find one in use, report it (section 14); it will be handled with {{doc_id_discovery}}.
+**No shadow AI.** Use only the declared, organisation-approved tools above, with organisation accounts (section 6); never use an AI tool on a personal account for {{org_name}} development or QMS work. Label every AI-assisted change (section 9). Any other AI tool, extension, bot or agent needs to be registered and validated first. If you find one in use, report it (section 14); it will be handled with {{doc_id_discovery}}. AI use the organisation does not know about cannot be validated, controlled or defended in an audit.
 
 ## 5. Approved contexts of use
 
@@ -72,7 +72,7 @@ Anything else is outside the intended use. Ask the tool owner ({{role_tool_owner
 
 ## 6. Accounts and access
 
-- Use only the organisation account or workspace, signed in through single sign-on. Personal accounts, free tiers, and accounts belonging to other organisations are prohibited for QMS-relevant work.
+- Use only the organisation account or workspace, signed in through single sign-on. Personal accounts, free tiers, and accounts belonging to other organisations are prohibited for {{org_name}} development and QMS work.
 - Do not share accounts or tokens. Tokens for CI or agents are issued by the tool owner, scoped to the minimum needed, and recorded.
 - Agents never run under your personal identity for QMS systems; they use the identity defined in the tool's inventory record.
 
@@ -194,7 +194,7 @@ Pull / merge request template fields (copy of `examples/github/pull_request_temp
 - **Document drafting:** every factual statement in an AI draft cites a source you can check (document ID and section, record ID). Check the sources, not the AI's paraphrase. Preview the exact content before anything is written to a controlled document or record; the write is made under your identity; the document owner approves under the document control procedure. Mark AI-assisted drafts in the document history.
 {{/ctx_doc_drafting}}
 {{#ctx_agents_qms}}
-- **QMS agents:** only the configured agents may act on QMS systems, only on their declared write targets, never under a personal account. Prompts, schedules and permissions change only through change control. Agent outputs take effect only after the responsible role confirms them. Report any write you did not expect.
+- **QMS agents:** only the configured agents may act on QMS systems, only on their declared write targets. Prompts, schedules and permissions change only through change control. Agent outputs that change records require confirmation by the accountable role. Report any write you did not expect.
 {{/ctx_agents_qms}}
 
 ## 12. Models
@@ -265,11 +265,11 @@ Report to [fill in: channel, e.g. the deviation / nonconformity process] without
 
 ## 15. Training and competence
 
-- Users and reviewers complete training on this work instruction before they get access or approve their first AI-assisted change{{#reg_iso13485}} (ISO 13485 §6.2){{/reg_iso13485}}. Training covers: these rules; typical AI failure modes (plausible but wrong code, invented dependencies, missed defects, prompt injection, automation bias); the review checklist; data rules; reporting.
+- Users and reviewers complete training on this work instruction before they get access or approve their first AI-assisted change{{#reg_iso13485}} (ISO 13485 clause 6.2){{/reg_iso13485}}. Training covers: these rules; typical AI failure modes (plausible but wrong code, invented dependencies, missed defects, prompt injection, automation bias); the review checklist; data rules; reporting.
 - Training is repeated when this work instruction changes materially, or when a new tool, surface or context of use is introduced.
 - Training records are kept per [fill in: training procedure].
-- Effectiveness of the training is checked by (required{{#reg_iso13485}}, ISO 13485 §6.2 c){{/reg_iso13485}}): [fill in, e.g. the reviewer-effectiveness sample PQ-02 and periodic review findings]. The method is proportionate to the risk of the work.
-- Where the EU AI Act applies, this training is part of the measures supporting AI literacy (Art. 4).
+- Effectiveness of the training is checked by (required{{#reg_iso13485}}, ISO 13485 clause 6.2 c){{/reg_iso13485}}): [fill in, e.g. the reviewer-effectiveness sample PQ-02 and periodic review findings]. The method is proportionate to the risk of the work.
+- Where the EU AI Act applies, this training is part of the measures supporting AI literacy (AI Act Article 4).
 
 ## 16. Records
 

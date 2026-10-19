@@ -12,11 +12,11 @@
 | Date | 2026-10-18 |
 | Organisation | Acme MedSoft |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. This is a checklist template: copy it for each execution, record who did each check and when, and file the completed copy as a record. Approval of each completed execution is given in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. This is a checklist template: copy it for each execution, record who did each check and when, and file the completed copy as a record. Approval of each completed execution is given in the eQMS.
 
 ## 1. Purpose and scope
 
-AI coding tools spread faster than inventories are updated: IDE extensions, review bots, CI actions, cloud agents and personal accounts appear without a formal request. This checklist finds AI tools that are in use at Acme MedSoft and reconciles them with the software inventory, so that every QMS-relevant tool is registered, validated or stopped.
+AI coding tools spread faster than inventories are updated: IDE extensions, review bots, CI actions, cloud agents and personal accounts appear without a formal request. This checklist finds AI tools that are in use at Acme MedSoft and reconciles them with the software inventory, so that every QMS-relevant tool is registered, validated or stopped. No shadow AI: a tool the organisation does not know about cannot be validated, controlled or defended in an audit.
 
 When to run it:
 
@@ -26,8 +26,8 @@ When to run it:
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6 (software used in the QMS is validated before use), §7.4 (purchased products and suppliers are controlled).
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7).
+- ISO 13485:2016 clause 4.1.6 (software used in the QMS is validated before use), clause 7.4 (purchased products and suppliers are controlled).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7).
 - ISO/IEC 27001 (cross-reference): inventory of information and associated assets, cloud services: ISO/IEC 27001:2022 Annex A 5.9 (inventory of information and other associated assets) and 5.23 (cloud services).
 - Internal: ACME-VAL-GEN-01 AI-assisted development work instruction; ACME-QP-04 Validation of QMS and development software; software inventory ACME-INV-SW.
 
@@ -69,7 +69,7 @@ Mark each check done with date and initials; record every finding in section 6.
 Run for every repository in scope and attach the output:
 
 ```
-python3 checks/find_ai_footprint.py --path REPO_DIR
+python3 checks/find_ai_footprint.py --path REPO_DIR --operator "<name>" --out evidence/GEN/DISCOVERY/
 ```
 
 | # | Check | How | Done | Findings |
@@ -136,5 +136,5 @@ Written by: Alex Example. Reviewed and approved in the eQMS by the Head of QA (S
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Alex Example | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Alex Example | First execution completed (initial validation) |

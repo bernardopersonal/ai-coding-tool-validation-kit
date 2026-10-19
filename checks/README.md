@@ -54,7 +54,17 @@ python3 checks/check_github_gates.py --repo OWNER/REPO --branch main --prs 20 --
 python3 checks/check_github_gates.py --repo OWNER/REPO --pr 123 --pr 124 --operator "<name>" --out ...   # specific PRs
 python3 checks/check_github_gates.py --repo OWNER/REPO --pr 123 --launcher 123=<login> --operator "<name>" --out evidence/GEN/OQ-05/
 python3 checks/check_github_gates.py --repo OWNER/REPO --prs 0 --operator "<name>" --out ...             # configuration only
+python3 checks/check_github_gates.py --repo OWNER/REPO --prs 300 --commits-since 2026-01-12 --operator "<name>" --out evidence/<TOOL>/INTERIM/   # look-back
 ```
+
+`--commits-since YYYY-MM-DD` (interim use, RV-01, lite plan section 9) lists
+every commit on the branch since that date (`GET /repos/{o}/{r}/commits`) and
+matches each to a merged PR into the branch: the checked PRs by merge commit,
+others through `GET /repos/{o}/{r}/commits/{sha}/pulls`. A commit in no merged
+PR (direct push, admin push, push before the protection existed) fails; a commit
+in a merged PR outside the checked sample is a warning (raise `--prs`). Bypass
+insights (`rule-suites`) cover only the last month: export older bypasses from
+the organisation audit log, or record the gap.
 
 Reads, for the branch: classic branch protection
 (`GET /repos/{o}/{r}/branches/{b}/protection`), the effective ruleset rules
@@ -201,8 +211,8 @@ the subset used in configuration files; the parser used is recorded per file.
 ## find_ai_footprint.py
 
 ```
-python3 checks/find_ai_footprint.py --path REPO_DIR --out evidence/discovery/
-python3 checks/find_ai_footprint.py --path REPO_DIR --known-tools claude_code,codex --org ORG --out ...
+python3 checks/find_ai_footprint.py --path REPO_DIR --operator "<name>" --out evidence/GEN/DISCOVERY/
+python3 checks/find_ai_footprint.py --path REPO_DIR --known-tools claude_code,codex --org ORG --operator "<name>" --out ...
 ```
 
 Lists agent configuration and instruction files (`.claude/`, `CLAUDE.md`,

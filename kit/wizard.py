@@ -12,10 +12,11 @@ from __future__ import annotations
 import copy
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from .config import (CODE_HOSTS, CONTEXTS, DEFAULT_CONFIG, MODEL_POLICIES, REGULATIONS,
-                     RISK_MODELS, SURFACES, TOOL_TYPES, check_doc_id_pattern, check_model,
-                     check_org_code, check_pinned_model, check_text, check_tool_id,
-                     is_pattern, validate_config)
+from .config import (CODE_HOSTS, CONTEXTS, DEFAULT_CONFIG, LITE_STOP_KEYS, MODEL_POLICIES,
+                     PROFILE_KEYS, PROFILES, REGULATIONS, RISK_MODELS, SURFACES, TOOL_TYPES,
+                     check_doc_id_pattern, check_model, check_org_code, check_pinned_model,
+                     check_text, check_tool_id, config_profile, full_profile_reasons,
+                     is_pattern, lite_blockers, validate_config)
 
 MAX_ATTEMPTS = 10
 NONE_TOKEN = "-"
@@ -225,10 +226,87 @@ def _ask_tool(io: _IO, index: int, total: int, base: Optional[Dict[str, Any]],
     return tool
 
 
+# Triggers for the full profile that cannot be read from the answers (L5 to L7).
+FULL_TRIGGERS_NOT_IN_ANSWERS = (
+    "a CSA \"high process risk\" determination for any intended use (L5)",
+    "a notified body, the FDA or a customer expects more depth (L6)",
+    "previous audit findings on the tool (L7)",
+)
+
+
+def _ask_lite_stops(io: _IO, cfg: Dict[str, Any], d: Dict[str, Any]) -> None:
+    """The yes/no answers behind the hard stops L2 (write path), L8 and L9."""
+    io.print("")
+    io.print("Hard stops for the lite profile: a 'yes' requires the full profile.")
+    contexts = cfg["contexts"]
+    surfaces = {s for t in cfg["tools"] for s in t["surfaces"]}
+    hints = {
+        "ai_output_as_evidence": "test_generation" in contexts or "code_tooling" in contexts,
+        "agent_untrusted_with_secrets": bool(surfaces & {"cloud_agent", "pr_review_bot",
+                                                         "ci_headless"}),
+    }
+    for key, question, number in LITE_STOP_KEYS:
+        if hints.get(key):
+            io.print("Hint: your contexts or surfaces make %s relevant; answer it carefully."
+                     % number)
+        cfg[key] = ask_bool(io, "%s %s" % (number, question), bool(d.get(key, False)))
+
+
+def _ask_profile(io: _IO, cfg: Dict[str, Any], previous: Optional[str],
+                 override: Optional[str]) -> str:
+    """Show the recommendation and its reasons, then ask (default: the recommendation).
+
+    A ``full`` choice in an existing config stays the default, because the
+    reasons for it may not be visible in the answers. ``override`` (from
+    ``--profile``) is used without asking.
+    """
+    reasons = full_profile_reasons(cfg)
+    blocked = bool(lite_blockers(cfg))
+    recommended = "full" if reasons else "lite"
+    io.print("")
+    io.print("Validation profile. Recommended for these answers: %s." % recommended)
+    if reasons:
+        io.print("The full profile is %s because:" % ("required" if blocked else "recommended"))
+        for reason in reasons:
+            io.print("  - " + reason)
+    else:
+        io.print("No trigger for the full profile in the answers: lite fits teams where the AI "
+                 "output is always independently verified downstream (human review + CI).")
+    io.print("Choose full in any case if: " + "; ".join(FULL_TRIGGERS_NOT_IN_ANSWERS) + ".")
+    if override is not None:
+        io.print("Profile: %s (set with --profile)." % override)
+        if override == "lite" and blocked:
+            io.print("  ! lite is not available with a hard stop: 'render' refuses it unless "
+                     "--force, and then marks it NOT VALID FOR RELEASE.")
+        elif override == "lite" and reasons:
+            io.print("  ! lite was chosen although full is recommended; the lite validation "
+                     "plan shows a warning with the reasons.")
+        return override
+    if blocked:
+        io.print("Profile: full (lite is not available with a hard stop).")
+        return "full"
+    default = recommended
+    if previous == "full" and recommended == "lite":
+        default = "full"
+        io.print("Keeping full from the existing config as the default.")
+    choice = ask_choice(io, "Profile:", PROFILES, default)
+    if choice == "lite" and reasons:
+        io.print("  ! lite chosen although full is recommended; the lite validation plan shows "
+                 "a warning with the reasons.")
+    return choice
+
+
 def run_wizard(defaults: Optional[Dict[str, Any]] = None,
                input_fn: Callable[[str], str] = input,
-               print_fn: Callable[..., None] = print) -> Dict[str, Any]:
-    """Ask every question and return a validated config dict."""
+               print_fn: Callable[..., None] = print,
+               profile: Optional[str] = None) -> Dict[str, Any]:
+    """Ask every question and return a validated config dict.
+
+    The profile is asked last, after the answers that decide whether the full
+    profile is recommended; ``profile`` (``--profile``) skips that question.
+    """
+    if profile is not None and profile not in PROFILE_KEYS:
+        raise WizardAbort("profile must be one of: " + ", ".join(PROFILE_KEYS))
     d = copy.deepcopy(defaults if defaults is not None else DEFAULT_CONFIG)
     io = _IO(input_fn, print_fn)
     io.print("AI Coding Tool Validation Kit - configuration wizard")
@@ -300,6 +378,10 @@ def run_wizard(defaults: Optional[Dict[str, Any]] = None,
         tool = _ask_tool(io, i, count, base, [t["tool_id"] for t in tools])
         tools.append(tool)
     cfg["tools"] = tools
+    _ask_lite_stops(io, cfg, d)
+    # An existing config without the key (kit 0.1.0) rendered as full.
+    previous = config_profile(defaults) if defaults is not None else None
+    cfg["profile"] = _ask_profile(io, cfg, previous, profile)
     if d.get("today"):
         cfg["today"] = d["today"]
 
@@ -308,10 +390,10 @@ def run_wizard(defaults: Optional[Dict[str, Any]] = None,
         raise WizardAbort("the answers do not form a valid config:\n  - " +
                           "\n  - ".join(errors))
     io.print("")
-    io.print("Summary: %s (%s); tools: %s; contexts: %s; risk model: %s." % (
+    io.print("Summary: %s (%s); tools: %s; contexts: %s; risk model: %s; profile: %s." % (
         cfg["org_name"], cfg["org_code"],
         ", ".join("%s [%s]" % (t["tool_name"], t["tool_id"]) for t in tools),
-        ", ".join(cfg["contexts"]), cfg["risk_model"]))
+        ", ".join(cfg["contexts"]), cfg["risk_model"], cfg["profile"]))
     return cfg
 
 

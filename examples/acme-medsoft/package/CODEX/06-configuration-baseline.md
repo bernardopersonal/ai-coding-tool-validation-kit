@@ -10,7 +10,7 @@
 | Tool / vendor | OpenAI Codex / OpenAI |
 | Configuration owner (role) | Engineering Lead |
 | Approved by (role) | Head of QA |
-| Rendered | 2026-10-18 (kit 0.1.0) |
+| Rendered | 2026-10-18 (kit 0.2.0) |
 
 Related documents: ACME-VAL-CODEX-05 Test protocol (IQ-03 verifies this baseline) · ACME-VAL-CODEX-08 Change and revalidation (how this baseline changes) · ACME-VAL-GEN-01 Work instruction · ACME-VAL-GEN-03 Code-host gate qualification.
 
@@ -21,9 +21,9 @@ This record is the approved, versioned configuration of OpenAI Codex at Acme Med
 The binding controls live server-side (code host and CI). The tool's local configuration is defence in depth and is recorded here so that drift can be detected.
 
 Regulatory anchors:
-- ISO 13485:2016 §4.1.6 (validated state maintained after changes), §4.2.4 (agent configuration and instruction files are controlled items), §4.2.5 (records).
-- 21 CFR Part 820 (QMSR), which incorporates ISO 13485:2016 by reference (§820.10). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
-- IEC 62304: tools and settings used to develop the software are supporting items under configuration control (§5.1.10, §8.1).
+- ISO 13485:2016 clause 4.1.6 (validated state maintained after changes), clause 4.2.4 (agent configuration and instruction files are controlled items), clause 4.2.5 (records).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- IEC 62304: tools and settings used to develop the software are supporting items under configuration control (clauses 5.1.10 and 8.1).
 
 ## 2. How to fill in this record
 
@@ -41,7 +41,7 @@ Regulatory anchors:
 | Baseline ID / revision | CODEX-BL-01 / rev 1 |
 | Capture date (UTC) | 2026-10-20 |
 | Captured by (name) | Alex Example |
-| Capture method | capture script (version 0.1.0) plus manual fields (admin console, code host) |
+| Capture method | capture script (version 0.2.0) plus manual fields (admin console, code host) |
 | Evidence files and SHA-256 | `evidence/CODEX/IQ-03/baseline_codex_20261020T102030Z.json`, `evidence/CODEX/IQ-03/baseline_codex_20261020T110910Z.json`, `evidence/CODEX/IQ-03/baseline_codex_20261020T121540Z.json` (SHA-256 in ACME-VAL-CODEX-05, evidence index) |
 | Machines / runners captured | ACME-MBP-017 (macOS 15, MDM payload), ACME-WS-004 (Ubuntu 24.04, `/etc/codex/requirements.toml`), test VM ACME-VM-SBX-01; cloud-managed requirements (export) |
 | Supersedes revision | none (first baseline) |

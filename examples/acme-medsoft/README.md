@@ -15,7 +15,7 @@ This folder shows what a validation package looks like **after** it has been exe
 | Config | [kit.config.json](kit.config.json) (`today` fixed to 2026-10-18 so the render is reproducible) |
 | Package | [package/](package/): `00-shared/` (work instruction, tool discovery, code-host gate qualification), `CLAUDE/`, `CODEX/` |
 
-The answers differ from `python3 kit.py init --defaults` on purpose: placeholder model ids, four contexts of use, a PRRC, ISO/IEC 27001 cross-references and a 6-month periodic review.
+The answers differ from `python3 kit.py init --defaults` on purpose: the full profile (`"profile": "full"`), placeholder model ids, four contexts of use, a PRRC, ISO/IEC 27001 cross-references and a 6-month periodic review. A lite-profile counterpart for a narrower intended use of the same fictional company is in [../acme-medsoft-lite/](../acme-medsoft-lite/README.md).
 
 ## Story in one table
 
@@ -23,14 +23,14 @@ The answers differ from `python3 kit.py init --defaults` on purpose: placeholder
 |---|---|---|
 | 2026-01-12 / 2026-06-15 | First known use of Claude Code / OpenAI Codex, without validation | `*/04-validation-plan.md` section 12 (NC-2026-031, NC-2026-032) |
 | 2026-10-02 | Vendor monitoring routine starts (weekly) | `*/08-change-and-revalidation.md` section 5, OQ-13 |
-| 2026-10-12 to 2026-10-14 | Day 0: tool discovery and survey; drafts of 01 to 05 and of the code-host gate qualification; sandbox protection copied from production with `checks/mirror_protection.py` | `00-shared/tool-discovery-checklist.md`, `00-shared/code-host-gate-qualification.md` |
+| 2026-10-12 to 2026-10-14 | Preparation: tool discovery and survey; drafts of 01 to 05 and of the code-host gate qualification; sandbox protection copied from production with `checks/mirror_protection.py` | `00-shared/tool-discovery-checklist.md`, `00-shared/code-host-gate-qualification.md` |
 | 2026-10-18 | Package rendered with the kit | `kit.config.json` |
 | 2026-10-19 | Plans, protocols and the gate qualification approved **before** execution; OQ-20 probe sheets sealed; work instruction issued and all users briefed; interim controls effective | `*/04-validation-plan.md` sections 12 and 15 |
 | 2026-10-20 | IQ-01 to IQ-05 and the configuration baselines; Actions retention raised to 400 days | `*/05-test-protocol.md` section 6, `*/06-configuration-baseline.md` |
 | 2026-10-21 | Code-host gate qualification once for both tools (server-side merge attempts, also as admin); tool-specific agent attempts | `00-shared/code-host-gate-qualification.md`, `*/05-test-protocol.md` section 7 |
 | 2026-10-22 | Local guardrails, overrides, model envelope, provenance, monitoring routine (OQ-13), citation probes, prompt injection; MA-01 on both models of each tool; RV-01 retrospective review of the in-use period | `*/05-test-protocol.md` sections 7 to 9 |
 | 2026-10-22 | **One major deviation**: the provenance cross-check (OQ-11) finds one undeclared AI-assisted PR. A second sample passes, but the failure mode is unchanged, so the deviation stays open with a compensating control until the CI check CR-2026-047 is deployed | `CLAUDE/05-test-protocol.md` section 11 (DEV-CLAUDE-01), `CLAUDE/07-validation-report.md` sections 7 and 13 |
-| 2026-10-23 | Release decisions: Claude Code **approved for intended use** with conditions (PQ addendum; DEV-CLAUDE-01 accepted open); OpenAI Codex **approved with restrictions** (cloud agent only on non-product repositories until the ISO 13485 §4.1.5 terms review of cloud execution is approved) and the PQ condition | `*/07-validation-report.md` section 13 |
+| 2026-10-23 | Release decisions: Claude Code **approved for intended use** with conditions (PQ addendum; DEV-CLAUDE-01 accepted open); OpenAI Codex **approved with restrictions** (cloud agent only on non-product repositories until the ISO 13485 clause 4.1.5 terms review of cloud execution is approved) and the PQ condition | `*/07-validation-report.md` section 13 |
 | 2026-10-22 / 23 | Admission records for the two models of each tool, executed by the Validation Engineer and approved by the Head of QA | `*/08-change-and-revalidation.md` section 7 |
 | 2026-10-26 to 2026-11-20 | PQ-01 and PQ-02 on the released configuration (pending in this example) | `*/05-test-protocol.md` section 9 |
 | 2026-11-27 | Planned signed PQ addendum to both reports | `*/07-validation-report.md` section 5 |
@@ -50,7 +50,7 @@ The answers differ from `python3 kit.py init --defaults` on purpose: placeholder
 ## What is deliberately shown
 
 - Plan and protocol approved on 2026-10-19, before the first test on 2026-10-20; executor and approver are different people; every signature is "[signed in eQMS]", never a typed name standing in for a signature.
-- Use before validation treated as a nonconformity against ISO 13485 §4.1.6, with a CAPA on the root cause and a retrospective review (RV-01) that lists what can no longer be checked, separate from PQ.
+- Use before validation treated as a nonconformity against ISO 13485 clause 4.1.6, with a CAPA on the root cause and a retrospective review (RV-01) that lists what can no longer be checked, separate from PQ.
 - The code-host gates qualified once for both tools, with server-side negative tests on two repositories, including an admin identity; each tool protocol adds only its agent attempts.
 - A validated version that is exactly the tested version, and a model allow-list of admitted exact ids for the tool that can enforce it.
 - A known guardrail limitation reproduced instead of hidden (`sh -c` passes a Claude Code Bash deny rule; Codex hooks fail open; Codex command rules do not cover commands inside the sandbox, so the MA-01 denied-command check is N/A), each listed before execution with its compensating control.

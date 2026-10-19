@@ -44,7 +44,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 SCRIPT_NAME = "mirror_protection.py"
-SCRIPT_VERSION = "0.1.0"
+SCRIPT_VERSION = "0.2.0"
 EVIDENCE_SCHEMA = "ai-coding-tool-validation-kit/evidence/v1"
 API_VERSION = "2022-11-28"
 DEFAULT_API_URL = "https://api.github.com"

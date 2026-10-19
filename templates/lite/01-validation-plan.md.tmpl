@@ -1,0 +1,270 @@
+# {{doc_id_01}} Validation plan: {{tool_name}}
+
+| Field | Value |
+|---|---|
+| Document ID, version | {{doc_id_01}}, 0.1 (draft), lite profile |
+| Tool / vendor | {{tool_name}} / {{vendor}} |
+| Owner / approver (roles) | {{role_executor}} / {{role_approver}} |
+| Organisation, date | {{org_name}}, {{today}} |
+| Product context | {{product_context}} |
+
+> Generated with the AI Coding Tool Validation Kit {{kit_version}}, lite profile. Complete every `[fill in]`. Approved with {{doc_id_02}} **before** the first test, by the approver personally in the eQMS.
+{{#lite_blocked}}
+
+> **NOT VALID FOR RELEASE: hard stop for the lite profile.** The answers contain:
+>
+{{#full_reasons}}
+> - {{.}}
+{{/full_reasons}}
+>
+> A hard stop (L1, L2, L8, L9) cannot be overridden. Rendered with `--force`: deviation [fill in: ID, reason]. Use the full profile: `python3 kit.py render --config {{config_file}} --profile full --out output-full`.
+{{/lite_blocked}}
+{{^lite_blocked}}
+{{#full_recommended}}
+
+> **WARNING: the full profile is recommended for this configuration.** Triggers in the kit configuration:
+>
+{{#full_reasons}}
+> - {{.}}
+{{/full_reasons}}
+>
+> Render it into its own directory: `python3 kit.py render --config {{config_file}} --profile full --out output-full`. Lite stays only if section 2 answers each "no, because ..." and the {{role_approver}} accepts it.
+{{/full_recommended}}
+{{/lite_blocked}}
+
+## 1. Purpose and profile
+
+The **lite profile** is the risk-proportionate minimum where every AI output is independently verified downstream (qualified human review, required CI) before it takes effect (ISO 13485:2016 clause 4.1.6; FDA CSA; GAMP 5 Second Edition appendix D9). Requirement and test IDs and commands are those of the full profile; under a shared ID lite criteria equal or exceed full, and full adds tests and steps (upgrade: kit `docs/lite-vs-full.md`). Validated: tool, vendor, surface, context of use; models via the approved list and MA-01.
+
+Software validation procedure clause adopting lite, L1 to L9 and section 8: [fill in].
+
+## 2. When lite is not enough
+
+| # | Condition (any "yes": full; hard stops cannot be overridden) | Applies? Why |
+|---|---|---|
+| L1 | Hard stop: pinned model policy (AI output is a control or evidence) | {{#policy_pinned}}**yes**{{/policy_pinned}}{{^policy_pinned}}no (envelope){{/policy_pinned}} |
+| L2 | Hard stop: QMS agents, or any agent writing to QMS systems outside the code-host gate | {{#ctx_agents_qms}}**yes**{{/ctx_agents_qms}}{{^ctx_agents_qms}}{{#agent_qms_write}}**yes**{{/agent_qms_write}}{{^agent_qms_write}}no (none declared){{/agent_qms_write}}{{/ctx_agents_qms}} |
+| L3 | `doc_drafting` without independent source check of each draft | {{#ctx_doc_drafting}}[yes/no; why]{{/ctx_doc_drafting}}{{^ctx_doc_drafting}}no (not selected){{/ctx_doc_drafting}} |
+| L4 | GxP in scope with high-impact use | {{#reg_gxp}}[yes/no; why]{{/reg_gxp}}{{^reg_gxp}}no (not selected){{/reg_gxp}} |
+| L5 | Section 5 determination {{#risk_csa}}"high process risk"{{/risk_csa}}{{#risk_three}}"high"{{/risk_three}} | [yes/no; why] |
+| L6 | Notified body, FDA or customer expects more depth | [yes/no; why] |
+| L7 | Audit findings on this tool or AI tool validation | [yes/no; why] |
+| L8 | Hard stop: AI output (e.g. tests) used as verification evidence or QMS record without review of its adequacy | {{#ai_output_as_evidence}}**yes**{{/ai_output_as_evidence}}{{^ai_output_as_evidence}}[yes/no; why]{{/ai_output_as_evidence}} |
+| L9 | Hard stop: agent with write credentials or secrets beyond the PR path reads untrusted content | {{#agent_untrusted_with_secrets}}**yes**{{/agent_untrusted_with_secrets}}{{^agent_untrusted_with_secrets}}[yes/no; why: tokens, triggers, MCP]{{/agent_untrusted_with_secrets}} |
+
+Decision: [lite / full], by the {{role_approver}}; re-checked on T9, T10, T14 and periodic review.
+
+## 3. Inventory
+
+| Item | Value |
+|---|---|
+| Tool type, ID; surfaces | `{{tool_key}}`, {{tool_id}}; {{#surfaces}}`{{.}}` {{/surfaces}} |
+| Plan, contract / DPA, supplier evaluation | [fill in] |
+| Organisation workspace, SSO, admins (REQ-16) | [fill in] |
+| Seats reconciled with identity provider, training records (REQ-16, REQ-17) | [fill in: date, result] |
+| Validated version, update control | [fill in] |
+| Model policy, approved models | {{model_policy}}: {{#approved_models}}`{{.}}` {{/approved_models}} |
+| Vendor data terms: retention, training, region, source (REQ-09) | [fill in] |
+| GAMP 5 category | 4 (configured product) recommended: [fill in; justify 3] |
+{{#ctx_code_product}}
+| Software development / configuration management plan; IEC 62304 safety class | [fill in] |
+{{/ctx_code_product}}
+| Status | {{#already_in_use}}In use since [fill in] (section 9){{/already_in_use}}{{^already_in_use}}Not yet in use{{/already_in_use}} |
+
+{{#is_claude_code}}
+Version: `claude --version`, `claude doctor`; update control: managed `requiredMinimumVersion` / `requiredMaximumVersion`, `autoUpdatesChannel` or `DISABLE_UPDATES` (invalid values are dropped: confirm the effect).
+{{/is_claude_code}}
+{{#is_codex}}
+Version: `codex --version`, `codex doctor`. In CI pin `openai/codex-action` and set `codex-version` (blank installs the latest CLI).
+{{/is_codex}}
+{{#is_copilot}}
+Version: IDE extension and CLI versions; hosted features are versionless, so record the enterprise and organisation policy states.
+{{/is_copilot}}
+{{#is_cursor}}
+Version: application version per machine and a dated export of the team settings.
+{{/is_cursor}}
+{{#is_other}}
+Version and update control: [fill in; verify against the vendor's current documentation].
+{{/is_other}}
+
+## 4. Intended use
+
+The AI never approves, merges, signs or closes records; the responsible human approves under their own identity.
+
+| Context | Users, repositories or systems; approver |
+|---|---|
+{{#contexts_list}}
+| `{{key}}` | [fill in] |
+{{/contexts_list}}
+
+Not intended: other contexts, surfaces or models; the AI as reviewer of record or validating itself; personal accounts. Rules: {{doc_id_wi}}.
+
+## 5. Risk determination
+
+{{#risk_csa}}
+FDA CSA: **high process risk** when a tool failure may cause a quality problem that foreseeably compromises safety.
+{{/risk_csa}}
+{{#risk_three}}
+Low: failures always caught by a tested independent control; medium: could affect QMS records; high: could affect device safety, AI output is a control, or autonomous QMS action.
+{{/risk_three}}
+Crediting the tested gate and CI as independent verification is an interpretation: quote the CSA risk-determination section. The credit holds while PQ-02 passes.
+
+| Context | Suggested | Determination, rationale |
+|---|---|---|
+{{#ctx_code_product}}
+| `code_product` | {{#risk_csa}}Not high{{/risk_csa}}{{#risk_three}}Medium{{/risk_three}} when the tested gate and CI are the verification of record; otherwise high (L5) | [fill in] |
+{{/ctx_code_product}}
+{{#ctx_code_tooling}}
+| `code_tooling` | {{#risk_csa}}Not high{{/risk_csa}}{{#risk_three}}Low{{/risk_three}}; L8 if it produces QMS records or verification results | [fill in] |
+{{/ctx_code_tooling}}
+{{#ctx_pr_review}}
+| `pr_review` | {{#risk_csa}}Not high{{/risk_csa}}{{#risk_three}}Low{{/risk_three}} if REQ-15 holds | [fill in] |
+{{/ctx_pr_review}}
+{{#ctx_test_generation}}
+| `test_generation` | L8 if the tests are evidence without review of their adequacy | [fill in] |
+{{/ctx_test_generation}}
+{{#ctx_doc_drafting}}
+| `doc_drafting` | {{#risk_csa}}Not high{{/risk_csa}}{{#risk_three}}Medium{{/risk_three}} only if every draft is source-checked and owner-approved (L3) | [fill in] |
+{{/ctx_doc_drafting}}
+{{#ctx_agents_qms}}
+| `agents_qms` | High: hard stop L2 | [fill in] |
+{{/ctx_agents_qms}}
+
+Overall (highest context): [fill in]. Known guardrail limitations (verify against the vendor's current documentation):
+{{#is_claude_code}}
+KL-01 Bash deny rules match text; the OS sandbox enforces, not for file tools, hooks or MCP. KL-02 Without `sandbox.failIfUnavailable` a failed sandbox runs unsandboxed. KL-03 Hooks fail open unless `"onFailure": "block"`. KL-04 Auto mode can be the starting mode. KL-05 Server-managed settings are client-side, not on every surface. KL-06 Headless runs have no workspace-trust prompt. KL-07 Fallbacks can change the model. KL-08 Local transcripts are unencrypted.
+{{/is_claude_code}}
+{{#is_codex}}
+KL-01 In hooks only an explicit deny blocks. KL-02 Variables named like KEY, SECRET or TOKEN reach spawned commands by default. KL-03 Only `requirements.toml` enforces; `managed_config.toml` gives defaults. KL-04 Model defaults are not enforcement. KL-05 The cloud-task identity is undocumented. KL-06 Vendor logs miss local actions. KL-07 Command rules govern only commands run outside the sandbox.
+{{/is_codex}}
+{{#is_copilot}}
+KL-01 Copilot approvals can be set to count toward merge. KL-02 Default policies can enable new features and models. KL-03 Content exclusion does not apply to agent modes. KL-04 Code review reads instructions from the PR head branch.
+{{/is_copilot}}
+{{#is_cursor}}
+KL-01 Terminal and MCP allow-lists are best-effort. KL-02 The Bugbot check concludes neutral and does not block. KL-03 Cloud Agents have internet access and auto-run commands by default.
+{{/is_cursor}}
+{{#is_other}}
+KL-01 [fill in: documented limits of permissions, sandbox, hooks, model controls and logging].
+{{/is_other}}
+Accepted before execution, with compensating controls: [fill in].
+
+## 6. Applicable requirements (lite subset, abridged)
+
+Verified by (after the colon); "lite:" marks verification in place of a full-only test.
+
+- REQ-01 Approval by a qualified human other than author and agent launcher, on the final commit: OQ-01, OQ-02, OQ-05, PQ-01, PQ-02
+- REQ-02 AI, bot, app and CI approvals not counted; AI cannot merge: OQ-04, OQ-05, PQ-01
+- REQ-03 Required checks (tests, SAST, secrets, dependency / SOUP) block violations: OQ-07
+- REQ-04 No direct push; admin bypass prevented, or logged and reviewed: OQ-03, OQ-06, PQ-01
+- REQ-05 Every change traceable to a named human; agent activity distinguishable: OQ-01 (lite: for IQ-02, IQ-04)
+- REQ-06 Configuration baselined; managed settings not overridable: IQ-03, OQ-09
+{{#surf_local_cli_ide}}
+- REQ-07 Local guardrails behave as configured: OQ-08
+{{/surf_local_cli_ide}}
+{{^surf_local_cli_ide}}
+{{#surf_ci_headless}}
+- REQ-07 Local guardrails behave as configured: OQ-08
+{{/surf_ci_headless}}
+{{^surf_ci_headless}}
+- REQ-07 Local guardrails: not applicable, no local or CI surface
+{{/surf_ci_headless}}
+{{/surf_local_cli_ide}}
+- REQ-08 Approved models only (enforced where possible), recorded per PR, new models via MA-01: OQ-10, MA-01, PQ-01
+- REQ-09 No secrets, PHI or personal data beyond contract; vendor terms as contracted: OQ-07 (lite: section 3, for IQ-05)
+- REQ-10 AI-assisted changes declared (trailer, PR template): lite: OQ-01, PQ-01, for OQ-11
+{{#ctx_pr_review}}
+- REQ-15 AI review advisory only: OQ-04
+{{/ctx_pr_review}}
+{{^ctx_pr_review}}
+{{#surf_pr_review_bot}}
+- REQ-15 AI review advisory only: OQ-04
+{{/surf_pr_review_bot}}
+{{/ctx_pr_review}}
+- REQ-16 Organisation accounts with SSO: lite: section 3, for IQ-02
+- REQ-17 Users trained on {{doc_id_wi}} before use: section 3; OQ-01, PQ-01 approvers
+
+Full profile only: REQ-11 to REQ-14; IQ-01, IQ-02, IQ-04, IQ-05, OQ-11 to OQ-13, OQ-20, OQ-30, OQ-40{{#already_in_use}}, RV-01{{/already_in_use}}.
+
+## 7. Approach, samples, roles, acceptance
+
+Negative gate tests, server-side binding controls, limited scripted tests, historical samples, automated MA-01; criteria and minimum samples: {{doc_id_02}}.
+
+Planned: OQ-01, OQ-10 [fill in]; OQ-02 to OQ-07 [fill in: repositories]; MA-01 [fill in: ids]; PQ [fill in: period]. Sample rule (random, seed recorded): [fill in]. PQ-01 outlier: approval within [fill in: x] minutes of ready-for-review, or without comment, on a diff over [fill in: y] lines; reviewed by [fill in: qualified reviewer, not the approver]. PQ-02 missed-defect classes: 1 could affect safety, a risk control or a verification result (limit 0); 2 functional or critical coding-rule defect (limit [fill in]); 3 other.
+
+Roles: the {{role_executor}} executes and drafts {{doc_id_03}}, never approves; the {{role_approver}} approves plan, record, release, admissions and PQ addendum, never executes; the {{role_tool_owner}} owns configuration (frozen during execution), change control and vendor monitoring{{#owner_is_executor}} (also the executor: the {{role_approver}} does the technical review){{/owner_is_executor}}{{#role_prrc}}; the {{role_prrc}} (PRRC) is informed{{/role_prrc}}. Minimum team: one engineer, one approver, sandbox test accounts. {{tool_name}} is only the object under test.
+
+Deviation classes: **critical**, a gate or guardrail does not hold (unapproved merge, push or bypass; an AI approval counts; a denied action runs beyond accepted limitations); **major**, any other failed criterion, including guardrail tests IQ-03, OQ-09, OQ-10, MA-01, or a sampled change without qualified approval; **minor**, a record defect changing no result. Critical and major block release of the affected surface or context until corrected and re-tested.
+
+Acceptance: guardrail criteria hold in 100% of cases and runs. Release rests on IQ-03, OQ and MA-01, "approved with conditions" until the signed PQ addendum to {{doc_id_03}}, due within [fill in] weeks; if PQ fails, suspend use and assess merged changes. Evidence store [fill in], retention [fill in]{{#reg_iso13485}}, at least the device lifetime and two years from release (ISO 13485:2016 clause 4.2.5){{/reg_iso13485}}.
+
+## 8. Model change protocol (three tiers)
+
+If the procedure (section 1) forbids predetermined change protocols, model changes follow normal change control.
+
+1. **Initial validation:** MA-01 on every approved model, fixed here (changes by amendment): tasks [fill in: all of `admission/tasks/`, `doc-citation-probe` dropped only without `doc_drafting`; private tasks]; baseline variants [fill in]; 3 runs per task{{#ctx_doc_drafting}}, citation probe [fill in: 10]{{/ctx_doc_drafting}}; auxiliary models [fill in: none]; suite SHA-256 over the sorted per-file SHA-256 of tasks and fixtures, as `run_admission.py --list` prints it [fill in]. MA-01 screens for gross regression, not reliability.
+2. **Model admission:** a new id matching a pattern below, with tool version and IQ-03 baseline unchanged and no guardrail-relevant item in the screened release notes, needs MA-01 only. Pass: admission record ({{doc_id_03}} section 7) approved by the {{role_approver}}; {{#is_codex}}the exact id joins the monitored list{{/is_codex}}{{#is_other}}the exact id joins [fill in: the enforced or monitored list]{{/is_other}}{{^is_codex}}{{^is_other}}the exact id, never the pattern, joins the enforced allow-list{{/is_other}}{{/is_codex}}. Repointable ids (`*-latest`, unversioned names) are never admitted.
+
+| Approved entry | Pre-authorised pattern | Excluded |
+|---|---|---|
+{{#approved_models}}
+| `{{.}}` | [fill in] | `*-latest`, preview ids, [fill in] |
+{{/approved_models}}
+
+3. **Re-baseline:** on the change triggers in {{doc_id_03}}. New vendor: new initial validation.
+
+{{#is_claude_code}}
+Enforcement: managed `availableModels` with `availableModelsMatch: "exact"`, `enforceAvailableModels: true` and `deniedModels`.
+{{/is_claude_code}}
+{{#is_codex}}
+Enforcement: none verified (check the vendor's current documentation): "monitored, not enforced".
+{{/is_codex}}
+{{#is_copilot}}
+Enforcement: model availability policies; set "Default availability for released models" explicitly.
+{{/is_copilot}}
+{{#is_cursor}}
+Enforcement: the admin model allow / block list.
+{{/is_cursor}}
+{{#is_other}}
+Enforcement: [fill in, or "monitored, not enforced"].
+{{/is_other}}
+Weekly detection ([fill in: check]): model ids from telemetry, session logs or vendor exports, then trailers, PR template. Use before admission is a deviation (T4): changes made with the model are reviewed and its use stops{{#is_codex}}, unless a grace period for MA-01 is accepted here: [fill in: none, or N working days]{{/is_codex}}.
+
+{{#already_in_use}}
+## 9. Interim use
+
+Use before validation is a nonconformity{{#reg_iso13485}} (ISO 13485:2016 clause 4.1.6){{/reg_iso13485}}, declared openly.
+
+| Item | Content |
+|---|---|
+| First known use; contexts, surfaces; why use continues | [fill in] |
+| Interim controls verified before approval: REQ-01 to REQ-04 on every repository, REQ-09, REQ-16, REQ-17 | Evidence `evidence/{{tool_id}}/INTERIM/`: [fill in]; effective from [fill in] |
+| Restrictions until release | [fill in] |
+| Look-back since first use (gaps go to the nonconformity) | 1. Every protected-branch commit matched to an approved merged PR{{#code_github}} (`check_github_gates.py --commits-since <date>`){{/code_github}}. 2. Bypass history: audit-log or ruleset-history export, or the gap recorded{{#code_github}} (rule-suite insights cover one month){{/code_github}}. 3. Models used: inside, outside, unknown. 4. Product impact per released device version. 5. OQ-01 sample over the period; training that counts before {{doc_id_wi}}: [fill in] |
+| {{doc_id_discovery}} executed; release decision deadline | [fill in] |
+| Approval of interim use | {{role_approver}}, [fill in: date] |
+| Nonconformity and CAPA (mandatory) | [fill in: refs, root cause] |
+
+If the interim controls cannot be shown, QMS-relevant use stops until they are.
+{{/already_in_use}}
+{{^already_in_use}}
+## 9. Use before release
+
+No QMS-relevant use before the release decision in {{doc_id_03}}; sandbox use for this validation only.
+{{/already_in_use}}
+
+## 10. Readiness (go / no-go before approval)
+
+- [ ] Managed configuration deployed, owned by root / Administrators{{#is_claude_code}} (`tools/claude-code/managed-settings.example.json`){{/is_claude_code}}{{#is_codex}} (`tools/codex/requirements.example.toml`){{/is_codex}}; reference machine per OS{{#surf_ci_headless}} and CI runner{{/surf_ci_headless}}
+- [ ] Sandbox protected like production{{#code_github}} (`checks/mirror_protection.py`){{/code_github}}; code-owner review of agent and CI files{{#code_github}} (`examples/github/CODEOWNERS.example`){{/code_github}}
+- [ ] Required SOUP check{{#code_github}} (`examples/github-workflow-soup-gate.yml`){{/code_github}}; secret push protection{{#code_github}}; Actions approval setting off{{/code_github}}
+- [ ] MA-01 credentials; test accounts with SSO seats; reviewer list, training records; eQMS e-signatures
+
+## 11. Schedule and approval
+
+Sequence and dates: readiness, approval of plan and record, IQ-03 / OQ / MA-01, release decision, PQ window, signed addendum: [fill in].
+
+Approved in the eQMS by the {{role_approver}} before any test. Author: [fill in]. AI assistance: [yes/no; which sections].
+
+| Version | Date | Author | Change |
+|---|---|---|---|
+| 0.1 | {{today}} | [fill in] | Initial draft (kit {{kit_version}}, lite) |

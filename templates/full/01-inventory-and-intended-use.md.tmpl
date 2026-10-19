@@ -22,14 +22,14 @@ The validation unit is **tool + vendor + surface + context of use**. The languag
 ## 2. References
 
 {{#reg_iso13485}}
-- ISO 13485:2016 §4.1.6 (validation of computer software used in the QMS), §4.2.4 (control of documents: instruction and settings files are controlled configuration items), §6.2 (competence), §7.4 (purchasing: evaluation of the AI vendor).
-- ISO 13485:2016 §4.1.5 (outsourced processes): interpretation, relevant when agents run on vendor infrastructure (cloud agents). Document either the quality agreement / terms review or why the clause does not apply.
+- ISO 13485:2016 clause 4.1.6 (validation of computer software used in the QMS), clause 4.2.4 (control of documents: instruction and settings files are controlled configuration items), clause 6.2 (competence), clause 7.4 (purchasing: evaluation of the AI vendor).
+- ISO 13485:2016 clause 4.1.5 (outsourced processes): interpretation, relevant when agents run on vendor infrastructure (cloud agents). Document either the quality agreement / terms review or why the clause does not apply.
 {{/reg_iso13485}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 820 (QMSR), §820.10, which incorporates ISO 13485:2016 by reference (§820.7). Software validation duties come from ISO 13485 §4.1.6, §7.5.6 and §7.6 as incorporated; the former §820.70(i) no longer exists and is not cited. 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, which incorporates ISO 13485:2016 by reference (21 CFR 820.7). Software validation duties come from ISO 13485 clauses 4.1.6, 7.5.6 and 7.6 as incorporated; the former 21 CFR 820.70(i) no longer exists and is not cited. 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 {{/reg_fda_qmsr}}
 {{#reg_gxp}}
-- EU GMP Annex 11 (2011): clause 1 (risk management), 3 (suppliers and service providers), 4 (validation), 10 (change and configuration management), 11 (periodic evaluation).{{^reg_fda_qmsr}} 21 CFR Part 11 for electronic records and signatures.{{/reg_fda_qmsr}}
+- EU GMP Annex 11 (2011): clauses 1 (risk management), 3 (suppliers and service providers), 4 (validation), 10 (change and configuration management), 11 (periodic evaluation).{{^reg_fda_qmsr}} 21 CFR Part 11 for electronic records and signatures.{{/reg_fda_qmsr}}
 {{/reg_gxp}}
 {{#reg_iso27001}}
 - ISO/IEC 27001 (cross-reference): supplier relationships, secure development, configuration and change management controls. [fill in: control IDs from the Statement of Applicability]
@@ -147,7 +147,7 @@ Answer each question for the contexts in section 8. One "yes" makes the use QMS-
 | Q5 | Could a failure affect product conformity or QMS compliance without another control detecting it? | [yes/no] | [fill in] |
 | Q6 | Does it process confidential design data, personal data or health data? | [yes/no] | [fill in] |
 
-Decision: [QMS-relevant / not QMS-relevant].{{#reg_iso13485}} If QMS-relevant, it is validated under ISO 13485:2016 §4.1.6 before (further) use.{{/reg_iso13485}}{{^reg_iso13485}} If QMS-relevant, it is validated before (further) use.{{/reg_iso13485}} If not QMS-relevant, record why and keep the tool on the inventory for periodic re-check.
+Decision: [QMS-relevant / not QMS-relevant].{{#reg_iso13485}} If QMS-relevant, it is validated under ISO 13485:2016 clause 4.1.6 before (further) use.{{/reg_iso13485}}{{^reg_iso13485}} If QMS-relevant, it is validated before (further) use.{{/reg_iso13485}} If not QMS-relevant, record why and keep the tool on the inventory for periodic re-check.
 
 ## 7. GAMP 5 category
 
@@ -276,7 +276,7 @@ The following are not part of the intended use and are prohibited unless this do
 | Processing region / residency | [fill in] |
 | Certifications (scope and expiry as stated on the certificate) | [fill in] |
 | Change and deprecation notification commitments | [fill in] |
-| Supplier evaluation record | [fill in]{{#reg_iso13485}} (ISO 13485 §7.4){{/reg_iso13485}} |
+| Supplier evaluation record | [fill in]{{#reg_iso13485}} (ISO 13485 clause 7.4){{/reg_iso13485}} |
 
 {{#is_claude_code}}
 Anthropic points to its Trust Center (trust.anthropic.com) for the SOC 2 Type 2 report and ISO/IEC 27001 certificate, and holds an ISO/IEC 42001 certificate. Record the certificate scope text; public statements do not explicitly name Claude Code within those scopes.

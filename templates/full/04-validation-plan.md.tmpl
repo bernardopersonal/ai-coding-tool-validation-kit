@@ -20,10 +20,10 @@ This plan defines how {{org_name}} validates {{tool_name}} ({{vendor}}) for the 
 ## 2. References
 
 {{#reg_iso13485}}
-- ISO 13485:2016 §4.1.6: documented procedure; validation before initial use and, as appropriate, after changes to the software or its application; approach proportionate to risk; records (§4.2.5).
+- ISO 13485:2016 clause 4.1.6: documented procedure; validation before initial use and, as appropriate, after changes to the software or its application; approach proportionate to risk; records (clause 4.2.5).
 {{/reg_iso13485}}
 {{#reg_fda_qmsr}}
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7).
 - 21 CFR Part 11: records required by Part 820 that are kept or signed electronically, including the validation records of this package, follow the organisation's Part 11 controls.
 {{/reg_fda_qmsr}}
 {{#reg_gxp}}
@@ -74,7 +74,7 @@ An exclusion is accepted only with a reference to the record that covers the top
 |---|---|---|
 | Information security of the vendor service | Assessed under the supplier evaluation and the ISMS | {{#reg_iso27001}}ISO/IEC 27001 Statement of Applicability: {{/reg_iso27001}}[fill in] |
 | Personal data protection (DPA, data protection impact assessment) | Assessed by the privacy function | [fill in] |
-| Supplier evaluation and monitoring | Purchasing process{{#reg_iso13485}} (ISO 13485 §7.4){{/reg_iso13485}}; this plan only checks the contracted data terms (IQ-05) | [fill in] |
+| Supplier evaluation and monitoring | Purchasing process{{#reg_iso13485}} (ISO 13485 clause 7.4){{/reg_iso13485}}; this plan only checks the contracted data terms (IQ-05) | [fill in] |
 | AI governance and AI impact | {{#reg_iso42001}}AI management system{{/reg_iso42001}}{{^reg_iso42001}}Organisation AI policy{{/reg_iso42001}} | [fill in] |
 | Qualification of the language model itself | Not performed: the validation covers intended use, guardrails and output verification | This plan, section 3.2 |
 | AI functions inside the medical device | Design and development controls of the product, not this plan | [fill in] |
@@ -121,7 +121,7 @@ This protocol applies under [fill in: software validation procedure ID and claus
 - Initial validation fixes the admission suite version and its acceptance criteria (section 5.4).
 - Output: release decision in {{doc_id_07}}, with the approved envelope at release.
 
-### 5.2 Tier 2: model admission (light, per new model or model version)
+### 5.2 Tier 2: model admission (MA-01 only, per new model or model version)
 
 {{#policy_envelope}}
 Pre-authorised scope, one row per envelope entry (patterns use the kit's glob semantics, `*` and `?`; the vendor's own allow-list syntax is translated in {{doc_id_06}} section 12):
@@ -301,8 +301,8 @@ Detailed steps, expected results and acceptance criteria are in {{doc_id_05}} an
 {{#is_other}}
 - `python3 checks/capture_baseline.py --tool other --repo PATH --operator "<name>" --out evidence/{{tool_id}}/IQ-03/` plus manual capture of the vendor console settings (IQ-03).
 {{/is_other}}
-- `python3 checks/client_regression.py --probes <probe file> --operator "<name>" --out evidence/{{tool_id}}/CS-3a/` (automated client regression on a candidate version, {{doc_id_08}}).
-- `python3 checks/find_ai_footprint.py --path REPO_DIR` (tool discovery, {{doc_id_discovery}}).
+- `python3 checks/client_regression.py --probes <probe file> --candidate-version <version> --var NAME=VALUE --operator "<name>" --out evidence/{{tool_id}}/CS-3a/` (automated client regression on a candidate version, {{doc_id_08}}; `--var` as the probe file needs).
+- `python3 checks/find_ai_footprint.py --path REPO_DIR --operator "<name>" --out evidence/GEN/DISCOVERY/` (tool discovery, {{doc_id_discovery}}).
 
 ## 7. Sample sizes and fixed rules
 
@@ -358,7 +358,7 @@ Samples are selected by a rule written here before execution, not chosen after l
 {{#code_gitlab}}
 - GitLab: export `/projects/:id/merge_requests/:iid/approval_state` and the project approval settings for each sampled merge request, and archive the JSON.
 {{/code_gitlab}}
-- Retention: [fill in: retention period]{{#reg_iso13485}}; at least the lifetime of the device as defined by {{org_name}} and not less than two years from release (ISO 13485 §4.2.5), or longer where other regulations require, for example technical documentation periods{{/reg_iso13485}}.
+- Retention: [fill in: retention period]{{#reg_iso13485}}; at least the lifetime of the device as defined by {{org_name}} and not less than two years from release (ISO 13485 clause 4.2.5), or longer where other regulations require, for example technical documentation periods{{/reg_iso13485}}.
 
 ## 10. Roles and responsibilities
 
@@ -394,7 +394,7 @@ Rules:
 {{#already_in_use}}
 ## 12. Interim-use justification (tool already in use)
 
-{{tool_name}} is in use at {{org_name}} before this validation is complete. This is declared openly. {{#reg_iso13485}}ISO 13485 §4.1.6 requires validation before initial use; use before validation is a nonconformity, and this section documents how the gap is handled until the release decision.{{/reg_iso13485}}{{^reg_iso13485}}Use before validation is a nonconformity against the QMS requirement for validation before use; this section documents how the gap is handled until the release decision.{{/reg_iso13485}}
+{{tool_name}} is in use at {{org_name}} before this validation is complete. This is declared openly. {{#reg_iso13485}}ISO 13485 clause 4.1.6 requires validation before initial use; use before validation is a nonconformity, and this section documents how the gap is handled until the release decision.{{/reg_iso13485}}{{^reg_iso13485}}Use before validation is a nonconformity against the QMS requirement for validation before use; this section documents how the gap is handled until the release decision.{{/reg_iso13485}}
 
 | Item | Content |
 |---|---|
@@ -410,7 +410,7 @@ Rules:
 | Tool discovery | {{doc_id_discovery}} executed before this plan is approved, to find other AI tools in use |
 | Deadline for the release decision | [fill in: date, at most N weeks from approval of this plan] |
 | Approval of interim use | {{role_approver}}, in the eQMS |
-| Nonconformity and CAPA (mandatory) | Use before validation is a nonconformity{{#reg_iso13485}} against ISO 13485 §4.1.6{{/reg_iso13485}}. NC ref: [fill in]; CAPA ref, root cause of why the tool entered use without validation: [fill in] |
+| Nonconformity and CAPA (mandatory) | Use before validation is a nonconformity{{#reg_iso13485}} against ISO 13485 clause 4.1.6{{/reg_iso13485}}. NC ref: [fill in]; CAPA ref, root cause of why the tool entered use without validation: [fill in] |
 
 If the interim controls cannot be shown to be in place, QMS-relevant use stops until they are.
 {{/already_in_use}}
@@ -424,13 +424,13 @@ If the interim controls cannot be shown to be in place, QMS-relevant use stops u
 
 | Step | Activities | Output | Target date |
 |---|---|---|---|
-| Day 0 (before the execution week) | Tool discovery; {{doc_id_01}} to {{doc_id_03}}, this plan, {{doc_id_05}} and {{doc_id_gates}} drafted and reviewed; sandbox repository protected like production (`checks/mirror_protection.py`) | Drafts ready for approval | [fill in] |
-| Day 1 | This plan, {{doc_id_05}} and {{doc_id_gates}} approved (criteria fixed) | Approved plan and protocols | [fill in] |
-| Day 2 | IQ-01 to IQ-05; configuration baseline {{doc_id_06}} | IQ records, baseline with hashes | [fill in] |
-| Day 3 | Code-host gate qualification {{doc_id_gates}} (once per code host; skip if a current record covers the same repositories and protection export); tool-specific parts of OQ-01 to OQ-05 | OQ records | [fill in] |
-| Day 4 | OQ-08 to OQ-13, OQ-40 and context tests; MA-01 on every model in the envelope{{#already_in_use}}; RV-01{{/already_in_use}} | OQ and MA-01 records | [fill in] |
-| Day 5 | Results review, deviations, {{doc_id_07}} and release decision | Approved report | [fill in] |
-| Release + at least 4 weeks | PQ-01, PQ-02 on the released configuration | Signed report addendum | [fill in] |
+| Preparation (before execution) | Tool discovery; {{doc_id_01}} to {{doc_id_03}}, this plan, {{doc_id_05}} and {{doc_id_gates}} drafted and reviewed; sandbox repository protected like production (`checks/mirror_protection.py`) | Drafts ready for approval | [fill in] |
+| Approval | This plan, {{doc_id_05}} and {{doc_id_gates}} approved (criteria fixed) | Approved plan and protocols | [fill in] |
+| Installation | IQ-01 to IQ-05; configuration baseline {{doc_id_06}} | IQ records, baseline with hashes | [fill in] |
+| Gates | Code-host gate qualification {{doc_id_gates}} (once per code host; skip if a current record covers the same repositories and protection export); tool-specific parts of OQ-01 to OQ-05 | OQ records | [fill in] |
+| Operation and models | OQ-08 to OQ-13, OQ-40 and context tests; MA-01 on every model in the envelope{{#already_in_use}}; RV-01{{/already_in_use}} | OQ and MA-01 records | [fill in] |
+| Report and release | Results review, deviations, {{doc_id_07}} and release decision | Approved report | [fill in] |
+| After release (PQ period, minimum as in section 7) | PQ-01, PQ-02 on the released configuration | Signed report addendum | [fill in] |
 
 ## 14. Design rules of this plan
 

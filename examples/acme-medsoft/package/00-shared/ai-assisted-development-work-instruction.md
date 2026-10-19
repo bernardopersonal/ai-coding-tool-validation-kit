@@ -13,7 +13,7 @@
 | Organisation | Acme MedSoft |
 | Product context | Class II SaMD (FDA 510(k)); EU MDR Class IIa planned |
 
-> Generated with the AI Coding Tool Validation Kit 0.1.0. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS.
+> Generated with the AI Coding Tool Validation Kit 0.2.0. Complete every `[fill in]` before review. Approval is given by the approver personally in the eQMS.
 
 ## 1. Purpose and scope
 
@@ -23,10 +23,10 @@ Using AI coding tools is encouraged. The rules below exist so that every change 
 
 ## 2. References
 
-- ISO 13485:2016 §4.1.6 (validated software for the intended use), §4.2.4 (controlled documents and configuration), §6.2 (competence, training, awareness).
-- 21 CFR Part 820 (QMSR), §820.10, incorporating ISO 13485:2016 by reference (§820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
+- ISO 13485:2016 clause 4.1.6 (validated software for the intended use), clause 4.2.4 (controlled documents and configuration), clause 6.2 (competence, training, awareness).
+- 21 CFR Part 820 (QMSR): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 - ISO/IEC 27001 (cross-reference): acceptable use and secure development policies: ISO/IEC 27001:2022 Annex A 5.10 and 8.25 to 8.28; ACME-POL-02 Acceptable use, ACME-POL-05 Secure development.
-- EU AI Act Art. 4 (AI literacy measures of providers and deployers of AI systems), where applicable.
+- EU AI Act Article 4 (AI literacy measures of providers and deployers of AI systems), where applicable.
 - Internal: ACME-VAL-GEN-02 Tool discovery checklist; validation packages listed in section 4; ACME-QP-12 Code review and merge; ACME-QP-02 Document control; ACME-POL-02 Acceptable use; ACME-QP-16 Deviations, nonconformities and CAPA.
 
 ## 3. Definitions
@@ -49,7 +49,7 @@ Only the tools below may be used for QMS-relevant work, only through the listed 
 | Claude Code | Anthropic | `local_cli_ide` `pr_review_bot` `ci_headless`  | envelope | `anthropic-model-a` `anthropic-model-b`  | ACME-VAL-CLAUDE-01 to ACME-VAL-CLAUDE-08 | Validated: approved for intended use (ACME-VAL-CLAUDE-07, 2026-10-23) |
 | OpenAI Codex | OpenAI | `local_cli_ide` `cloud_agent`  | envelope | `openai-model-a` `openai-model-b`  | ACME-VAL-CODEX-01 to ACME-VAL-CODEX-08 | Validated: approved with restrictions, cloud agent only on qa-tooling and val-sandbox (ACME-VAL-CODEX-07, 2026-10-23) |
 
-Any other AI tool, extension, bot or agent needs to be registered and validated first. If you find one in use, report it (section 14); it will be handled with ACME-VAL-GEN-02.
+**No shadow AI.** Use only the declared, organisation-approved tools above, with organisation accounts (section 6); never use an AI tool on a personal account for Acme MedSoft development or QMS work. Label every AI-assisted change (section 9). Any other AI tool, extension, bot or agent needs to be registered and validated first. If you find one in use, report it (section 14); it will be handled with ACME-VAL-GEN-02. AI use the organisation does not know about cannot be validated, controlled or defended in an audit.
 
 ## 5. Approved contexts of use
 
@@ -62,7 +62,7 @@ Anything else is outside the intended use. Ask the tool owner (Engineering Lead)
 
 ## 6. Accounts and access
 
-- Use only the organisation account or workspace, signed in through single sign-on. Personal accounts, free tiers, and accounts belonging to other organisations are prohibited for QMS-relevant work.
+- Use only the organisation account or workspace, signed in through single sign-on. Personal accounts, free tiers, and accounts belonging to other organisations are prohibited for Acme MedSoft development and QMS work.
 - Do not share accounts or tokens. Tokens for CI or agents are issued by the tool owner, scoped to the minimum needed, and recorded.
 - Agents never run under your personal identity for QMS systems; they use the identity defined in the tool's inventory record.
 
@@ -187,11 +187,11 @@ Report to the QA mailbox and through the deviation process of ACME-QP-16 without
 
 ## 15. Training and competence
 
-- Users and reviewers complete training on this work instruction before they get access or approve their first AI-assisted change (ISO 13485 §6.2). Training covers: these rules; typical AI failure modes (plausible but wrong code, invented dependencies, missed defects, prompt injection, automation bias); the review checklist; data rules; reporting.
+- Users and reviewers complete training on this work instruction before they get access or approve their first AI-assisted change (ISO 13485 clause 6.2). Training covers: these rules; typical AI failure modes (plausible but wrong code, invented dependencies, missed defects, prompt injection, automation bias); the review checklist; data rules; reporting.
 - Training is repeated when this work instruction changes materially, or when a new tool, surface or context of use is introduced.
 - Training records are kept per ACME-QP-03 Training and competence.
-- Effectiveness of the training is checked by (required, ISO 13485 §6.2 c)): the reviewer-effectiveness sample PQ-02 and the periodic review findings. The method is proportionate to the risk of the work.
-- Where the EU AI Act applies, this training is part of the measures supporting AI literacy (Art. 4).
+- Effectiveness of the training is checked by (required, ISO 13485 clause 6.2 c)): the reviewer-effectiveness sample PQ-02 and the periodic review findings. The method is proportionate to the risk of the work.
+- Where the EU AI Act applies, this training is part of the measures supporting AI literacy (AI Act Article 4).
 
 ## 16. Records
 
@@ -210,6 +210,6 @@ Reviewed and approved in the eQMS by the Head of QA (Sam Sample, 2026-10-23, [si
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 0.1 | 2026-10-18 | Jordan Demo | Initial draft generated with the kit (0.1.0) |
+| 0.1 | 2026-10-18 | Jordan Demo | Initial draft generated with the kit (0.2.0) |
 | 1.0 | 2026-10-19 | Jordan Demo | Approved; all users briefed on 2026-10-19 (interim control) |
 | 1.1 | 2026-10-23 | Jordan Demo | Section 4 status updated after the release decisions |

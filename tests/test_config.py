@@ -32,6 +32,10 @@ class DefaultConfigTests(unittest.TestCase):
         cfg = default_config()
         self.assertEqual(cfg["org_name"], "Acme MedSoft")
         self.assertEqual([t["tool_key"] for t in cfg["tools"]], ["claude_code", "codex"])
+        self.assertEqual(cfg["profile"], "lite")
+
+    def test_json_puts_profile_first(self):
+        self.assertEqual(next(iter(json.loads(config_to_json(default_config())))), "profile")
 
     def test_json_round_trip(self):
         cfg = default_config()
@@ -53,17 +57,27 @@ class DeriveTests(unittest.TestCase):
         self.ctx = derive(default_config(), today="2026-01-31")
 
     def test_doc_ids(self):
-        claude = self.ctx["tools_list"][0]
+        full = derive(default_config(), today="2026-01-31", profile="full")
+        claude = full["tools_list"][0]
         self.assertEqual(claude["doc_id_01"], "ACME-VAL-CLAUDE-01")
         self.assertEqual(claude["doc_id_08"], "ACME-VAL-CLAUDE-08")
-        self.assertEqual(self.ctx["tools_list"][1]["doc_id_05"], "ACME-VAL-CODEX-05")
-        self.assertEqual(self.ctx["doc_id_wi"], "ACME-VAL-GEN-01")
-        self.assertEqual(self.ctx["doc_id_discovery"], "ACME-VAL-GEN-02")
+        self.assertEqual(full["tools_list"][1]["doc_id_05"], "ACME-VAL-CODEX-05")
+        self.assertEqual(full["doc_id_wi"], "ACME-VAL-GEN-01")
+        self.assertEqual(full["doc_id_discovery"], "ACME-VAL-GEN-02")
+
+    def test_lite_doc_ids_do_not_collide_with_full(self):
+        lite = self.ctx["tools_list"][0]   # the default config renders lite
+        self.assertEqual([lite["doc_id_%02d" % n] for n in (1, 2, 3)],
+                         ["ACME-VAL-CLAUDE-L01", "ACME-VAL-CLAUDE-L02", "ACME-VAL-CLAUDE-L03"])
+        self.assertEqual(lite["doc_id_05"], "ACME-VAL-CLAUDE-05")
+        self.assertEqual(self.ctx["doc_id_wi"], "ACME-VAL-GEN-L01")
+        self.assertEqual(self.ctx["doc_id_discovery"], "ACME-VAL-GEN-L02")
+        self.assertEqual(self.ctx["doc_id_gates"], "ACME-VAL-GEN-03")   # full-only document
 
     def test_custom_pattern(self):
         cfg = default_config()
         cfg["doc_id_pattern"] = "VAL-{nn}-{tool}"
-        ctx = derive(cfg)
+        ctx = derive(cfg, profile="full")
         self.assertEqual(ctx["tools_list"][0]["doc_id_03"], "VAL-03-CLAUDE")
         self.assertEqual(ctx["doc_id_wi"], "VAL-01-GEN")
 
@@ -81,9 +95,21 @@ class DeriveTests(unittest.TestCase):
         self.assertFalse(ctx["code_gitlab"])
         self.assertTrue(ctx["risk_csa"])
         self.assertFalse(ctx["risk_three"])
-        self.assertTrue(ctx["ctx_doc_drafting"])
+        self.assertFalse(ctx["ctx_doc_drafting"])
+        self.assertTrue(ctx["ctx_code_product"])
         self.assertFalse(ctx["ctx_agents_qms"])
         self.assertEqual(ctx["today"], "2026-01-31")
+        self.assertFalse(ctx["owner_is_executor"])
+        self.assertFalse(ctx["agent_qms_write"] or ctx["ai_output_as_evidence"] or
+                         ctx["agent_untrusted_with_secrets"])
+        self.assertEqual(ctx["config_file"], "kit.config.json")
+        self.assertEqual(derive(default_config(), config_file="x/my.json")["config_file"],
+                         "x/my.json")
+
+    def test_owner_is_executor(self):
+        cfg = default_config()
+        cfg["role_tool_owner"] = " validation engineer "
+        self.assertTrue(derive(cfg)["owner_is_executor"])
 
     def test_lists(self):
         self.assertEqual(self.ctx["contexts_list"][0],
@@ -197,6 +223,18 @@ class ValidationTests(unittest.TestCase):
     def test_role_prrc_optional(self):
         self.assertEqual(self.errors(lambda c: c.pop("role_prrc")), "")
 
+    def test_lite_stop_keys_optional_booleans(self):
+        for key in ("agent_qms_write", "ai_output_as_evidence", "agent_untrusted_with_secrets"):
+            with self.subTest(key=key):
+                self.assertEqual(self.errors(lambda c: c.pop(key)), "")
+                self.assertEqual(self.errors(lambda c: c.update({key: True})), "")
+                self.assertInvalid(lambda c: c.update({key: "yes"}), "%s must be true or false"
+                                   % key)
+
+    def test_profile_optional(self):
+        self.assertEqual(self.errors(lambda c: c.pop("profile")), "")
+        self.assertEqual(self.errors(lambda c: c.update(profile="full")), "")
+
     def test_executor_differs_from_approver(self):
         self.assertInvalid(lambda c: c.update(role_approver="validation engineer"),
                            "executor != approver")
@@ -209,6 +247,8 @@ class ValidationTests(unittest.TestCase):
         self.assertInvalid(lambda c: c["tools"][0].update(tool_key="vim"), "tool_key")
         self.assertInvalid(lambda c: c["tools"][0].update(surfaces=["moon"]), "surfaces")
         self.assertInvalid(lambda c: c["tools"][0].update(model_policy="any"), "model_policy")
+        self.assertInvalid(lambda c: c.update(profile="medium"), "profile must be one of")
+        self.assertInvalid(lambda c: c.update(profile=None), "profile must be one of")
 
     def test_types(self):
         self.assertInvalid(lambda c: c.update(reg_gxp="yes"), "reg_gxp must be true or false")

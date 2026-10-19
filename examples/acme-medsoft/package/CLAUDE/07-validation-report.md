@@ -12,7 +12,7 @@
 | Report drafted by (role) | Validation Engineer |
 | Technical review (role) | Engineering Lead |
 | Release decision (role) | Head of QA |
-| Rendered | 2026-10-18 (kit 0.1.0) |
+| Rendered | 2026-10-18 (kit 0.2.0) |
 
 Related documents: ACME-VAL-CLAUDE-01 Inventory and intended use · ACME-VAL-CLAUDE-02 Requirements · ACME-VAL-CLAUDE-03 Risk assessment · ACME-VAL-CLAUDE-04 Validation plan · ACME-VAL-CLAUDE-05 Test protocol · ACME-VAL-CLAUDE-06 Configuration baseline · ACME-VAL-CLAUDE-08 Change and revalidation · ACME-VAL-GEN-01 Work instruction · ACME-VAL-GEN-02 Tool discovery checklist · ACME-VAL-GEN-03 Code-host gate qualification.
 
@@ -47,9 +47,9 @@ Summary of results (written by the person named in section 14, not by the AI too
 
 ## 2. Regulatory basis
 
-- ISO 13485:2016 §4.1.6: validation of QMS software before initial use and after changes, proportionate to risk, with records (§4.2.5). Supporting clauses: §4.2.4 (controlled configuration), §6.2 (competence), §7.4 (supplier), §4.1.5 (outsourced processes, for vendor-hosted agents).
-- 21 CFR Part 820 (QMSR, in force since 2 February 2026), which incorporates ISO 13485:2016 by reference (§820.10). FDA guidance "Computer Software Assurance for Production and Quality Management System Software": this report records the intended use, the risk determination, the assurance activities, the issues found and their disposition, a conclusion, the date and the name of the people involved, and the approval.
-- 21 CFR Part 11: this report and the validation records are records required by Part 820; kept and signed electronically, they meet the organisation's Part 11 controls (§11.10 controls, §11.50 signature manifestation, §11.70 signature-to-record linking).
+- ISO 13485:2016 clause 4.1.6: validation of QMS software before initial use and after changes, proportionate to risk, with records (clause 4.2.5). Supporting clauses: 4.2.4 (controlled configuration), 6.2 (competence), 7.4 (supplier), 4.1.5 (outsourced processes, for vendor-hosted agents).
+- 21 CFR Part 820 (QMSR, in force since 2 February 2026): 21 CFR 820.10, incorporating ISO 13485:2016 by reference (21 CFR 820.7). FDA guidance "Computer Software Assurance for Production and Quality Management System Software": this report records the intended use, the risk determination, the assurance activities, the issues found and their disposition, a conclusion, the date and the name of the people involved, and the approval.
+- 21 CFR Part 11: this report and the validation records are records required by Part 820; kept and signed electronically, they meet the organisation's Part 11 controls (21 CFR 11.10 controls, 11.50 signature manifestation, 11.70 signature-to-record linking).
 - ISO/IEC 27001: information-security aspects (access, supplier security, logging) are cross-referenced to the ISMS; see section 4 for requirements whose evidence comes from the ISMS.
 - IEC 62304: the tool, its configuration and the model identifiers are supporting items under configuration control and are named in the software development plan where required.
 - ISO/TR 80002-2:2017: risk-based confidence-building activities for software used in device development and the QMS; the validated state is maintained under ACME-VAL-CLAUDE-08.
@@ -191,7 +191,7 @@ Models outside this list may not be used. Adding a model follows ACME-VAL-CLAUDE
 | Interim-use justification (ACME-VAL-CLAUDE-04) and interim controls applied | Section 12 of ACME-VAL-CLAUDE-04, approved 2026-10-19; interim controls verified and effective from the same day (gate script on all repositories, work instruction briefing, tool discovery) |
 | Historical changes reviewed (RV-01: period, number of PRs, method) | 2026-01-12 to 2026-10-18: 31 AI-assisted PRs before the label rule (2026-01-12 to 2026-05-03, listed from billing, session records and interviews); 555 PRs merged from 2026-05-04 to 2026-10-18 checked with the gate script (approval and required checks); review metrics and a re-review sample for 2026-09-14 to 2026-10-11 (36 AI-assisted PRs); OQ-11 cross-check |
 | Historical changes merged without qualified human approval | number 0; deviation refs none |
-| Nonconformity / CAPA for use before validation | NC-2026-031 (use since 2026-01-12 without validation, ISO 13485 §4.1.6), open; CAPA-2026-012 (validation trigger in software onboarding, ACME-QP-04 and ACME-QP-09), in progress, effectiveness check due 2027-01-29 |
+| Nonconformity / CAPA for use before validation | NC-2026-031 (use since 2026-01-12 without validation, ISO 13485 clause 4.1.6), open; CAPA-2026-012 (validation trigger in software onboarding, ACME-QP-04 and ACME-QP-09), in progress, effectiveness check due 2027-01-29 |
 | Models used during interim use outside the current envelope | none found in telemetry or PR records since telemetry was enabled (2026-05-04); earlier use could not be determined and is covered by the human review of every PR (listed in NC-2026-031) |
 | Records or product changes needing follow-up | none; check evidence expired for 215 PRs, credited through the ruleset history and re-runs of the 16 safety-relevant ones (RV-01) |
 | End of interim use | on the date of the release decision in section 13 |
@@ -241,7 +241,7 @@ Statement: Claude Code did not execute any test in ACME-VAL-CLAUDE-05, did not r
 
 ## 15. Signatures
 
-Each signatory signs personally in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU). Signatures are never typed by the AI tool or by another person on someone's behalf. Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (§11.50) and is linked to this report (§11.70).
+Each signatory signs personally in the eQMS (in an e-signature system validated for 21 CFR Part 11 where FDA requirements apply, and meeting the organisation's eIDAS requirements in the EU). Signatures are never typed by the AI tool or by another person on someone's behalf. Electronic signatures meet 21 CFR Part 11: the signature shows the signer's printed name, the date and time, and the meaning of the signature (21 CFR 11.50) and is linked to this report (21 CFR 11.70).
 
 | Role | Name | Meaning of the signature | Signature (eQMS / e-signature) | Date and time (UTC) |
 |---|---|---|---|---|

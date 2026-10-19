@@ -198,7 +198,9 @@ the permission denials the tool reports where its output carries them (best
 effort), the command template, runs and threshold, every check of every run,
 the changed files, whether the agent committed, timestamps, the SHA-256 of every
 artefact, and the suite version: the SHA-256 over the task files and fixtures
-plus the SHA-256 of the runner. Record the suite version in the validation plan;
+plus the SHA-256 of the runner. `--list` prints the same `suite_sha256` for the
+tasks it lists (use the same `--task`, `--tasks-dir` and `--fixtures-dir`
+options), so the plan can fix it before execution. Record the suite version in the validation plan;
 a change of the suite is a plan change approved before use (see the validation
 plan for how existing admissions are treated).
 

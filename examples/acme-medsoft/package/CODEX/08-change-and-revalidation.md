@@ -11,24 +11,24 @@
 | Owner (role) | Engineering Lead |
 | Approved by (role) | Head of QA |
 | Periodic review interval | 6 months |
-| Rendered | 2026-10-18 (kit 0.1.0) |
+| Rendered | 2026-10-18 (kit 0.2.0) |
 
 Related documents: ACME-VAL-CODEX-03 Risk assessment · ACME-VAL-CODEX-04 Validation plan · ACME-VAL-CODEX-05 Test protocol · ACME-VAL-CODEX-06 Configuration baseline · ACME-VAL-CODEX-07 Validation report · ACME-VAL-GEN-02 Tool discovery checklist · ACME-VAL-GEN-03 Code-host gate qualification.
 
 ## 1. Purpose and principles
 
-This document keeps OpenAI Codex in a validated state after release. It works as a predetermined change protocol for the tool: it states in advance which future changes are pre-authorised and the exact tests that authorise them, so that routine changes (above all new models) need hours of testing, not a new validation.
+This document keeps OpenAI Codex in a validated state after release. It works as a predetermined change protocol for the tool: it states in advance which future changes are pre-authorised and the exact tests that authorise them, so that routine changes (above all new models) need a defined test subset, not a new validation.
 
 - **Configuration** (settings, rules, hooks, MCP servers, instruction files, code-host gates, model envelope) is baselined in ACME-VAL-CODEX-06 and changes only through a change record.
 - **Behaviour** varies: models change, sometimes without a version change. It is covered by the vendor monitoring routine (section 5), the model admission check MA-01 and the periodic review (section 6).
 - Three tiers:
   1. **Initial validation** (once per tool and vendor): full IQ / OQ / PQ of the guardrails plus MA-01 on every model in the initial envelope (ACME-VAL-CODEX-05, ACME-VAL-CODEX-07).
-  2. **Model admission** (light, per new model or model version that matches a pre-authorised pattern of ACME-VAL-CODEX-04 section 5.2): MA-01 only; pass, and the model joins the envelope with an admission record (section 7), which is the revalidation record permitted by the software validation procedure cited in ACME-VAL-CODEX-04 section 2.
-  3. **Re-baseline** (medium, on the triggers in section 4): a defined confirmatory subset of tests.
+  2. **Model admission** (MA-01 only, per new model or model version that matches a pre-authorised pattern of ACME-VAL-CODEX-04 section 5.2): pass, and the model joins the envelope with an admission record (section 7), which is the revalidation record permitted by the software validation procedure cited in ACME-VAL-CODEX-04 section 2.
+  3. **Re-baseline** (on the triggers in section 4): a defined confirmatory subset of tests.
 - Tests that change for a trigger are chosen from ACME-VAL-CODEX-05; their acceptance criteria do not change. A criterion may change only through a revision of ACME-VAL-CODEX-05 approved before the re-test.
 
 Regulatory anchors:
-- ISO 13485:2016 §4.1.6: validation after changes to the software or its application, proportionate to risk; §7.4: supplier monitoring and re-evaluation.
+- ISO 13485:2016 clause 4.1.6: validation after changes to the software or its application, proportionate to risk; clause 7.4: supplier monitoring and re-evaluation.
 - 21 CFR Part 820 (QMSR), incorporating ISO 13485:2016 by reference; FDA CSA guidance (risk-based assurance, including for software changes). 21 CFR Part 11 applies to the records of this package that are kept or signed electronically.
 - ISO/TR 80002-2:2017, Maintain phase: keep the validated state while managing changes; monitoring of use or configuration can be appropriate because both can drift, and a change of intended use can require more validation even without a software change.
 
@@ -145,7 +145,7 @@ Next periodic review due: 2027-04-23. The checklist above is completed at that r
 
 ## 7. Admission record template (new model or model version)
 
-For each later model, copy the template of this section from the kit (`templates/08-change-and-revalidation.md.tmpl`) into a new admission record. The record is complete only when signed; the AI tool does not fill in the decision or the signatures.
+For each later model, copy the template of this section from the kit (`templates/full/08-change-and-revalidation.md.tmpl`) into a new admission record. The record is complete only when signed; the AI tool does not fill in the decision or the signatures.
 
 Admission records issued at initial validation (one per model in the initial envelope):
 

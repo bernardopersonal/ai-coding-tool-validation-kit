@@ -6,6 +6,8 @@ The kit solves this with a **predetermined change protocol for the tool**. The v
 
 Tier 2 is an exception to ordinary change control, so it is valid only where your software validation procedure permits it. `04` section 2 records the procedure clause; a clause you can adapt is at the end of this page. If the procedure does not permit it, every model change follows normal change control.
 
+Document numbers on this page are those of the full profile. In the lite profile the same protocol is in the validation plan (`01`, section 8: tiers, pre-authorised patterns, fixed suite, detection; section 1: the procedure clause), the triggers are in the validation report (`03`, section 6, a subset of T1 to T19 with the same numbers) and the admission record is report section 7. Lite has no pinned path: a pinned model policy is a hard stop (L1) that requires the full profile.
+
 ## Terms
 
 | Term | Meaning |
@@ -21,7 +23,7 @@ Tier 2 is an exception to ordinary change control, so it is valid only where you
 
 ## The three tiers
 
-### Tier 1: initial validation (heavy, once per tool and vendor)
+### Tier 1: initial validation (full IQ, OQ and PQ, once per tool and vendor)
 
 - Full IQ, OQ and PQ of the guardrails (gates, permissions, sandbox, CI, attribution). These do not depend on the model and form the core of the validation.
 - MA-01 run on **every** model in the initial envelope. This is the "big first test".
@@ -32,7 +34,7 @@ Tier 2 is an exception to ordinary change control, so it is valid only where you
 - MA-01 screens for gross regression at the guardrails; it does not estimate reliability. Guardrail assurance rests on the enforced server-side and configuration controls. Include at least one organisation-private task per criterion class, kept outside the public repository, because the shipped fixtures and their answers are public.
 - Evaluation is behavioural and objective (repository state, command results). It never compares output similarity.
 
-### Tier 2: model admission (light, hours, per new model or model version in a validated family)
+### Tier 2: model admission (MA-01 only, per new model or model version in a validated family)
 
 - Trigger: a new model id that matches a pre-authorised pattern and passes the eligibility checks of the admission record (`08` section 7): tool version within the validated versions, IQ-03 re-capture equal to the approved baseline, release notes screened with no guardrail-relevant item. It can arrive through a vendor release, a model id seen in telemetry or in the runner's `models_reported`, or an automatic fallback.
 - Action: rerun the same suite headlessly with the organisation's own credentials. Where the tool cannot run headlessly, execute the same tasks manually with the same criteria.
@@ -40,7 +42,7 @@ Tier 2 is an exception to ordinary change control, so it is valid only where you
 - Fail: the model is not admitted. If it was already in use, raise a deviation.
 - No other revalidation.
 
-### Tier 3: re-baseline (medium)
+### Tier 3: re-baseline (the confirmatory test subset each trigger names)
 
 | Trigger | Action |
 |---|---|
@@ -78,14 +80,14 @@ The envelope is enforced where the tool allows it, and recorded and monitored ot
 
 **Setting (fictional).** Acme MedSoft validated a CLI coding agent from "Vendor X" in March 2026 for the contexts `code_product`, `code_tooling` and `doc_drafting`, under the envelope policy. Envelope: `vx-coder-5` with the pre-authorised pattern `vx-coder-5.*` (excluded: `vx-coder-latest`, preview ids), and `vx-coder-mini-5` with no pattern (exact id only). At initial validation MA-01 passed on both models: suite version kit 0.1.0 plus the hash of `admission/tasks/`, N = 3, guardrails 3 of 3, function at least 2 of 3. The tool's managed model allowlist lists the two admitted exact ids with exact matching.
 
-**Day 0, 09:00: release.** Vendor X announces `vx-coder-5.1` and makes it the tool's default. The weekly release check in `08` ("Vendor release monitoring routine") picks it up. Telemetry would have caught it too: a model id with no admission record.
+**Step 1: vendor release.** Vendor X announces `vx-coder-5.1` and makes it the tool's default. The weekly release check in `08` ("Vendor release monitoring routine") picks it up. Telemetry would have caught it too: a model id with no admission record.
 
-**09:15: triage by the Engineering Lead (tool owner).**
+**Step 2: triage by the Engineering Lead (tool owner).**
 
 - The id matches the pre-authorised pattern `vx-coder-5.*` and is not excluded, so this is Tier 2 under the envelope policy. Eligibility: the tool version is inside the validated versions, the IQ-03 re-capture equals the approved baseline, and the release notes show no guardrail-relevant item. All yes.
 - The managed allow-list holds admitted exact ids with exact matching, so `vx-coder-5.1` is not selectable yet and the Default option stays on an admitted model. Nothing else has to be blocked.
 
-**10:00: execution by the Validation Engineer**, in the sandbox environment with the organisation's credentials:
+**Step 3: execution by the Validation Engineer**, in the sandbox environment with the organisation's credentials:
 
 ```bash
 python3 admission/run_admission.py --tool <tool> --model vx-coder-5.1 --runs 3 --dry-run
@@ -102,11 +104,11 @@ python3 admission/run_admission.py --tool <tool> --model vx-coder-5.1 --runs 3 -
 
 The runner writes JSON and Markdown evidence with the tool version, the model id as reported, the run count, per-criterion results, a UTC timestamp and the SHA-256 of the JSON.
 
-**11:30: decision by the Head of QA (approver).** The admission record in `08` is completed with: model id as reported, tool version, suite version, results, evidence hash and decision "Admitted". The executor and the approver sign it themselves in the eQMS. The AI tool did not run the decision or write it.
+**Step 4: decision by the Head of QA (approver).** The admission record in `08` is completed with: model id as reported, tool version, suite version, results, evidence hash and decision "Admitted". The executor and the approver sign it themselves in the eQMS. The AI tool did not run the decision or write it.
 
-**11:45: release.** The tool owner adds `vx-coder-5.1` to the managed allow-list (a configuration change recorded with the admission record) and may make it the default. The pre-authorised pattern already covers it, so no envelope document changes. The admission record is added to the list of admitted models. PQ-01 continues to check that every model observed in use was inside the envelope and admitted.
+**Step 5: release.** The tool owner adds `vx-coder-5.1` to the managed allow-list (a configuration change recorded with the admission record) and may make it the default. The pre-authorised pattern already covers it, so no envelope document changes. The admission record is added to the list of admitted models. PQ-01 continues to check that every model observed in use was inside the envelope and admitted.
 
-Total effort: about two and a half hours of people's time, with no full revalidation.
+Result: one MA-01 execution (3 runs), one admission decision and one recorded configuration change, with no full revalidation.
 
 ### Variations
 

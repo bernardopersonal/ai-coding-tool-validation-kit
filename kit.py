@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """AI Coding Tool Validation Kit - command line interface.
 
-  python3 kit.py init [--defaults] [--config PATH] [--out DIR] [--docx] [--force]
-  python3 kit.py render --config PATH [--out DIR] [--docx]
+  python3 kit.py init [--defaults] [--profile lite|full] [--config PATH] [--out DIR]
+                      [--docx] [--force]
+  python3 kit.py render --config PATH [--profile lite|full] [--out DIR] [--docx] [--force]
   python3 kit.py example-config
   python3 kit.py vars [--update README_DEV.md]
 
@@ -14,16 +15,18 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from kit import __version__  # noqa: E402
-from kit.config import (ConfigError, config_to_json, default_config, load_config,  # noqa: E402
-                        variables_markdown)
-from kit.package import (DEFAULT_TEMPLATES_DIR, convert_to_docx, render_package,  # noqa: E402
-                         write_text_lf)
+from kit.config import (LEGACY_PROFILE, PROFILE_KEYS, ConfigError, config_to_json,  # noqa: E402
+                        default_config, effective_profile, full_profile_reasons, lite_blockers,
+                        load_config, variables_markdown)
+from kit.package import (RenderRefused, convert_to_docx, render_package,  # noqa: E402
+                         resolve_templates_dir, write_text_lf)
 from kit.render import RenderError  # noqa: E402
 from kit.wizard import WizardAbort, confirm, run_wizard  # noqa: E402
 
@@ -37,11 +40,47 @@ def _err(message: str) -> None:
     print(message, file=sys.stderr)
 
 
+def _profile_notices(cfg: dict, profile: str, override: Optional[str], config_file: str,
+                     force: bool) -> None:
+    if override is None and "profile" not in cfg:
+        print("Notice: the config has no \"profile\" key; rendering the %s profile (configs "
+              "written by kit 0.1.0 keep rendering as full). Add \"profile\": \"lite\" or "
+              "\"full\" to the config, or pass --profile, to choose." % LEGACY_PROFILE)
+    reasons = full_profile_reasons(cfg)
+    if profile == "lite" and reasons:
+        blocked = bool(lite_blockers(cfg))
+        if blocked and not force:
+            return  # render_package refuses with the reasons
+        print("Warning: hard stop, the full profile is required (the lite documents are "
+              "marked NOT VALID FOR RELEASE):" if blocked else
+              "Warning: the full profile is recommended for these answers:")
+        for reason in reasons:
+            print("  - " + reason)
+        print("  Render full into its own directory: python3 kit.py render --config %s "
+              "--profile full --out output-full" % config_file)
+
+
+def _stale_files(out: Path, written: List[Path]) -> List[str]:
+    """Markdown files under ``out`` that this render did not write."""
+    keep = {p.resolve() for p in written}
+    return sorted(str(p.relative_to(out)) for p in out.rglob("*.md")
+                  if p.is_file() and p.resolve() not in keep)
+
+
 def _render(cfg: dict, args: argparse.Namespace) -> int:
     try:
-        written = render_package(cfg, args.templates, args.out)
+        profile = effective_profile(cfg, args.profile)
+        print("Profile: %s (templates: %s)" % (
+            profile, resolve_templates_dir(args.templates, profile)))
+        force = bool(getattr(args, "force", False))
+        _profile_notices(cfg, profile, args.profile, args.config, force)
+        written = render_package(cfg, args.templates, args.out, profile=profile, force=force,
+                                 config_file=args.config)
     except ConfigError as exc:
         _err("Configuration error: %s" % exc)
+        return EXIT_CONFIG
+    except RenderRefused as exc:
+        _err("Not rendered: %s" % exc)
         return EXIT_CONFIG
     except RenderError as exc:
         _err("Render error: %s" % exc)
@@ -50,6 +89,15 @@ def _render(cfg: dict, args: argparse.Namespace) -> int:
     print("Rendered %d file(s) into %s/" % (len(written), out))
     for path in written:
         print("  " + str(path.relative_to(out)))
+    stale = _stale_files(out, written)
+    if stale:
+        print("Notice: %d Markdown file(s) in %s/ were not written by this render (for example "
+              "from the other profile or an earlier tool list); remove them before filing the "
+              "package:" % (len(stale), out))
+        for rel in stale[:10]:
+            print("  " + rel)
+        if len(stale) > 10:
+            print("  ...")
     if args.docx:
         if convert_to_docx(written):
             return EXIT_RENDER
@@ -60,6 +108,8 @@ def cmd_init(args: argparse.Namespace) -> int:
     cfg_path = Path(args.config)
     if args.defaults:
         cfg = default_config()
+        if args.profile:
+            cfg["profile"] = args.profile
     else:
         defaults = None
         if cfg_path.exists():
@@ -69,7 +119,7 @@ def cmd_init(args: argparse.Namespace) -> int:
             except ConfigError as exc:
                 print("Ignoring %s as defaults (%s)\n" % (cfg_path, exc))
         try:
-            cfg = run_wizard(defaults)
+            cfg = run_wizard(defaults, profile=args.profile)
         except WizardAbort as exc:
             _err("Wizard aborted: %s" % exc)
             return EXIT_CONFIG
@@ -147,21 +197,33 @@ def build_parser() -> argparse.ArgumentParser:
                        help="output directory (default: output)")
         p.add_argument("--docx", action="store_true",
                        help="also convert each .md to .docx with pandoc (if installed)")
-        p.add_argument("--templates", default=str(DEFAULT_TEMPLATES_DIR), metavar="DIR",
-                       help="templates directory (default: the kit's templates/)")
+        p.add_argument("--profile", choices=PROFILE_KEYS, default=None,
+                       help="validation profile: lite (plan, test record and report per tool) "
+                            "or full (in-depth package); overrides the config's \"profile\" "
+                            "(a config without it renders as full)")
+        p.add_argument("--templates", default=None, metavar="DIR",
+                       help="templates directory (default: the kit's templates/<profile>/; a "
+                            "directory with lite/ and full/ subdirectories selects the "
+                            "profile's subdirectory)")
 
-    p_init = sub.add_parser("init", help="run the wizard, write the config and render")
+    p_init = sub.add_parser("init", help="run the wizard, write the config and render "
+                                         "(--profile is stored in the config)")
     p_init.add_argument("--defaults", action="store_true",
                         help="skip the questions and use the default (example) answers")
     p_init.add_argument("--config", default="kit.config.json", metavar="PATH",
                         help="config file to write (default: kit.config.json)")
     p_init.add_argument("--force", action="store_true",
-                        help="overwrite an existing config without asking")
+                        help="overwrite an existing config without asking; render as for "
+                             "'render --force'")
     add_render_options(p_init)
     p_init.set_defaults(func=cmd_init)
 
     p_render = sub.add_parser("render", help="render the package from an existing config")
     p_render.add_argument("--config", required=True, metavar="PATH", help="config file (JSON)")
+    p_render.add_argument("--force", action="store_true",
+                          help="render even if the lite profile has a hard stop (L1, L2, L8, "
+                               "L9: documents marked NOT VALID FOR RELEASE) or the output "
+                               "directory holds the other profile's documents")
     add_render_options(p_render)
     p_render.set_defaults(func=cmd_render)
 
