@@ -6,6 +6,8 @@
 
 **No shadow AI.** AI tools the organisation does not know about (unsanctioned tools, personal accounts, AI-assisted changes nobody declared) cannot be validated, controlled or defended in an audit. Declare every tool, use organisation accounts, and label AI-assisted changes. The tool-discovery checklist and `checks/find_ai_footprint.py` help you find what is already in use.
 
+**Why I built this.** In my work with software and medical-device companies I keep seeing the same thing: every team is already writing code with AI, and many of them have not validated the tools doing it. In a regulated environment that cannot stay that way. This kit is a small first step, not the whole answer: validating the tools is one piece of using AI responsibly in regulated software, next to design controls, risk management, cybersecurity and how you review what the AI produces. I hope it helps. Feedback and contributions are very welcome. Bernardo Plaza, [plazatrillo.es](https://plazatrillo.es)
+
 A ready-to-run kit to validate AI coding assistants as QMS and development software under ISO 13485:2016 (and the FDA QMSR, which incorporates ISO 13485 by reference), with a risk-based, CSA-style approach. A wizard renders a validation package for your organisation, lite or full. Scripts collect the evidence. A model admission suite keeps you validated when the vendor ships a new model.
 
 Version 0.2.0 · Python 3.9+ standard library only · Claude Code and OpenAI Codex supported out of the box, GitHub Copilot, Cursor and other tools through [docs/adapting-other-tools.md](docs/adapting-other-tools.md).
@@ -188,4 +190,4 @@ Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). Changes: [CHANGELOG.md](CHANGE
 
 ---
 
-Maintained by Bernardo Plaza - regulatory, quality and security for software medical devices.
+Maintained by Bernardo Plaza, regulatory, quality and security for software medical devices · [plazatrillo.es](https://plazatrillo.es)

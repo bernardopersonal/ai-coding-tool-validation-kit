@@ -83,3 +83,5 @@ Write a **predetermined change protocol** for models into the validation plan be
 5. Schedule vendor release monitoring and the periodic review.
 
 Not legal advice. Adapt it to your QMS.
+
+Bernardo Plaza · [plazatrillo.es](https://plazatrillo.es)
